@@ -96,8 +96,6 @@ function fileValidator(file: File) {
 }
 
 const baseStyle = {
-  width: "100%",
-  maxWidth: "1000px",
   height: "200px",
   display: "flex",
   flexDirection: "column" as "column", // TypeScript is weird
