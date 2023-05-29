@@ -6,6 +6,8 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "Mu2Mi",
   description: "Generate MIDI multitrack from audio",
+  themeColor: "#ffffff",
+  manifest: "./site.webmanifest",
 };
 
 // Add a navbar to the top of the page

@@ -1,6 +1,6 @@
-import AudioDropzone from "./AudioDropzone";
-import Footer from "./Footer";
-import Navbar from "./Navbar";
+import AudioDropZone from "./AudioDropzone";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import YoutubeUpload from "./YoutubeUpload";
 
 export default function Page() {
@@ -11,7 +11,7 @@ export default function Page() {
         className="flex flex-col gap-2 w-full max-w-screen-xl flex-1"
         role="presentation"
       >
-        <AudioDropzone></AudioDropzone>
+        <AudioDropZone ></AudioDropZone>
         <YoutubeUpload></YoutubeUpload>
       </div>
       <Footer></Footer>
