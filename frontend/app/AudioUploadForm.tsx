@@ -1,4 +1,8 @@
+"use client";
+
 import React from "react";
+
+const maxFileSize = 50 * 1024 * 1024; // 50MB
 
 export default function AudioUploadForm() {
   return (
@@ -7,7 +11,7 @@ export default function AudioUploadForm() {
       className="flex flex-col gap-3 w-full max-w-screen-xl flex-1"
       name="audio-upload-form"
       id="audio-upload-form"
-      action=""
+      action="/"
       method="post"
       encType="multipart/form-data"
     >
@@ -46,6 +50,15 @@ export default function AudioUploadForm() {
             type="file"
             accept=".mp3, .wav, .flac, .aac, .ogg, .m4a"
             className="hidden"
+            onChange={(e) => {
+              if (e.target.files) {
+                const file = e.target.files[0];
+                if (file.size > maxFileSize) {
+                  alert("File is too large");
+                  e.preventDefault();
+                }
+              }
+            }}
           />
         </label>
       </div>
@@ -57,6 +70,7 @@ export default function AudioUploadForm() {
         id="ytb-link"
         name="ytb-link"
         placeholder="Or enter a YouTube link"
+        pattern="^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$"
       />
 
       <button
@@ -65,7 +79,7 @@ export default function AudioUploadForm() {
         type="submit"
       >
         <svg
-          className= "mr-1"
+          className="mr-1"
           xmlns="http://www.w3.org/2000/svg"
           height="24"
           viewBox="0 -960 960 960"
