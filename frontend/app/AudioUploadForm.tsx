@@ -8,10 +8,10 @@ export default function AudioUploadForm() {
   return (
     // action should be the URL that processes the form submission
     <form
-      className="flex flex-col gap-3 w-full max-w-screen-xl flex-1"
+      className="flex flex-col gap-3 w-full max-w-screen-xl"
       name="audio-upload-form"
       id="audio-upload-form"
-      action="/"
+      action="http://127.0.0.1:8000"
       method="post"
       encType="multipart/form-data"
     >
