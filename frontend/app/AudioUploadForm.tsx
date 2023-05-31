@@ -11,7 +11,7 @@ export default function AudioUploadForm() {
       className="flex flex-col gap-3 w-full max-w-screen-xl"
       name="audio-upload-form"
       id="audio-upload-form"
-      action="http://127.0.0.1:8000"
+      action="http://127.0.0.1:6969/api/separate/"
       method="post"
       encType="multipart/form-data"
     >
