@@ -4,19 +4,21 @@ import re
 from spleeter.separator import Separator
 from spleeter.audio import Codec
 
-SPLEETER_16KHZ_5STEMS = "5stems-16kHz"
+SPLEETER_CONFIG = "2stems" # + "-16kHz"
 
-separator = Separator("./config/spleeter/" + SPLEETER_16KHZ_5STEMS + ".json")
+separator = Separator("./config/spleeter/" + SPLEETER_CONFIG + ".json")
+
+OUTPUT_PATH = "./media/separate_2stems/" # + "_16khz/"
 
 # Synchronous separation
 separator.separate_to_file(
     audio_descriptor=\
     "./media/source/jpop/y2mate.com - Mrs GREEN APPLEケセラセラOfficial Music Video.mp3",
-    destination="media/separate/jpop",
+    destination=OUTPUT_PATH + "jpop",
     codec=Codec.MP3,
     bitrate="320k",
     filename_format="{filename}({instrument})[spleeter_"
-    + re.sub(r"-", "_", SPLEETER_16KHZ_5STEMS)
+    + re.sub(r"-", "_", SPLEETER_CONFIG)
     + "].{codec}",
     synchronous=True,
 )
@@ -33,11 +35,11 @@ for audio in audio_sources:
     identifier = audio.split("/")[3]
     separator.separate_to_file(
         audio_descriptor=audio,
-        destination="./media/separate/" + identifier,
+        destination=OUTPUT_PATH + identifier,
         codec=Codec.MP3,
         bitrate="320k",
         filename_format="{filename}({instrument})[spleeter_"
-        + re.sub(r"-", "_", SPLEETER_16KHZ_5STEMS)
+        + re.sub(r"-", "_", SPLEETER_CONFIG)
         + "].{codec}",
         synchronous=False,
     )
