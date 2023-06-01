@@ -35,6 +35,12 @@ class SpleeterModelSeparate(APIView):
             return Response({"error": "File extension not allowed"}, status=400)
         if audio_file.size > SeparateConfig.MAX_FILE_SIZE:
             return Response({"error": "File size too large"}, status=400)
+        
+        # Error if any of the required fields are missing
+        if not request.data.get("model"):
+            return Response({"error": "No model selected"}, status=400)
+        if not request.data.get("tempo"):
+            return Response({"error": "No tempo entered"}, status=400) 
 
         # generate unique identifier
         identifier = str(uuid.uuid4())
@@ -46,7 +52,24 @@ class SpleeterModelSeparate(APIView):
 
         truncated_filename = Path(audio_file.name).stem
 
-        SeparateConfig.separator.separate_to_file(
+        # Select model based on user input
+        match request.data.get("model"):
+            case "2stems":
+                separator = SeparateConfig.separator_2_stems
+            case "2stems-16kHz":
+                separator = SeparateConfig.separator_2_stems_16kHz
+            case "4stems":
+                separator = SeparateConfig.separator_4_stems
+            case "4stems-16kHz":
+                separator = SeparateConfig.separator_4_stems_16kHz
+            case "5stems":
+                separator = SeparateConfig.separator_5_stems
+            case "5stems-16kHz":
+                separator = SeparateConfig.separator_5_stems_16kHz
+            case _:
+                return Response({"error": "Invalid model selected"}, status=400)
+
+        separator.separate_to_file(
             audio_descriptor=file_path,
             destination=SeparateConfig.OUTPUT_PATH + identifier,
             codec=SeparateConfig.OUTPUT_EXTENSION,
@@ -70,6 +93,7 @@ class SpleeterModelSeparate(APIView):
             sonify_midi=False,
             save_model_outputs=False,
             save_notes=False,
+            midi_tempo=float(request.data.get("tempo")),
         )
 
         # Create empty zip file at zip_file_path

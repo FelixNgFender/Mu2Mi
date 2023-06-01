@@ -11,7 +11,12 @@ class SeparateConfig(AppConfig):
     SPLEETER_CONFIG = "5stems" + "-16kHz"
     CONFIG_FOLDER = os.path.join(BASE_DIR, 'separate/config/spleeter/')
     CONFIG_FILE = os.path.join(CONFIG_FOLDER, SPLEETER_CONFIG + ".json")
-    separator = Separator(CONFIG_FILE)
+    separator_2_stems = Separator(CONFIG_FOLDER + "2stems.json")
+    separator_2_stems_16kHz = Separator(CONFIG_FOLDER + "2stems-16kHz.json")
+    separator_4_stems = Separator(CONFIG_FOLDER + "4stems.json")
+    separator_4_stems_16kHz = Separator(CONFIG_FOLDER + "4stems-16kHz.json")
+    separator_5_stems = Separator(CONFIG_FOLDER + "5stems.json")
+    separator_5_stems_16kHz = Separator(CONFIG_FOLDER + "5stems-16kHz.json")
     AUDIO_LOADER = AudioAdapter.default()
     SAMPLE_RATE = 44100
     OUTPUT_PATH = os.path.join(BASE_DIR, 'separate/media/processed/')

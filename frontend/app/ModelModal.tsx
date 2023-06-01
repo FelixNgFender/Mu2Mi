@@ -27,7 +27,13 @@ export default function ModelModal({
           >
             Source separation model
           </label>
-          <select className={inputClasses} id="model" form="audio-upload-form">
+          <select
+            className={inputClasses}
+            name="model"
+            id="model"
+            form="audio-upload-form"
+            required
+          >
             <option value="2stems">
               Spleeter 2 Stems (Vocals & Accompaniment)
             </option>
@@ -56,6 +62,7 @@ export default function ModelModal({
           </label>
           <input
             className={inputClasses}
+            name="tempo"
             id="tempo"
             type="number"
             min="1"
