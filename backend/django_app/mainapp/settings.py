@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "separate",
     "rest_framework",
+    'rest_framework.authtoken',
+    'rest_auth',
 ]
 
 MIDDLEWARE = [
@@ -135,8 +137,3 @@ try:
     from .local_settings import *
 except ImportError:
     pass
-
-#
-MEDIA_URL = "/media/"
-
-MEDIA_ROOT = BASE_DIR / "media"
