@@ -1,10 +1,14 @@
 import re
 import os
+import uuid
+import zipfile
+
+from pathlib import Path
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from spleeter.audio import Codec
+from django.http import FileResponse
 
 # from rest_framework.authentication import TokenAuthentication
 # from rest_framework.permissions import IsAuthenticated
@@ -24,19 +28,29 @@ class SpleeterModelSeparate(APIView):
             audio_file = request.data["ytb-link"]
         else:
             return Response({"error": "No audio file found"}, status=400)
-        # Temporarily save audio file to the desired path
-        file_path = os.path.join(SeparateConfig.SAVE_PATH, audio_file.name)
+
+        if audio_file.name.split(".")[-1] not in SeparateConfig.ALLOWED_EXTENSIONS:
+            return Response({"error": "File extension not allowed"}, status=400)
+        if audio_file.size > SeparateConfig.MAX_FILE_SIZE:
+            return Response({"error": "File size too large"}, status=400)
+
+        # generate unique identifier
+        identifier = str(uuid.uuid4())
+
+        file_path = os.path.join(SeparateConfig.SAVE_PATH, identifier)
+
         with open(file_path, "wb") as file:
             file.write(audio_file.read())
 
-        # Separate audio file
-        identifier = audio_file.name.split(".")[0]
+        truncated_filename = Path(audio_file.name).stem
+
         SeparateConfig.separator.separate_to_file(
             audio_descriptor=file_path,
             destination=SeparateConfig.OUTPUT_PATH + identifier,
-            codec=Codec.MP3,
-            bitrate="320k",
-            filename_format="{filename}({instrument})[spleeter_"
+            codec=SeparateConfig.OUTPUT_EXTENSION,
+            bitrate=SeparateConfig.OUTPUT_BITRATE,
+            filename_format=truncated_filename
+            + "({instrument})[spleeter_"
             + re.sub(r"-", "_", SeparateConfig.SPLEETER_CONFIG)
             + "].{codec}",
             synchronous=True,
@@ -45,5 +59,28 @@ class SpleeterModelSeparate(APIView):
         # Delete source audio file
         os.remove(file_path)
 
-        # Return respons, print Hello World on the browser
-        
+        # Create empty zip file at zip_file_path
+        zip_file_path = os.path.join(SeparateConfig.OUTPUT_PATH + identifier + ".zip")
+
+        zip_file = zipfile.ZipFile(zip_file_path, "w")
+        # write each file from output folder to zip file
+        for file in os.listdir(SeparateConfig.OUTPUT_PATH + identifier):
+            zip_file.write(
+                SeparateConfig.OUTPUT_PATH + identifier + "/" + file,
+                arcname=file,
+                compress_type=zipfile.ZIP_DEFLATED,
+            )
+        zip_file.close()
+
+        # Delete output dir
+        for file in os.listdir(SeparateConfig.OUTPUT_PATH + identifier):
+            os.remove(SeparateConfig.OUTPUT_PATH + identifier + "/" + file)
+        os.rmdir(SeparateConfig.OUTPUT_PATH + identifier)
+
+        # Return zip file
+        response = FileResponse(open(zip_file_path, "rb"), as_attachment=True)
+
+        os.remove(zip_file_path)
+
+        return response
+    
