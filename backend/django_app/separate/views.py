@@ -4,6 +4,7 @@ import uuid
 import zipfile
 
 from pathlib import Path
+from basic_pitch.inference import predict_and_save
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -15,6 +16,7 @@ from django.http import FileResponse
 
 from django.shortcuts import render
 from .apps import SeparateConfig
+
 
 class SpleeterModelSeparate(APIView):
     # authentication_classes = [TokenAuthentication]
@@ -56,13 +58,25 @@ class SpleeterModelSeparate(APIView):
             synchronous=True,
         )
 
-        # Delete source audio file
-        os.remove(file_path)
+        # Pipe each file in output folder through basic pitch
+        audio_paths = [
+            SeparateConfig.OUTPUT_PATH + identifier + "/" + file
+            for file in os.listdir(SeparateConfig.OUTPUT_PATH + identifier)
+        ]
+        predict_and_save(
+            audio_paths,
+            SeparateConfig.OUTPUT_PATH + identifier,
+            save_midi=True,
+            sonify_midi=False,
+            save_model_outputs=False,
+            save_notes=False,
+        )
 
         # Create empty zip file at zip_file_path
         zip_file_path = os.path.join(SeparateConfig.OUTPUT_PATH + identifier + ".zip")
 
         zip_file = zipfile.ZipFile(zip_file_path, "w")
+
         # write each file from output folder to zip file
         for file in os.listdir(SeparateConfig.OUTPUT_PATH + identifier):
             zip_file.write(
@@ -72,15 +86,18 @@ class SpleeterModelSeparate(APIView):
             )
         zip_file.close()
 
+         # Delete source audio file
+        os.remove(file_path)
+
         # Delete output dir
         for file in os.listdir(SeparateConfig.OUTPUT_PATH + identifier):
             os.remove(SeparateConfig.OUTPUT_PATH + identifier + "/" + file)
         os.rmdir(SeparateConfig.OUTPUT_PATH + identifier)
 
-        # Return zip file
+        # Save zip file
         response = FileResponse(open(zip_file_path, "rb"), as_attachment=True)
 
+        # Delete zip file
         os.remove(zip_file_path)
 
         return response
-    

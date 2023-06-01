@@ -1,9 +1,8 @@
 import os
 from spleeter.audio import Codec
-from django.apps import AppConfig
-
 from spleeter.separator import Separator
 from spleeter.audio.adapter import AudioAdapter
+from django.apps import AppConfig
 
 class SeparateConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
