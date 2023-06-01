@@ -10,8 +10,9 @@ export default function AudioUploadForm({
   openModelModal: () => void;
 }) {
   const [fileNames, setFileNames] = useState<string[]>([]);
+  const buttonClasses =
+    "self-center bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center";
   return (
-    // action should be the URL that processes the form submission
     <form
       className="flex flex-col gap-3 w-full max-w-screen-xl"
       name="audio-upload-form"
@@ -87,11 +88,7 @@ export default function AudioUploadForm({
         disabled
       />
 
-      <button
-        className="self-center bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
-        type="button"
-        onClick={openModelModal}
-      >
+      <button className={buttonClasses} type="button" onClick={openModelModal}>
         <span>Continue</span>
         <svg
           xmlns="http://www.w3.org/2000/svg"
