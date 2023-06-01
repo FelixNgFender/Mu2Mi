@@ -69,8 +69,9 @@ export default function AudioUploadForm() {
         type="url"
         id="ytb-link"
         name="ytb-link"
-        placeholder="Or enter a YouTube link"
+        placeholder="Split stems from YouTube link (coming soon)"
         pattern="^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$"
+        disabled
       />
 
       <button
