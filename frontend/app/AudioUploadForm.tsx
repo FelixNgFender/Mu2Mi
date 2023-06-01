@@ -1,11 +1,15 @@
 "use client";
 
-import React from "react";
+import { useState } from "react";
 
 const maxFileSize = 50 * 1024 * 1024; // 50MB
 
-export default function AudioUploadForm() {
-  const [fileNames, setFileNames] = React.useState<string[]>([]);
+export default function AudioUploadForm({
+  openModelModal,
+}: {
+  openModelModal: () => void;
+}) {
+  const [fileNames, setFileNames] = useState<string[]>([]);
   return (
     // action should be the URL that processes the form submission
     <form
@@ -85,19 +89,18 @@ export default function AudioUploadForm() {
 
       <button
         className="self-center bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
-        form="audio-upload-form"
-        type="submit"
+        type="button"
+        onClick={openModelModal}
       >
+        <span>Continue</span>
         <svg
-          className="mr-1"
           xmlns="http://www.w3.org/2000/svg"
           height="24"
           viewBox="0 -960 960 960"
           width="24"
         >
-          <path d="M220-160q-24 0-42-18t-18-42v-143h60v143h520v-143h60v143q0 24-18 42t-42 18H220Zm230-153v-371L330-564l-43-43 193-193 193 193-43 43-120-120v371h-60Z" />
+          <path d="m375-240-43-43 198-198-198-198 43-43 241 241-241 241Z" />
         </svg>
-        <span>Submit</span>
       </button>
     </form>
   );
