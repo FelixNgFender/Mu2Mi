@@ -11,16 +11,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import FileResponse
 
-# from rest_framework.authentication import TokenAuthentication
-# from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from django.shortcuts import render
 from .apps import SeparateConfig
 
 
 class SpleeterModelSeparate(APIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
         # frontend form has "upload" and "ytb-link" fields, prioritizing "upload"

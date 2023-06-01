@@ -14,6 +14,16 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
+# Monkey patching for weird bug in Django 4
+# https://stackoverflow.com/questions/70382084/import-error-force-text-from-django-utils-encoding
+# Also that you also fixed ugettext_lazy to gettext_lazy in
+# .venv/lib/python3.10/site-packages/rest_auth/views.py and
+# .venv/lib/python3.10/site-packages/rest_auth/serializers.py
+import django
+from django.utils.encoding import force_str
+
+django.utils.encoding.force_text = force_str
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,13 +51,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "separate",
     "rest_framework",
-    'rest_framework.authtoken',
-    'rest_auth',
+    "rest_framework.authtoken",
+    "rest_auth",
+    'corsheaders',
+    "separate",
+    "users",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
