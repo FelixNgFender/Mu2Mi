@@ -5,6 +5,7 @@ import React from "react";
 const maxFileSize = 50 * 1024 * 1024; // 50MB
 
 export default function AudioUploadForm() {
+  const [fileNames, setFileNames] = React.useState<string[]>([]);
   return (
     // action should be the URL that processes the form submission
     <form
@@ -18,7 +19,7 @@ export default function AudioUploadForm() {
       <div className="flex items-center justify-center">
         <label
           htmlFor="upload"
-          className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-white hover:bg-slate-50  "
+          className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-white hover:bg-slate-50"
         >
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             <svg
@@ -44,6 +45,11 @@ export default function AudioUploadForm() {
               MP3, WAV, FLAC, AAC, OGG, or M4A (MAX. 50MB)
             </p>
           </div>
+          <div className="flex items-center justify-center w-full h-12 text-center border-t border-gray-200">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {fileNames.length > 0 ? fileNames[0] : "No file selected"}
+            </p>
+          </div>
           <input
             name="upload"
             id="upload"
@@ -53,9 +59,12 @@ export default function AudioUploadForm() {
             onChange={(e) => {
               if (e.target.files) {
                 const file = e.target.files[0];
+                if (!file) return;
                 if (file.size > maxFileSize) {
                   alert("File is too large");
                   e.preventDefault();
+                } else {
+                  setFileNames([file.name]);
                 }
               }
             }}
