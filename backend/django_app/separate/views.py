@@ -51,6 +51,14 @@ class SpleeterModelSeparate(APIView):
         # generate unique identifier
         identifier = str(uuid.uuid4())
 
+        # make source path and process path if they don't exist
+        if not os.path.exists(SeparateConfig.MEDIA_PATH):
+            os.makedirs(SeparateConfig.MEDIA_PATH)
+        if not os.path.exists(SeparateConfig.SAVE_PATH):
+            os.makedirs(SeparateConfig.SAVE_PATH)
+        if not os.path.exists(SeparateConfig.OUTPUT_PATH):
+            os.makedirs(SeparateConfig.OUTPUT_PATH)
+
         file_path = os.path.join(SeparateConfig.SAVE_PATH, identifier)
 
         with open(file_path, "wb") as file:

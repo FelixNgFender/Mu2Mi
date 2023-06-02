@@ -19,8 +19,9 @@ class SeparateConfig(AppConfig):
     separator_5_stems_16kHz = Separator(CONFIG_FOLDER + "5stems-16kHz.json")
     AUDIO_LOADER = AudioAdapter.default()
     SAMPLE_RATE = 44100
-    OUTPUT_PATH = os.path.join(BASE_DIR, 'separate/media/processed/')
-    SAVE_PATH = os.path.join(BASE_DIR, 'separate/media/source/')
+    MEDIA_PATH = os.path.join(BASE_DIR, 'separate/media/')
+    OUTPUT_PATH = os.path.join(MEDIA_PATH, 'processed/')
+    SAVE_PATH = os.path.join(MEDIA_PATH, 'source/')
     ALLOWED_EXTENSIONS = ["mp3", "wav", "flac", "aac", "ogg", "m4a"]
     OUTPUT_EXTENSION = Codec.MP3
     MAX_FILE_SIZE = 50000000 # 50MB
