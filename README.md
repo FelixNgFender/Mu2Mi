@@ -4,7 +4,7 @@
   </div>
   <div style="background-color: #FB5A00; width: 2px; margin-bottom: 5px"></div>
   <div style="flex: 1;">
-    <img src="docs/ムツミ_Final.svg" alt="Mu2Mi Japanese logo" title="Mu2Mi Japanese logo">
+    <img src="docs/ムツミ.svg" alt="Mu2Mi Japanese logo" title="Mu2Mi Japanese logo">
   </div>
 </div>
 
