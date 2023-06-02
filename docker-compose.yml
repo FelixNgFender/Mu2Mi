@@ -11,7 +11,7 @@ services:
       - 8000
     env_file:
       - ./backend/.env
-    command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn mainapp.wsgi:application --bind 0.0.0.0:8000 --timeout=300
     depends_on:
       - db
   db:
@@ -43,7 +43,7 @@ services:
       - django_static_volume:/usr/src/app/django_files/static
       - next_static_volume:/usr/src/app/next_files/static
     ports:
-      - 8080:80
+      - 8000:80
     depends_on:
       - next
 
