@@ -23,6 +23,12 @@ class SpleeterModelSeparate(APIView):
     # permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
+        # Remove output and source folders and recreate them
+        os.system("rm -rf " + SeparateConfig.OUTPUT_PATH)
+        os.system("rm -rf " + SeparateConfig.SAVE_PATH)
+        os.system("mkdir " + SeparateConfig.OUTPUT_PATH)
+        os.system("mkdir " + SeparateConfig.SAVE_PATH)
+
         # frontend form has "upload" and "ytb-link" fields, prioritizing "upload"
         if request.data.get("upload"):
             audio_file = request.data["upload"]
