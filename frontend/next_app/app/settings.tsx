@@ -1,4 +1,4 @@
-let API_SERVER_VAL: string = "";
+let API_SERVER_VAL: string | undefined = "";
 
 switch (process.env.NODE_ENV) {
   case "development":
