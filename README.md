@@ -150,7 +150,7 @@ To use Mu2Mi, follow these steps:
    docker compose up
    ```
 
-8. Access Mu2Mi in your web browser at [http://localhost:8000/](http://localhost:8000/).
+8. Access Mu2Mi in your web browser at [http://localhost:80/](http://localhost:80/).
 
 9. Upload an audio file and wait for approximately 1-2 minutes.
 
