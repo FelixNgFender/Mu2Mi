@@ -18,9 +18,9 @@ Mu2Mi can be installed with or without Docker. However, we recommend using Docke
 
 ## Platform Support
 
-Mu2Mi local installation has only been tested on WSL2 (Windows Subsystem for Linux) using Ubuntu 22.04.2 LTS. It may work on other platforms, but we cannot guarantee that it will.
+Mu2Mi local installation (both methods) has only been tested on WSL2 (Windows Subsystem for Linux) using Ubuntu 22.04.2 LTS. It may work on other platforms, but we cannot guarantee that it will.
 
-> **Note**: For Windows installation, `backend\entrypoint.sh` must be converted to `LF` line endings before building the Docker image. This can be done using any text editor that supports line ending conversion. However, Windows is currently not supported due to Python dependency issues.
+> **Note**: For Windows installation with Docker, `backend\entrypoint.sh` must be converted to `LF` line endings before building the Docker image. This can be done using any text editor that supports line ending conversion. However, Windows installation without Docker is currently not supported due to Python dependency issues.
 
 ## Installation with Docker
 
