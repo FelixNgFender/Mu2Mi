@@ -32,7 +32,7 @@ services:
       - 3000
     env_file:
       - .env
-    command: node server.js
+    command: node server.js -p 3000
     depends_on:
       - django
 
@@ -43,7 +43,7 @@ services:
       - django_static_volume:/usr/src/app/django_files/static
       - next_static_volume:/usr/src/app/next_files/static
     ports:
-      - 8000:80
+      - 80:80
     depends_on:
       - next
 

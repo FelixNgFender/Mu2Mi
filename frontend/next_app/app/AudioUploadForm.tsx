@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { API_SERVER } from "./settings";
 
 const maxFileSize = 50 * 1024 * 1024; // 50MB
 
@@ -17,7 +18,7 @@ export default function AudioUploadForm({
       className="flex flex-col gap-3 w-full max-w-screen-xl"
       name="audio-upload-form"
       id="audio-upload-form"
-      action="http://127.0.0.1:8000/api/separate/"
+      action={`${API_SERVER}/api/separate/`}
       method="post"
       encType="multipart/form-data"
     >
