@@ -16,6 +16,12 @@ It utilizes [Spleeter](https://github.com/deezer/spleeter) to perform source sep
 
 Mu2Mi can be installed with or without Docker. However, we recommend using Docker as it is the easiest way to get started.
 
+## Platform Support
+
+Mu2Mi local installation has only been tested on WSL2 (Windows Subsystem for Linux) using Ubuntu 22.04.2 LTS. It may work on other platforms, but we cannot guarantee that it will.
+
+> **Note**: For Windows installation, `backend\entrypoint.sh` must be converted to `LF` line endings before building the Docker image. This can be done using any text editor that supports line ending conversion. However, Windows is currently not supported due to Python dependency issues.
+
 ## Installation with Docker
 
 To use Mu2Mi, follow these steps:
@@ -228,9 +234,9 @@ To use Mu2Mi, follow these steps:
 
 10. Start the Next.js development server:
 
-   ```shell
-   npm run dev
-   ```
+```shell
+npm run dev
+```
 
 11. Access Mu2Mi in your web browser at [http://localhost:3000/](http://localhost:3000/).
 
