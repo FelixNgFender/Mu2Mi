@@ -10,7 +10,7 @@
 
 # Mu2Mi: MIDI Multitrack Generation from Audio
 
-Mu2Mi is a web application that generates isolated stem tracks of vocal, accompaniment, bass, and drum from any audio file (preferably songs c:).
+Mu2Mi is a web application that generates isolated stem tracks and MIDI data of vocal, accompaniment, bass, and drum from any audio file (preferably songs c:).
 
 It utilizes [Spleeter](https://github.com/deezer/spleeter) to perform source separation and [Basic Pitch](https://github.com/spotify/basic-pitch) to generate MIDI files from the separated audio. The application is built using [Django](https://www.djangoproject.com/) and [Next.js](https://nextjs.org/) and packaged using [Docker](https://www.docker.com/).
 
