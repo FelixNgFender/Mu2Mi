@@ -18,7 +18,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(255), nullable=False, index=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
-    password = Column(String(255), nullable=False)
+    password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
 
     tracks = relationship("Track", back_populates="user")

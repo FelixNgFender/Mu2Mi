@@ -24,8 +24,10 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 def create_user(db: Session, user: schemas.UserCreate):
     """Create a new user"""
     # TODO: Implement real password hashing
-    fake_hashed_password = user.password + "notreallyhashed"
-    db_user = models.User(email=user.email, hashed_password=fake_hashed_password)
+    fake_password_hash = user.password + "notreallyhashed"
+    db_user = models.User(
+        username=user.username, email=user.email, password_hash=fake_password_hash
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -60,9 +62,11 @@ def get_user_tracks(db: Session, user_id: int, skip: int = 0, limit: int = 100):
     )
 
 
-def create_user_track(db: Session, track: schemas.TrackCreate, user_id: int):
+def create_user_track(
+    db: Session, track: schemas.TrackCreate, user_id: int, algorithm_id: int
+):
     """Create a new track for a user"""
-    db_item = models.Track(**track.dict(), user_id=user_id)
+    db_item = models.Track(**track.dict(), user_id=user_id, algorithm_id=algorithm_id)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -76,6 +80,8 @@ def delete_user_track(db: Session, track_id: int, user_id: int):
         .filter(models.Track.id == track_id, models.Track.user_id == user_id)
         .first()
     )
+    if db_item is None:
+        return None
     db.delete(db_item)
     db.commit()
     return db_item

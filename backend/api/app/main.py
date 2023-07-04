@@ -86,10 +86,15 @@ def read_user_tracks(
 
 @app.post("/api/users/{user_id}/tracks/", response_model=schemas.Track)
 def create_track_for_user(
-    user_id: int, track: schemas.TrackCreate, db: Session = Depends(get_db)
+    user_id: int,
+    algorithm_id: int,
+    track: schemas.TrackCreate,
+    db: Session = Depends(get_db),
 ):
     """Create a new track for a user"""
-    return crud.create_user_track(db=db, track=track, user_id=user_id)
+    return crud.create_user_track(
+        db=db, track=track, user_id=user_id, algorithm_id=algorithm_id
+    )
 
 
 @app.delete("/api/users/{user_id}/tracks/{track_id}", response_model=schemas.Track)
