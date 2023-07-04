@@ -1,6 +1,0 @@
-.vscode
-*.log
-*.pot
-*.pyc
-__pycache__/
-**/static/*
