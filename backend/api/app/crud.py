@@ -1,7 +1,8 @@
 """CRUD utilities for interacting with the database"""
 from sqlalchemy.orm import Session
 
-from . import models, schemas
+import models
+import schemas
 
 # pylint: disable=invalid-name
 

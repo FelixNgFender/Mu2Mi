@@ -1,20 +1,12 @@
 """Database connection and session management module."""
 
-import os
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-load_dotenv()
-
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
-
-if SQLALCHEMY_DATABASE_URL is None:
-    raise ValueError("DATABASE_URL environment variable is not set.")
+from config import settings
 
 # Create the SQLAlchemy engine
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(settings.sqlalchemy_database_url)
 # Each instance of the SessionLocal class will be a database session
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Inherit from this class to create database models or classes
