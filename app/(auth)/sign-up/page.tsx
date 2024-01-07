@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FaGithub, FaFacebook, FaGoogle } from "react-icons/fa";
+import { Icons } from "@/components/icons";
 
 import {
   Card,
@@ -29,7 +29,7 @@ const SignUpPage = async () => {
             className={cn(buttonVariants({ variant: "outline" }), "flex")}
           >
             <span>
-              <FaGoogle className="mr-2 h-4 w-4" />
+              <Icons.google className="mr-2 h-4 w-4" />
             </span>
             <span>Sign up with Google</span>
           </Link>
@@ -38,7 +38,7 @@ const SignUpPage = async () => {
             className={buttonVariants({ variant: "outline" })}
           >
             <span>
-              <FaFacebook className="mr-2 h-4 w-4" />
+              <Icons.facebook className="mr-2 h-4 w-4" />
             </span>
             <span>Sign up with Facebook</span>
           </Link>
@@ -47,7 +47,7 @@ const SignUpPage = async () => {
             className={buttonVariants({ variant: "outline" })}
           >
             <span>
-              <FaGithub className="mr-2 h-4 w-4" />
+              <Icons.gitHub className="mr-2 h-4 w-4" />
             </span>
             <span>Sign up with GitHub</span>
           </Link>

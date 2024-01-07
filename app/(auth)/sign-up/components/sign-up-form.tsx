@@ -43,6 +43,8 @@ const signUpSchema = z
   });
 
 export const SignUpForm = () => {
+
+  // TODO: <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
   // 1. Define your form.
   const router = useRouter();
   const form = useForm<z.infer<typeof signUpSchema>>({

@@ -32,7 +32,6 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.49.2",
-    "react-icons": "^4.12.0",
     "redis": "^4.6.12",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
