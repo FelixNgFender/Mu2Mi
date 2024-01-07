@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    restart: unless-stopped
+    env_file:
+      - .env.local
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sh:/docker-entrypoint-initdb.d/init.sh
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"
+        ]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    env_file:
+      - .env.local
+    volumes:
+      - redis-data:/data
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
