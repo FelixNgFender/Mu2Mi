@@ -23,11 +23,7 @@ const SignInPage = async () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>
-                    <h4 className="text-xl font-bold md:text-2xl">
-                        Welcome back
-                    </h4>
-                </CardTitle>
+                <CardTitle>Welcome back</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">
                 <div className="inline-flex w-full flex-col space-y-2 overflow-hidden md:space-y-4">

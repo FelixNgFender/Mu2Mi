@@ -12,11 +12,7 @@ const PasswordResetPage = async () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>
-                    <h4 className="text-xl font-bold md:text-2xl">
-                        Forgot your password?
-                    </h4>
-                </CardTitle>
+                <CardTitle>Forgot your password?</CardTitle>
                 <CardDescription>
                     <p className="text-sm text-muted-foreground">
                         Enter the email address associated with your account,

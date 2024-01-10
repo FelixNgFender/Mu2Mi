@@ -17,11 +17,7 @@ const EmailVerificationPage = async () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>
-                    <h4 className="text-xl font-bold md:text-2xl">
-                        Email verification
-                    </h4>
-                </CardTitle>
+                <CardTitle>Email verification</CardTitle>
                 <CardDescription>
                     <p className="text-sm text-muted-foreground">
                         Your email verification link was sent to your inbox.

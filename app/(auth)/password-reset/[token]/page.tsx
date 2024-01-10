@@ -19,11 +19,7 @@ const SignUpPage = async ({
     return (
         <Card>
             <CardHeader>
-                <CardTitle>
-                    <h4 className="text-xl font-bold md:text-2xl">
-                        Set your new password
-                    </h4>
-                </CardTitle>
+                <CardTitle>Set your new password</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">
                 <NewPasswordForm token={params.token} />
