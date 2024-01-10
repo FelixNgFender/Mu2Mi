@@ -1,4 +1,5 @@
 import { googleAuth } from '@/app/_server/auth';
+import { env } from '@/lib/env';
 import * as context from 'next/headers';
 import type { NextRequest } from 'next/server';
 
@@ -8,7 +9,7 @@ export const GET = async (request: NextRequest) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         path: '/',
-        maxAge: 60 * 60,
+        maxAge: env.AUTH_COOKIE_DURATION_S,
     });
     return new Response(null, {
         status: 302,

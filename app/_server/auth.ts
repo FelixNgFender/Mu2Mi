@@ -1,3 +1,4 @@
+import { env } from '@/lib/env';
 import { postgres as postgresAdapter } from '@lucia-auth/adapter-postgresql';
 import { redis as redisAdapter } from '@lucia-auth/adapter-session-redis';
 import { apple, facebook, google, twitter } from '@lucia-auth/oauth/providers';
@@ -36,9 +37,9 @@ export const auth = lucia({
 });
 
 export const googleAuth = google(auth, {
-    clientId: process.env.GOOGLE_CLIENT_ID || '',
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    redirectUri: process.env.GOOGLE_REDIRECT_URI || '',
+    clientId: env.GOOGLE_CLIENT_ID,
+    clientSecret: env.GOOGLE_CLIENT_SECRET,
+    redirectUri: env.GOOGLE_REDIRECT_URI,
     scope: [
         'https://www.googleapis.com/auth/userinfo.email',
         'https://www.googleapis.com/auth/userinfo.profile',
@@ -47,38 +48,39 @@ export const googleAuth = google(auth, {
 });
 
 // TODO: Implement routes
-export const facebookAuth = facebook(auth, {
-    clientId: process.env.FACEBOOK_CLIENT_ID || '',
-    clientSecret: process.env.FACEBOOK_CLIENT_SECRET || '',
-    redirectUri: process.env.FACEBOOK_REDIRECT_URI || '',
-    scope: ['email', 'public_profile'],
-});
+// TODO: Get new client ID and secret
+// export const facebookAuth = facebook(auth, {
+//     clientId: env.FACEBOOK_CLIENT_ID,
+//     clientSecret: env.FACEBOOK_CLIENT_SECRET,
+//     redirectUri: env.FACEBOOK_REDIRECT_URI,
+//     scope: ['email', 'public_profile'],
+// });
 
 // TODO: Implement routes
 // const certificatePath = path.join(
 //     process.cwd(),
-//     process.env.APPLE_CERT_PATH ?? '',
+//     env.APPLE_CERT_PATH ?? '',
 // );
 
 // const certificate = fs.readFileSync(certificatePath, 'utf-8');
 
 // export const appleAuth = apple(auth, {
-//     clientId: process.env.APPLE_CLIENT_ID || '',
-//     redirectUri: process.env.APPLE_REDIRECT_URI || '',
-//     teamId: process.env.APPLE_TEAM_ID || '',
-//     keyId: process.env.APPLE_KEY_ID || '',
+//     clientId: env.APPLE_CLIENT_ID || '',
+//     redirectUri: env.APPLE_REDIRECT_URI || '',
+//     teamId: env.APPLE_TEAM_ID || '',
+//     keyId: env.APPLE_KEY_ID || '',
 //     certificate,
 //     scope: ['email', 'name'],
 //     responseMode: 'form_post',
 // });
 
 // TODO: Implement routes
-export const twitterAuth = twitter(auth, {
-    clientId: process.env.TWITTER_CLIENT_ID || '',
-    clientSecret: process.env.TWITTER_CLIENT_SECRET || '',
-    redirectUri: process.env.TWITTER_REDIRECT_URI || '',
-    scope: ['email', 'public_profile'],
-});
+// export const twitterAuth = twitter(auth, {
+//     clientId: env.TWITTER_CLIENT_ID,
+//     clientSecret: env.TWITTER_CLIENT_SECRET,
+//     redirectUri: env.TWITTER_REDIRECT_URI,
+//     scope: ['email', 'public_profile'],
+// });
 
 export type Auth = typeof auth;
 

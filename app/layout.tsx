@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@/app/_providers/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
+import { env } from '@/lib/env';
 import { cn } from '@/lib/utils';
 import '@/styles/globals.css';
 import { Metadata } from 'next';
@@ -12,7 +13,7 @@ export const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-    metadataBase: new URL(process.env.ORIGIN ?? 'http://localhost:3000'),
+    metadataBase: new URL(env.ORIGIN),
 };
 
 export default function RootLayout({

@@ -3,11 +3,11 @@ import {
     emailVerification as emailVerificationTable,
     passwordReset as passwordResetTable,
 } from '@/app/_server/schema';
+import { env } from '@/lib/env';
 import { eq } from 'drizzle-orm';
 import { generateRandomString, isWithinExpiration } from 'lucia/utils';
 
-const TOKEN_EXPIRES_IN_MS =
-    (Number(process.env.TOKEN_EXPIRES_IN_S) || 7200) * 1000;
+const TOKEN_DURATION_MS = env.TOKEN_DURATION_S * 1000;
 
 export const generateEmailVerificationToken = async (userId: string) => {
     const storedUserTokens = await db
@@ -19,7 +19,7 @@ export const generateEmailVerificationToken = async (userId: string) => {
             // check if expiration is within 1 hour
             // and reuse the token if true
             return isWithinExpiration(
-                Number(token.expires) - TOKEN_EXPIRES_IN_MS / 2,
+                Number(token.expires) - TOKEN_DURATION_MS / 2,
             );
         });
         if (reusableStoredToken) return reusableStoredToken.id;
@@ -28,7 +28,7 @@ export const generateEmailVerificationToken = async (userId: string) => {
     await db.insert(emailVerificationTable).values({
         id: token,
         userId: userId,
-        expires: new Date().getTime() + TOKEN_EXPIRES_IN_MS,
+        expires: new Date().getTime() + TOKEN_DURATION_MS,
     });
 
     return token;
@@ -63,7 +63,7 @@ export const generatePasswordResetToken = async (userId: string) => {
             // check if expiration is within 1 hour
             // and reuse the token if true
             return isWithinExpiration(
-                Number(token.expires) - TOKEN_EXPIRES_IN_MS / 2,
+                Number(token.expires) - TOKEN_DURATION_MS / 2,
             );
         });
         if (reusableStoredToken) return reusableStoredToken.id;
@@ -72,7 +72,7 @@ export const generatePasswordResetToken = async (userId: string) => {
     await db.insert(passwordResetTable).values({
         id: token,
         userId: userId,
-        expires: new Date().getTime() + TOKEN_EXPIRES_IN_MS,
+        expires: new Date().getTime() + TOKEN_DURATION_MS,
     });
     return token;
 };

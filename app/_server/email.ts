@@ -22,17 +22,17 @@
 // 	});
 // };
 // import { ServerClient } from 'postmark';
-import { stringToBoolean } from '@/lib/utils';
+import { env } from '@/lib/env';
 
-// const transporter = new ServerClient(process.env.POSTMARK_API_KEY);
+// const transporter = new ServerClient(env.POSTMARK_API_KEY);
 
 export const sendEmailVerificationLink = async (
     email: string,
     token: string,
 ) => {
-    const url = `${process.env.ORIGIN}/email-verification/${token}`;
+    const url = `${env.ORIGIN}/email-verification/${token}`;
 
-    if (!stringToBoolean(process.env.ENABLE_EMAIL)) {
+    if (!env.ENABLE_EMAIL) {
         console.log('====================================');
         console.log('New email received at: ', email);
         console.log('Your email verification link is: ', `${url}`);
@@ -41,20 +41,20 @@ export const sendEmailVerificationLink = async (
     }
 
     // transporter.sendEmail({
-    //     From: process.env.EMAIL_VERIFY,
+    //     From: env.EMAIL_VERIFY,
     //     To: email,
     //     Subject: 'Email Verification',
     //     TextBody: `Click this link to verify your email: ${url}`,
     //     HtmlBody: `<a href="${url}">Click this link to verify your email</a>`,
-    //     MessageStream: process.env.POSTMARK_MESSAGE_STREAM,
+    //     MessageStream: env.POSTMARK_MESSAGE_STREAM,
     //     Tag: 'email-verification',
     // });
 };
 
 export const sendPasswordResetLink = async (email: string, token: string) => {
-    const url = `${process.env.ORIGIN}/password-reset/${token}`;
+    const url = `${env.ORIGIN}/password-reset/${token}`;
 
-    if (!stringToBoolean(process.env.ENABLE_EMAIL)) {
+    if (env.ENABLE_EMAIL) {
         console.log('====================================');
         console.log('New email received at: ', email);
         console.log('Your password reset link is: ', `${url}`);
@@ -63,7 +63,7 @@ export const sendPasswordResetLink = async (email: string, token: string) => {
     }
 
     // transporter.sendEmail({
-    //     From: process.env.EMAIL_VERIFY,
+    //     From: env.EMAIL_VERIFY,
     //     To: email,
     //     Subject: 'Password Reset',
     //     TextBody: `Click this link to reset your password: ${url}`,

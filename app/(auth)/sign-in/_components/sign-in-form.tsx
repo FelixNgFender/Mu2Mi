@@ -32,7 +32,7 @@ export const SignInForm = () => {
         defaultValues: {
             email: '',
             password: '',
-            rememberMe: true,
+            rememberMe: false,
         },
     });
 
@@ -59,7 +59,7 @@ export const SignInForm = () => {
                 }
             }
         }
-        if (response.status === 500) {
+        if (response.status === 500 || response.status === 429) {
             const responseData = await response.json();
             toast({
                 variant: 'destructive',

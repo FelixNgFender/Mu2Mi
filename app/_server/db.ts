@@ -1,4 +1,4 @@
-import { stringToBoolean } from '@/lib/utils';
+import { env } from '@/lib/env';
 import { type PostgresJsDatabase, drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { type RedisClientType, createClient } from 'redis';
@@ -28,15 +28,15 @@ import { type RedisClientType, createClient } from 'redis';
 //     globalThis.hasAddedShutdownListeners = true;
 // }
 
-export const queryClient = postgres(process.env.DATABASE_URL || '');
+export const queryClient = postgres(env.DATABASE_URL);
 export const db: PostgresJsDatabase = drizzle(queryClient, {
-    logger: stringToBoolean(process.env.APP_DEBUG),
+    logger: env.APP_DEBUG,
 });
 
 const globalForRedis = global as unknown as { redisClient: RedisClientType };
 
 export const redisClient =
-    globalForRedis.redisClient ?? createClient({ url: process.env.REDIS_URL });
+    globalForRedis.redisClient ?? createClient({ url: env.REDIS_URL });
 
 if (process.env.NODE_ENV === 'development') {
     globalForRedis.redisClient = redisClient;
