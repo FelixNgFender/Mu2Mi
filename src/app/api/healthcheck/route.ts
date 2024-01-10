@@ -1,4 +1,4 @@
-import { queryClient, redisClient } from '@/src/app/_server/db';
+import { queryClient, redisClient } from '@/src/server/db';
 
 export const dynamic = 'force-dynamic';
 

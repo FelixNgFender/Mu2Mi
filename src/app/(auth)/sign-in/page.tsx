@@ -1,4 +1,4 @@
-import { getPageSession } from '@/src/app/_server/auth';
+import { getPageSession } from '@/src/server/auth';
 import { Icons } from '@/src/components/icons';
 import { buttonVariants } from '@/src/components/ui/button';
 import {

@@ -1,6 +1,6 @@
-import { auth, googleAuth } from '@/src/app/_server/auth';
-import { db } from '@/src/app/_server/db';
-import { user as userTable } from '@/src/app/_server/schema';
+import { auth, googleAuth } from '@/src/server/auth';
+import { db } from '@/src/server/db';
+import { user as userTable } from '@/src/server/schema';
 import { OAuthRequestError } from '@lucia-auth/oauth';
 import { eq } from 'drizzle-orm';
 import { cookies, headers } from 'next/headers';

@@ -1,6 +1,6 @@
-import { auth } from '@/src/app/_server/auth';
-import { sendEmailVerificationLink } from '@/src/app/_server/email';
-import { generateEmailVerificationToken } from '@/src/app/_server/token';
+import { auth } from '@/src/server/auth';
+import { sendEmailVerificationLink } from '@/src/server/email';
+import { generateEmailVerificationToken } from '@/src/server/token';
 import type { NextRequest } from 'next/server';
 
 export const POST = async (request: NextRequest) => {

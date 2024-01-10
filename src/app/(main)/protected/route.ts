@@ -1,4 +1,4 @@
-import { auth } from '@/src/app/_server/auth';
+import { auth } from '@/src/server/auth';
 import * as context from 'next/headers';
 import type { NextRequest } from 'next/server';
 

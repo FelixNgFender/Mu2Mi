@@ -2,14 +2,14 @@ import {
     signInSchemaServer,
     signInSchemaServerType,
 } from '@/src/app/_schemas/server/sign-in';
-import { auth } from '@/src/app/_server/auth';
+import { auth } from '@/src/server/auth';
 import { env } from '@/src/lib/env';
 // import {
 //     TooManyRequestsError,
 //     deviceCookie,
 //     isValidateDeviceCookie,
 //     loginTimeout,
-// } from '@/src/app/_server/throttle';
+// } from '@/src/server/throttle';
 import { generateRandomString } from 'lucia/utils';
 import * as context from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';

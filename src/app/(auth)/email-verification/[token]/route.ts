@@ -1,5 +1,5 @@
-import { auth } from '@/src/app/_server/auth';
-import { validateEmailVerificationToken } from '@/src/app/_server/token';
+import { auth } from '@/src/server/auth';
+import { validateEmailVerificationToken } from '@/src/server/token';
 import type { NextRequest } from 'next/server';
 
 export const GET = async (

@@ -1,6 +1,6 @@
 import { signUpSchemaClient } from '@/src/app/_schemas/client/sign-up';
-import { db } from '@/src/app/_server/db';
-import { user as userTable } from '@/src/app/_server/schema';
+import { db } from '@/src/server/db';
+import { user as userTable } from '@/src/server/schema';
 import { eq } from 'drizzle-orm';
 import * as z from 'zod';
 

@@ -1,5 +1,5 @@
 import { signInSchemaClient } from '@/src/app/_schemas/client/sign-in';
-import { auth } from '@/src/app/_server/auth';
+import { auth } from '@/src/server/auth';
 import * as z from 'zod';
 
 /**

@@ -1,8 +1,8 @@
-import { db } from '@/src/app/_server/db';
+import { db } from '@/src/server/db';
 import {
     emailVerification as emailVerificationTable,
     passwordReset as passwordResetTable,
-} from '@/src/app/_server/schema';
+} from '@/src/server/schema';
 import { env } from '@/src/lib/env';
 import { eq } from 'drizzle-orm';
 import { generateRandomString, isWithinExpiration } from 'lucia/utils';
