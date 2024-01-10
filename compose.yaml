@@ -9,7 +9,7 @@ services:
             - .env.local
         volumes:
             - postgres-data:/var/lib/postgresql/data
-            - ./postgres/init.sh:/docker-entrypoint-initdb.d/init.sh
+            - ./docker/init-postgres.sh:/docker-entrypoint-initdb.d/init.sh
         ports:
             - ${POSTGRES_PORT}:${POSTGRES_PORT}
         healthcheck:
