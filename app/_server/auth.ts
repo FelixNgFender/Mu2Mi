@@ -46,6 +46,7 @@ export const googleAuth = google(auth, {
     ],
 });
 
+// TODO: Implement routes
 export const facebookAuth = facebook(auth, {
     clientId: process.env.FACEBOOK_CLIENT_ID || '',
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET || '',
@@ -53,6 +54,7 @@ export const facebookAuth = facebook(auth, {
     scope: ['email', 'public_profile'],
 });
 
+// TODO: Implement routes
 // const certificatePath = path.join(
 //     process.cwd(),
 //     process.env.APPLE_CERT_PATH ?? '',
@@ -70,6 +72,7 @@ export const facebookAuth = facebook(auth, {
 //     responseMode: 'form_post',
 // });
 
+// TODO: Implement routes
 export const twitterAuth = twitter(auth, {
     clientId: process.env.TWITTER_CLIENT_ID || '',
     clientSecret: process.env.TWITTER_CLIENT_SECRET || '',
