@@ -20,11 +20,13 @@ import { useToast } from '@/components/ui/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 export const PasswordResetForm = () => {
     // 1. Define your form.
     const { toast } = useToast();
+    const router = useRouter();
     const form = useForm<passwordResetSchemaClientType>({
         resolver: zodResolver(passwordResetSchemaClient),
         defaultValues: {
@@ -123,7 +125,7 @@ export const PasswordResetForm = () => {
                         className="w-full"
                         type="button"
                         onClick={() => {
-                            history.back();
+                            router.back();
                         }}
                     >
                         Go back

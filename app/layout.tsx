@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import '@/styles/globals.css';
 import { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
+import NextTopLoader from 'nextjs-toploader';
 
 export const fontSans = FontSans({
     subsets: ['latin'],
@@ -33,6 +34,7 @@ export default function RootLayout({
                     enableSystem
                     disableTransitionOnChange
                 >
+                    <NextTopLoader />
                     {children}
                     <Toaster />
                 </ThemeProvider>
