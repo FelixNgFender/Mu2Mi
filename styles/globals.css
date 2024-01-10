@@ -3,91 +3,91 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Name: custom color palette
+    :root {
+        /* Name: custom color palette
        Author: Ilias Ism
        URL: https://gradient.page */
 
-    /* CSS: .bg-gradient { background: var(--gradient) } */
-    --gradient: linear-gradient(to top left, #231557, #44107a, #ff1361);
-    --background: 269 98.05% 98.42%;
-    --foreground: 269 6.1% 0.84%;
+        /* CSS: .bg-gradient { background: var(--gradient) } */
+        --gradient: linear-gradient(to top left, #231557, #44107a, #ff1361);
+        --background: 269 98.05% 98.42%;
+        --foreground: 269 6.1% 0.84%;
 
-    --muted: 269 6.1% 92.1%;
-    --muted-foreground: 269 3.05% 42.1%;
+        --muted: 269 6.1% 92.1%;
+        --muted-foreground: 269 3.05% 42.1%;
 
-    --popover: 269 41.2% 92.1%;
-    --popover-foreground: 269 6.1% 1.05%;
+        --popover: 269 41.2% 92.1%;
+        --popover-foreground: 269 6.1% 1.05%;
 
-    --card: 269 41.2% 92.1%;
-    --card-foreground: 269 6.1% 1.05%;
+        --card: 269 41.2% 92.1%;
+        --card-foreground: 269 6.1% 1.05%;
 
-    --primary: 269 61% 21%;
-    --primary-foreground: 269 1.22% 92.1%;
+        --primary: 269 61% 21%;
+        --primary-foreground: 269 1.22% 92.1%;
 
-    --secondary: 269 3.05% 96.05%;
-    --secondary-foreground: 269 4.66% 12.1%;
+        --secondary: 269 3.05% 96.05%;
+        --secondary-foreground: 269 4.66% 12.1%;
 
-    --accent: 269 3.05% 96.05%;
-    --accent-foreground: 269 4.66% 12.1%;
+        --accent: 269 3.05% 96.05%;
+        --accent-foreground: 269 4.66% 12.1%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
 
-    --border: 269 11.1% 79%;
-    --input: 269 11.1% 89.84%;
-    --ring: 269 61% 21%;
+        --border: 269 11.1% 79%;
+        --input: 269 11.1% 89.84%;
+        --ring: 269 61% 21%;
 
-    --radius: 0.5rem;
-  }
+        --radius: 0.5rem;
+    }
 
-  .dark {
-    /* Name: custom color palette
+    .dark {
+        /* Name: custom color palette
        Author: Ilias Ism
        URL: https://gradient.page */
 
-    /* CSS: .bg-gradient { background: var(--gradient) } */
-    --gradient: linear-gradient(to top left, #f7ff00, #db36a4);
+        /* CSS: .bg-gradient { background: var(--gradient) } */
+        --gradient: linear-gradient(to top left, #f7ff00, #db36a4);
 
-    --background: 66 65% 4%;
-    --foreground: 66 10% 97.5%;
+        --background: 66 65% 4%;
+        --foreground: 66 10% 97.5%;
 
-    --muted: 66 50% 15%;
-    --muted-foreground: 66 10% 55%;
+        --muted: 66 50% 15%;
+        --muted-foreground: 66 10% 55%;
 
-    --popover: 66 45% 6.5%;
-    --popover-foreground: 66 10% 97.5%;
+        --popover: 66 45% 6.5%;
+        --popover-foreground: 66 10% 97.5%;
 
-    --card: 66 45% 6.5%;
-    --card-foreground: 66 10% 97.5%;
+        --card: 66 45% 6.5%;
+        --card-foreground: 66 10% 97.5%;
 
-    --primary: 66 100% 50%;
-    --primary-foreground: 66 10% 5%;
+        --primary: 66 100% 50%;
+        --primary-foreground: 66 10% 5%;
 
-    --secondary: 66 50% 15%;
-    --secondary-foreground: 66 10% 97.5%;
+        --secondary: 66 50% 15%;
+        --secondary-foreground: 66 10% 97.5%;
 
-    --accent: 66 50% 15%;
-    --accent-foreground: 66 10% 97.5%;
+        --accent: 66 50% 15%;
+        --accent-foreground: 66 10% 97.5%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 66 10% 97.5%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 66 10% 97.5%;
 
-    --border: 66 50% 15%;
-    --input: 66 50% 15%;
-    --ring: 66 100% 50%;
-  }
+        --border: 66 50% 15%;
+        --input: 66 50% 15%;
+        --ring: 66 100% 50%;
+    }
 }
 
 .bg-gradient {
-  background: var(--gradient);
+    background: var(--gradient);
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
 }
