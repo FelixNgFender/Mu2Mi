@@ -23,7 +23,7 @@
 // };
 // import { ServerClient } from 'postmark';
 import { env } from '@/src/lib/env';
-import { logger } from '@/src/server/logger';
+import { logger } from '@/src/lib/logger';
 
 // const transporter = new ServerClient(env.POSTMARK_API_KEY);
 

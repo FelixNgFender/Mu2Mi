@@ -1,4 +1,4 @@
-import { logger } from '@/src/server/logger';
+import { logger } from '@/src/lib/logger';
 import { z } from 'zod';
 
 const isString = z.string().min(1);
