@@ -5,6 +5,16 @@ const isBoolean = isString.transform((value) => value === 'true');
 const isNumber = isString.transform(Number);
 
 const envSchema = z.object({
+    // Node.js
+    NODE_ENV: z.enum(['development', 'production', 'test']),
+
+    // Express
+    PORT: isNumber,
+    HOST: isString,
+
+    // Next.js
+    NEXT_MANUAL_SIG_HANDLE: isBoolean,
+
     // General
     ORIGIN: isString,
     APP_LOGGING: isBoolean,

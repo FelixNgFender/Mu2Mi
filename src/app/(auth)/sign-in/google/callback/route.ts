@@ -1,3 +1,5 @@
+import { AppError, errorNames } from '@/src/lib/error';
+import { httpStatus } from '@/src/lib/http';
 import { auth, googleAuth } from '@/src/server/auth';
 import { db } from '@/src/server/db';
 import { user as userTable } from '@/src/server/schema';
@@ -23,10 +25,18 @@ export const GET = async (request: NextRequest) => {
             const existingUser = await getExistingUser();
             if (existingUser) return existingUser;
             if (!googleUser.email_verified) {
-                throw new Error('Email not verified');
+                throw new AppError(
+                    errorNames.Application.OAuthError,
+                    'Email not verified',
+                    true,
+                );
             }
             if (!googleUser.email) {
-                throw new Error('Email not provided');
+                throw new AppError(
+                    errorNames.Application.OAuthError,
+                    'Email not provided',
+                    true,
+                );
             }
             const [existingDatabaseUserWithEmail] = await db
                 .select()
@@ -64,7 +74,7 @@ export const GET = async (request: NextRequest) => {
         });
         authRequest.setSession(session);
         return new Response(null, {
-            status: 302,
+            status: httpStatus.Redirect.Found,
             headers: {
                 Location: '/',
             },
@@ -72,11 +82,11 @@ export const GET = async (request: NextRequest) => {
     } catch (e) {
         if (e instanceof OAuthRequestError) {
             return new Response(null, {
-                status: 400,
+                status: httpStatus.ClientError.BadRequest,
             });
         }
         return new Response(null, {
-            status: 500,
+            status: httpStatus.ServerError.InternalServerError,
         });
     }
 };

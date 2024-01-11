@@ -1,6 +1,6 @@
 import { ThemeProvider } from '@/src/components/theme-provider';
 import { Toaster } from '@/src/components/ui/toaster';
-import { env } from '@/src/lib/env';
+import { env } from '@/src/server/env';
 import { cn } from '@/src/lib/utils';
 import { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';

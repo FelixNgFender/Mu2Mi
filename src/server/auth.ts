@@ -1,4 +1,4 @@
-import { env } from '@/src/lib/env';
+import { env } from '@/src/server/env';
 import { postgres as postgresAdapter } from '@lucia-auth/adapter-postgresql';
 import { redis as redisAdapter } from '@lucia-auth/adapter-session-redis';
 import { apple, facebook, google, twitter } from '@lucia-auth/oauth/providers';
@@ -13,7 +13,7 @@ import { cache } from 'react';
 import { queryClient, redisClient } from './db';
 
 export const auth = lucia({
-    env: process.env.NODE_ENV === 'development' ? 'DEV' : 'PROD',
+    env: env.NODE_ENV === 'development' ? 'DEV' : 'PROD',
     middleware: nextjs_future(),
     adapter: {
         user: postgresAdapter(queryClient, {

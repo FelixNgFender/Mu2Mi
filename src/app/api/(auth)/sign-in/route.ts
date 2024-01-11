@@ -1,15 +1,11 @@
-import { env } from '@/src/lib/env';
+import { HttpError, errorNames } from '@/src/lib/error';
+import { httpStatus } from '@/src/lib/http';
 import {
     signInSchemaServer,
     signInSchemaServerType,
 } from '@/src/schemas/server/sign-in';
 import { auth } from '@/src/server/auth';
-// import {
-//     TooManyRequestsError,
-//     deviceCookie,
-//     isValidateDeviceCookie,
-//     loginTimeout,
-// } from '@/src/server/throttle';
+import { env } from '@/src/server/env';
 import { generateRandomString } from 'lucia/utils';
 import * as context from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,17 +25,20 @@ export const POST = async (request: NextRequest) => {
         if (!validDeviceCookie) {
             context.cookies().set('device_cookie', '', {
                 path: '/',
-                secure: process.env.NODE_ENV === 'production',
+                secure: env.NODE_ENV === 'production',
                 maxAge: 0,
                 httpOnly: true,
             });
             const storedTimeout = loginTimeout.get(email) ?? null;
             const timeoutUntil = storedTimeout?.timeoutUntil ?? 0;
             if (Date.now() < timeoutUntil) {
-                throw new TooManyRequestsError(
+                throw new HttpError(
+                    errorNames.Http.ClientError.TooManyRequests,
+                    httpStatus.ClientError.TooManyRequests,
                     `You've made too many login attempts. Please try again in ${Math.floor(
                         (timeoutUntil - Date.now()) / 1000,
                     )} seconds.`,
+                    true,
                 );
             }
             const timeoutSeconds = storedTimeout
@@ -52,8 +51,11 @@ export const POST = async (request: NextRequest) => {
             try {
                 await auth.useKey('email', email.toLowerCase(), password); // throws `LuciaError` if invalid
             } catch {
-                throw new TooManyRequestsError(
+                throw new HttpError(
+                    errorNames.Http.ClientError.BadRequest,
+                    httpStatus.ClientError.BadRequest,
                     `The email or password you entered is incorrect. You can try again in ${timeoutSeconds} seconds.`,
+                    true,
                 );
             }
             loginTimeout.delete(email);
@@ -66,7 +68,7 @@ export const POST = async (request: NextRequest) => {
         });
         context.cookies().set('device_cookie', newDeviceCookieId, {
             path: '/',
-            secure: process.env.NODE_ENV === 'production',
+            secure: env.NODE_ENV === 'production',
             maxAge: env.DEVICE_COOKIE_DURATION_S * 1000,
             httpOnly: true,
         });

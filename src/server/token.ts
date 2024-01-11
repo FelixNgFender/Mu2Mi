@@ -1,11 +1,13 @@
-import { env } from '@/src/lib/env';
 import { db } from '@/src/server/db';
+import { env } from '@/src/server/env';
 import {
     emailVerification as emailVerificationTable,
     passwordReset as passwordResetTable,
 } from '@/src/server/schema';
 import { eq } from 'drizzle-orm';
 import { generateRandomString, isWithinExpiration } from 'lucia/utils';
+
+import { AppError, errorNames } from '../lib/error';
 
 const TOKEN_DURATION_MS = env.TOKEN_DURATION_S * 1000;
 
@@ -40,7 +42,12 @@ export const validateEmailVerificationToken = async (token: string) => {
             .select()
             .from(emailVerificationTable)
             .where(eq(emailVerificationTable.id, token));
-        if (!storedToken) throw new Error('Invalid token');
+        if (!storedToken)
+            throw new AppError(
+                errorNames.Application.TokenError,
+                'Invalid token',
+                true,
+            );
         await tx
             .delete(emailVerificationTable)
             .where(eq(emailVerificationTable.userId, storedToken.userId));
@@ -48,7 +55,11 @@ export const validateEmailVerificationToken = async (token: string) => {
     });
     const tokenExpires = Number(storedToken.expires); // bigint => number conversion
     if (!isWithinExpiration(tokenExpires)) {
-        throw new Error('Expired token');
+        throw new AppError(
+            errorNames.Application.TokenError,
+            'Expired token',
+            true,
+        );
     }
     return storedToken.userId;
 };
@@ -83,7 +94,12 @@ export const validatePasswordResetToken = async (token: string) => {
             .select()
             .from(passwordResetTable)
             .where(eq(passwordResetTable.id, token));
-        if (!storedToken) throw new Error('Invalid token');
+        if (!storedToken)
+            throw new AppError(
+                errorNames.Application.TokenError,
+                'Invalid token',
+                true,
+            );
         await tx
             .delete(passwordResetTable)
             .where(eq(passwordResetTable.id, storedToken.id));
@@ -91,7 +107,11 @@ export const validatePasswordResetToken = async (token: string) => {
     });
     const tokenExpires = Number(storedToken.expires); // bigint => number conversion
     if (!isWithinExpiration(tokenExpires)) {
-        throw new Error('Expired token');
+        throw new AppError(
+            errorNames.Application.TokenError,
+            'Expired token',
+            true,
+        );
     }
     return storedToken.userId;
 };
