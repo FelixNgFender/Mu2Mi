@@ -1,9 +1,5 @@
 'use client';
 
-import {
-    signInSchemaClient,
-    signInSchemaClientType,
-} from '@/src/schemas/client/sign-in';
 import { Button } from '@/src/components/ui/button';
 import { Checkbox } from '@/src/components/ui/checkbox';
 import {
@@ -17,6 +13,10 @@ import {
 import { Input } from '@/src/components/ui/input';
 import { Separator } from '@/src/components/ui/separator';
 import { useToast } from '@/src/components/ui/use-toast';
+import {
+    signInSchemaClient,
+    signInSchemaClientType,
+} from '@/src/schemas/client/sign-in';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

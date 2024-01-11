@@ -34,10 +34,12 @@ export const sendEmailVerificationLink = async (
     const url = `${env.ORIGIN}/email-verification/${token}`;
 
     if (!env.ENABLE_EMAIL) {
-        logger.info('====================================');
-        logger.info('New email received at: ', email);
-        logger.info('Your email verification link is: ', `${url}`);
-        logger.info('====================================');
+        logger.info(`
+=======================================
+New email received at: ${email}
+Your email verification link is: ${url}
+=======================================
+        `);
         return;
     }
 
@@ -56,10 +58,12 @@ export const sendPasswordResetLink = async (email: string, token: string) => {
     const url = `${env.ORIGIN}/password-reset/${token}`;
 
     if (!env.ENABLE_EMAIL) {
-        logger.info('====================================');
-        logger.info('New email received at: ', email);
-        logger.info('Your password reset link is: ', `${url}`);
-        logger.info('====================================');
+        logger.info(`
+=======================================
+New email received at: ${email}
+Your password reset link is: ${url}
+=======================================
+        `);
         return;
     }
 

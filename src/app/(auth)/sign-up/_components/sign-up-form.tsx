@@ -1,9 +1,5 @@
 'use client';
 
-import {
-    signUpSchemaClient,
-    signUpSchemaClientType,
-} from '@/src/schemas/client/sign-up';
 import { Button } from '@/src/components/ui/button';
 import {
     Form,
@@ -15,6 +11,10 @@ import {
 } from '@/src/components/ui/form';
 import { Input } from '@/src/components/ui/input';
 import { useToast } from '@/src/components/ui/use-toast';
+import {
+    signUpSchemaClient,
+    signUpSchemaClientType,
+} from '@/src/schemas/client/sign-up';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

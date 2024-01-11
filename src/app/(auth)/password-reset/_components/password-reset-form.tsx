@@ -1,9 +1,5 @@
 'use client';
 
-import {
-    passwordResetSchemaClient,
-    passwordResetSchemaClientType,
-} from '@/src/schemas/client/password-reset';
 import { Icons } from '@/src/components/icons';
 import { Button } from '@/src/components/ui/button';
 import {
@@ -17,6 +13,10 @@ import {
 import { Input } from '@/src/components/ui/input';
 import { ToastAction } from '@/src/components/ui/toast';
 import { useToast } from '@/src/components/ui/use-toast';
+import {
+    passwordResetSchemaClient,
+    passwordResetSchemaClientType,
+} from '@/src/schemas/client/password-reset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -46,6 +46,8 @@ export const PasswordResetForm = () => {
             },
             redirect: 'manual',
         });
+        // TODO: For users previously signed in with OAuth, this flow seems to work until
+        // the new password is set. Investigate?
         if (response.status === 400) {
             const responseData = await response.json();
             for (const error of responseData.errors) {

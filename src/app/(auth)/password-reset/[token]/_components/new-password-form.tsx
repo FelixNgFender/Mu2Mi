@@ -1,13 +1,5 @@
 'use client';
 
-import {
-    newPasswordSchemaClient,
-    newPasswordSchemaClientType,
-} from '@/src/schemas/client/new-password';
-import {
-    passwordResetSchemaClient,
-    passwordResetSchemaClientType,
-} from '@/src/schemas/client/password-reset';
 import { Icons } from '@/src/components/icons';
 import { Button } from '@/src/components/ui/button';
 import {
@@ -21,6 +13,14 @@ import {
 import { Input } from '@/src/components/ui/input';
 import { ToastAction } from '@/src/components/ui/toast';
 import { useToast } from '@/src/components/ui/use-toast';
+import {
+    newPasswordSchemaClient,
+    newPasswordSchemaClientType,
+} from '@/src/schemas/client/new-password';
+import {
+    passwordResetSchemaClient,
+    passwordResetSchemaClientType,
+} from '@/src/schemas/client/password-reset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
