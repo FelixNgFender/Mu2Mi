@@ -1,4 +1,4 @@
-import { ThemeProvider } from '@/src/app/_providers/theme-provider';
+import { ThemeProvider } from '@/src/components/theme-provider';
 import { Toaster } from '@/src/components/ui/toaster';
 import { env } from '@/src/lib/env';
 import { cn } from '@/src/lib/utils';
