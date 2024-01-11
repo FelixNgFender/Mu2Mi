@@ -93,7 +93,6 @@ export type Auth = typeof auth;
  * This allows you share the session across pages and layouts,
  * making it possible to validate the request in multiple layouts
  * and page files without making unnecessary database calls.
- *
  * @example
  * ```tsx
  * const Page = async () => {

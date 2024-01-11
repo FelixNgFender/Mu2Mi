@@ -2,8 +2,8 @@ import {
     signInSchemaServer,
     signInSchemaServerType,
 } from '@/src/app/_schemas/server/sign-in';
-import { auth } from '@/src/server/auth';
 import { env } from '@/src/lib/env';
+import { auth } from '@/src/server/auth';
 // import {
 //     TooManyRequestsError,
 //     deviceCookie,
@@ -19,8 +19,6 @@ export const POST = async (request: NextRequest) => {
     try {
         const data: signInSchemaServerType = await request.json();
         const { email, password, rememberMe } = data;
-        console.log(deviceCookie);
-        console.log(loginTimeout);
         const storedDeviceCookieId = context.cookies().get('device_cookie')
             ?.value;
         const validDeviceCookie = isValidateDeviceCookie(
@@ -113,7 +111,6 @@ export const POST = async (request: NextRequest) => {
                 },
             );
         }
-        console.log(e);
         return NextResponse.json(
             {
                 error: 'Server error, please try again later',

@@ -1,4 +1,3 @@
-import { getPageSession } from '@/src/server/auth';
 import {
     Card,
     CardContent,
@@ -6,6 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/src/components/ui/card';
+import { getPageSession } from '@/src/server/auth';
 import { redirect } from 'next/navigation';
 
 import { EmailVerificationForm } from './_components/email-verification-form';

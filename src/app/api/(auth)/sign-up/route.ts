@@ -49,8 +49,6 @@ export const POST = async (request: NextRequest) => {
             },
         });
     } catch (e) {
-        console.log(e);
-
         if (e instanceof ZodError) {
             return NextResponse.json(
                 {

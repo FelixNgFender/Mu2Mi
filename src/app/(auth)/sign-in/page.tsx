@@ -1,4 +1,3 @@
-import { getPageSession } from '@/src/server/auth';
 import { Icons } from '@/src/components/icons';
 import { buttonVariants } from '@/src/components/ui/button';
 import {
@@ -9,6 +8,7 @@ import {
     CardTitle,
 } from '@/src/components/ui/card';
 import { Separator } from '@/src/components/ui/separator';
+import { getPageSession } from '@/src/server/auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 

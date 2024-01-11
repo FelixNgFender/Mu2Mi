@@ -23,6 +23,7 @@
 // };
 // import { ServerClient } from 'postmark';
 import { env } from '@/src/lib/env';
+import { logger } from '@/src/server/logger';
 
 // const transporter = new ServerClient(env.POSTMARK_API_KEY);
 
@@ -33,10 +34,10 @@ export const sendEmailVerificationLink = async (
     const url = `${env.ORIGIN}/email-verification/${token}`;
 
     if (!env.ENABLE_EMAIL) {
-        console.log('====================================');
-        console.log('New email received at: ', email);
-        console.log('Your email verification link is: ', `${url}`);
-        console.log('====================================');
+        logger.info('====================================');
+        logger.info('New email received at: ', email);
+        logger.info('Your email verification link is: ', `${url}`);
+        logger.info('====================================');
         return;
     }
 
@@ -54,11 +55,11 @@ export const sendEmailVerificationLink = async (
 export const sendPasswordResetLink = async (email: string, token: string) => {
     const url = `${env.ORIGIN}/password-reset/${token}`;
 
-    if (env.ENABLE_EMAIL) {
-        console.log('====================================');
-        console.log('New email received at: ', email);
-        console.log('Your password reset link is: ', `${url}`);
-        console.log('====================================');
+    if (!env.ENABLE_EMAIL) {
+        logger.info('====================================');
+        logger.info('New email received at: ', email);
+        logger.info('Your password reset link is: ', `${url}`);
+        logger.info('====================================');
         return;
     }
 

@@ -1,9 +1,11 @@
 import { queryClient, redisClient } from '@/src/server/db';
+import { logger } from '@/src/server/logger';
 
 export const dynamic = 'force-dynamic';
 
 export const GET = async () => {
     try {
+        logger.info('Healthcheck');
         const start = performance.now();
         await queryClient`SELECT 1`;
         const databaseLatency = (performance.now() - start).toFixed(2);
@@ -19,7 +21,6 @@ export const GET = async () => {
             redisLatency: redisLatency + 'ms',
         });
     } catch (e) {
-        console.error(e);
         return new Response(null, {
             status: 500,
         });

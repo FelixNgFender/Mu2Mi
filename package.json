@@ -41,6 +41,7 @@
         "redis": "^4.6.12",
         "tailwind-merge": "^2.2.0",
         "tailwindcss-animate": "^1.0.7",
+        "winston": "^3.11.0",
         "zod": "^3.22.4"
     },
     "devDependencies": {

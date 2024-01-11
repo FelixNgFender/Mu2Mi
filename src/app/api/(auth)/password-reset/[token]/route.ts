@@ -29,9 +29,7 @@ export const POST = async (
         const { token } = params;
         const userId = await validatePasswordResetToken(token);
         let user = await auth.getUser(userId);
-        console.log('user', user);
         await auth.invalidateAllUserSessions(user.userId);
-        console.log('reach here');
         await auth.updateKeyPassword('email', user.email, password);
         if (!user.emailVerified) {
             user = await auth.updateUserAttributes(user.userId, {

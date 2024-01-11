@@ -1,3 +1,4 @@
+import { logger } from '@/src/server/logger';
 import { z } from 'zod';
 
 const isString = z.string().min(1);
@@ -7,7 +8,16 @@ const isNumber = isString.transform(Number);
 const envSchema = z.object({
     // General
     ORIGIN: isString,
-    APP_DEBUG: isBoolean,
+    APP_LOGGING: isBoolean,
+    LOG_LEVEL: z.enum([
+        'error',
+        'warn',
+        'info',
+        'http',
+        'verbose',
+        'debug',
+        'silly',
+    ]),
     ENABLE_EMAIL: isBoolean,
     TOKEN_DURATION_S: isNumber,
     AUTH_COOKIE_DURATION_S: isNumber,
@@ -15,6 +25,7 @@ const envSchema = z.object({
     TIMEOUT_DURATION_S: isNumber,
 
     // Database
+    DATABASE_LOGGING: isBoolean,
     DATABASE_URL: isString,
     REDIS_URL: isString,
 
@@ -27,6 +38,9 @@ const envSchema = z.object({
     FACEBOOK_REDIRECT_URI: isString,
 });
 
+/**
+ * Centralized environment variables for the application.
+ */
 export let env: z.infer<typeof envSchema>;
 
 try {
@@ -39,7 +53,7 @@ try {
                 errors ? `${field}: ${errors.join(', ')}` : field,
             )
             .join('\n  ');
-        console.error(`Missing environment variables:\n  ${errorMessage}`);
+        logger.error(`Missing environment variables:\n  ${errorMessage}`);
         // Fail fast
         process.exit(1);
     }
