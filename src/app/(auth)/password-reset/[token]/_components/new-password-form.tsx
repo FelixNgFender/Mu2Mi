@@ -3,11 +3,11 @@
 import {
     newPasswordSchemaClient,
     newPasswordSchemaClientType,
-} from '@/src/app/_schemas/client/new-password';
+} from '@/src/schemas/client/new-password';
 import {
     passwordResetSchemaClient,
     passwordResetSchemaClientType,
-} from '@/src/app/_schemas/client/password-reset';
+} from '@/src/schemas/client/password-reset';
 import { Icons } from '@/src/components/icons';
 import { Button } from '@/src/components/ui/button';
 import {

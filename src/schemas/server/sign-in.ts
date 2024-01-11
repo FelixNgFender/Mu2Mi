@@ -1,4 +1,4 @@
-import { signInSchemaClient } from '@/src/app/_schemas/client/sign-in';
+import { signInSchemaClient } from '@/src/schemas/client/sign-in';
 import { auth } from '@/src/server/auth';
 import * as z from 'zod';
 

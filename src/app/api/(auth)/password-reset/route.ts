@@ -1,7 +1,7 @@
 import {
     passwordResetSchemaServer,
     passwordResetSchemaServerType,
-} from '@/src/app/_schemas/server/password-reset';
+} from '@/src/schemas/server/password-reset';
 import { auth } from '@/src/server/auth';
 import { db } from '@/src/server/db';
 import { sendPasswordResetLink } from '@/src/server/email';

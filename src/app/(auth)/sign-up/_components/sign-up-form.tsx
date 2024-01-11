@@ -3,7 +3,7 @@
 import {
     signUpSchemaClient,
     signUpSchemaClientType,
-} from '@/src/app/_schemas/client/sign-up';
+} from '@/src/schemas/client/sign-up';
 import { Button } from '@/src/components/ui/button';
 import {
     Form,

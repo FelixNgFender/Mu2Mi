@@ -1,7 +1,7 @@
 import {
     signUpSchemaServer,
     signUpSchemaServerType,
-} from '@/src/app/_schemas/server/sign-up';
+} from '@/src/schemas/server/sign-up';
 import { auth } from '@/src/server/auth';
 import { sendEmailVerificationLink } from '@/src/server/email';
 import { generateEmailVerificationToken } from '@/src/server/token';

@@ -3,7 +3,7 @@
 import {
     signInSchemaClient,
     signInSchemaClientType,
-} from '@/src/app/_schemas/client/sign-in';
+} from '@/src/schemas/client/sign-in';
 import { Button } from '@/src/components/ui/button';
 import { Checkbox } from '@/src/components/ui/checkbox';
 import {

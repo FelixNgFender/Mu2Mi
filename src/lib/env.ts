@@ -1,4 +1,3 @@
-import { logger } from '@/src/lib/logger';
 import { z } from 'zod';
 
 const isString = z.string().min(1);
@@ -53,7 +52,8 @@ try {
                 errors ? `${field}: ${errors.join(', ')}` : field,
             )
             .join('\n  ');
-        logger.error(`Missing environment variables:\n  ${errorMessage}`);
+        // Had to use console.error here because logger is not initialized yet (circular dependency)
+        console.error(`Missing environment variables:\n  ${errorMessage}`);
         // Fail fast
         process.exit(1);
     }

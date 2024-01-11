@@ -1,4 +1,4 @@
-import { newPasswordSchemaClient } from '@/src/app/_schemas/client/new-password';
+import { newPasswordSchemaClient } from '@/src/schemas/client/new-password';
 import * as z from 'zod';
 
 /**

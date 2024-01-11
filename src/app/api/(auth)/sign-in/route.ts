@@ -1,7 +1,7 @@
 import {
     signInSchemaServer,
     signInSchemaServerType,
-} from '@/src/app/_schemas/server/sign-in';
+} from '@/src/schemas/server/sign-in';
 import { env } from '@/src/lib/env';
 import { auth } from '@/src/server/auth';
 // import {
