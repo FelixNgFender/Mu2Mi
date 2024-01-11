@@ -5,8 +5,6 @@ services:
         image: postgres:alpine
         container_name: postgres
         restart: unless-stopped
-        env_file:
-            - .env.local
         volumes:
             - postgres-data:/var/lib/postgresql/data
             - ./docker/init-postgres.sh:/docker-entrypoint-initdb.d/init.sh
@@ -27,8 +25,6 @@ services:
         container_name: redis
         restart: unless-stopped
         command: redis-server --save 60 1 --loglevel warning
-        env_file:
-            - .env.local
         volumes:
             - redis-data:/data
         ports:

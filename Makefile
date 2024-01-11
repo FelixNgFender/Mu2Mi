@@ -1,4 +1,4 @@
-DOCKER_COMPOSE = docker compose --env-file .env.local
+DOCKER_COMPOSE = docker compose
 
 .PHONY: build build-no-cache up watch stop kill down clean
 
