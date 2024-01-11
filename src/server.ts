@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import next from 'next';
 
 import { queryClient, redisClient } from './server/db';
@@ -31,35 +31,44 @@ const cleanup = async (exitCode = 0) => {
     process.exit(exitCode);
 };
 
-app.prepare().then(async () => {
-    const server = express();
+(async () => {
+    try {
+        await app.prepare();
+        const server = express();
 
-    // await (async () => {
-    //     redisClient;
-    //     await redisClient.connect();
-    // })();
+        // await (async () => {
+        //     redisClient;
+        //     await redisClient.connect();
+        // })();
 
-    server.all('*', (req: any, res: any) => {
-        return handle(req, res);
-    });
-
-    server.listen(port, hostname, () => {
-        logger.info(`> Ready on http://${hostname}:${port}, dev: ${dev}`);
-    });
-
-    process.on('uncaughtException', async (err) => {
-        console.error(err);
-        await cleanup(1);
-    });
-
-    process.on('unhandledRejection', async (err) => {
-        console.error(err);
-        await cleanup(1);
-    });
-
-    externalSignals.forEach((signal) => {
-        process.on(signal, async () => {
-            await cleanup();
+        server.all('*', (req: Request, res: Response) => {
+            return handle(req, res);
         });
-    });
-});
+
+        server.listen(port, hostname, (err?: any) => {
+            if (err) throw err;
+            logger.info(
+                `> Ready on http://${hostname}:${port} - env ${env.NODE_ENV}`,
+            );
+        });
+
+        process.on('uncaughtException', async (err) => {
+            console.error(err);
+            await cleanup(1);
+        });
+
+        process.on('unhandledRejection', async (err) => {
+            console.error(err);
+            await cleanup(1);
+        });
+
+        externalSignals.forEach((signal) => {
+            process.on(signal, async () => {
+                await cleanup();
+            });
+        });
+    } catch (err) {
+        logger.error(err);
+        process.exit(1);
+    }
+})();

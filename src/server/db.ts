@@ -2,16 +2,23 @@ import { env } from '@/src/server/env';
 import { logger } from '@/src/server/logger';
 import { type PostgresJsDatabase, drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { createClient } from 'redis';
+import { type RedisClientType, createClient } from 'redis';
 
 export const queryClient = postgres(env.DATABASE_URL);
 export const db: PostgresJsDatabase = drizzle(queryClient, {
     logger: env.DATABASE_LOGGING,
 });
 
-export const redisClient = createClient({ url: env.REDIS_URL });
+const globalForRedis = global as unknown as { redisClient: RedisClientType };
 
-if (!redisClient.isReady) {
+export const redisClient =
+    globalForRedis.redisClient ?? createClient({ url: env.REDIS_URL });
+
+if (env.NODE_ENV === 'development') {
+    globalForRedis.redisClient = redisClient;
+}
+
+if (!redisClient.isOpen) {
     redisClient
         .on('error', (err) => logger.error('Redis Client Error', err))
         .on('ready', () => logger.info('Redis Client Ready'))
