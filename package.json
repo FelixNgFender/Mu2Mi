@@ -13,7 +13,7 @@
         "db:push": "drizzle-kit push:pg",
         "db:introspect": "drizzle-kit introspect:pg",
         "db:generate": "drizzle-kit generate:pg",
-        "db:migrate": "node -r dotenv/config migrations/migrate.mjs"
+        "db:migrate": "node -r dotenv/config scripts/migrate.mjs"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.3.4",
