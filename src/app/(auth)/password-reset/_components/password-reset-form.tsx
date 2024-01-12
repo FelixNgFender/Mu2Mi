@@ -1,7 +1,7 @@
 'use client';
 
-import { Icons } from '@/src/components/icons';
-import { Button } from '@/src/components/ui/button';
+import { Icons } from '@/components/icons';
+import { Button } from '@/components/ui/button';
 import {
     Form,
     FormControl,
@@ -9,14 +9,14 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from '@/src/components/ui/form';
-import { Input } from '@/src/components/ui/input';
-import { ToastAction } from '@/src/components/ui/toast';
-import { useToast } from '@/src/components/ui/use-toast';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { ToastAction } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/use-toast';
 import {
     passwordResetSchemaClient,
     passwordResetSchemaClientType,
-} from '@/src/schemas/client/password-reset';
+} from '@/schemas/client/password-reset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

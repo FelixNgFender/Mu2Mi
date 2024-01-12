@@ -1,4 +1,4 @@
-import { ModeToggle as ThemeToggle } from '@/src/components/theme-toggle';
+import { ModeToggle as ThemeToggle } from '@/components/theme-toggle';
 import Link from 'next/link';
 
 const HomePage = () => {

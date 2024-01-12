@@ -4,8 +4,8 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@/src/components/ui/card';
-import { getPageSession } from '@/src/server/auth';
+} from '@/components/ui/card';
+import { getPageSession } from '@/server/auth';
 import { redirect } from 'next/navigation';
 
 import { EmailVerificationForm } from './_components/email-verification-form';

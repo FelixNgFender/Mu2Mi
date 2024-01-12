@@ -1,10 +1,10 @@
 'use client';
 
-import { Icons } from '@/src/components/icons';
-import { Button } from '@/src/components/ui/button';
-import { Form } from '@/src/components/ui/form';
-import { ToastAction } from '@/src/components/ui/toast';
-import { useToast } from '@/src/components/ui/use-toast';
+import { Icons } from '@/components/icons';
+import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
+import { ToastAction } from '@/components/ui/toast';
+import { useToast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';

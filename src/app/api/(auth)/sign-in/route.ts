@@ -1,11 +1,11 @@
-import { HttpError, errorNames } from '@/src/server/error';
-import { httpStatus } from '@/src/lib/http';
+import { HttpError, errorNames } from '@/server/error';
+import { httpStatus } from '@/lib/http';
 import {
     signInSchemaServer,
     signInSchemaServerType,
-} from '@/src/schemas/server/sign-in';
-import { auth } from '@/src/server/auth';
-import { env } from '@/src/server/env';
+} from '@/schemas/server/sign-in';
+import { auth } from '@/server/auth';
+import { env } from '@/server/env';
 import { generateRandomString } from 'lucia/utils';
 import * as context from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';

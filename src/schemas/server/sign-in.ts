@@ -1,5 +1,5 @@
-import { signInSchemaClient } from '@/src/schemas/client/sign-in';
-import { auth } from '@/src/server/auth';
+import { signInSchemaClient } from '@/schemas/client/sign-in';
+import { auth } from '@/server/auth';
 import 'server-cli-only';
 import * as z from 'zod';
 

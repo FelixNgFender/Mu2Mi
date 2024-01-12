@@ -1,6 +1,6 @@
-import { passwordResetSchemaClient } from '@/src/schemas/client/password-reset';
-import { db } from '@/src/server/db';
-import { user as userTable } from '@/src/server/schema';
+import { passwordResetSchemaClient } from '@/schemas/client/password-reset';
+import { db } from '@/server/db';
+import { user as userTable } from '@/server/schema';
 import { eq } from 'drizzle-orm';
 import 'server-cli-only';
 import * as z from 'zod';

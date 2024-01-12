@@ -1,4 +1,4 @@
-import { getPageSession } from '@/src/server/auth';
+import { getPageSession } from '@/server/auth';
 import { redirect } from 'next/navigation';
 
 const ProfilePage = async () => {

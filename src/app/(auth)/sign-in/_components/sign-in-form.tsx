@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/src/components/ui/button';
-import { Checkbox } from '@/src/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Form,
     FormControl,
@@ -9,14 +9,14 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from '@/src/components/ui/form';
-import { Input } from '@/src/components/ui/input';
-import { Separator } from '@/src/components/ui/separator';
-import { useToast } from '@/src/components/ui/use-toast';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/components/ui/use-toast';
 import {
     signInSchemaClient,
     signInSchemaClientType,
-} from '@/src/schemas/client/sign-in';
+} from '@/schemas/client/sign-in';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

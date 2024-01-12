@@ -1,4 +1,4 @@
-import { Middleware, handler } from '@/src/server/middleware';
+import { Middleware, handler } from '@/server/middleware';
 import { NextResponse } from 'next/server';
 
 const middleware_1: Middleware = async (_req, next) => {

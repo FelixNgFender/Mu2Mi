@@ -2,8 +2,8 @@ import {
     type ClientErrorHttpCode,
     type ServerErrorHttpCode,
     httpStatus,
-} from '@/src/lib/http';
-import { logger } from '@/src/server/logger';
+} from '@/lib/http';
+import { logger } from '@/server/logger';
 import 'server-cli-only';
 
 type ApplicationErrorNames = {

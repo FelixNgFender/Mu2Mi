@@ -4,7 +4,7 @@ import {
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@/src/components/ui/card';
+} from '@/components/ui/card';
 
 import { PasswordResetForm } from './_components/password-reset-form';
 

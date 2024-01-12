@@ -1,7 +1,7 @@
-import { queryClient, redisClient } from '@/src/server/db';
-import { env } from '@/src/server/env';
-import { errorHandler } from '@/src/server/error';
-import { logger } from '@/src/server/logger';
+import { queryClient, redisClient } from '@/server/db';
+import { env } from '@/server/env';
+import { errorHandler } from '@/server/error';
+import { logger } from '@/server/logger';
 import express, { Request, Response } from 'express';
 import next from 'next';
 import 'server-cli-only';

@@ -1,5 +1,5 @@
-import { queryClient, redisClient } from '@/src/server/db';
-import { logger } from '@/src/server/logger';
+import { queryClient, redisClient } from '@/server/db';
+import { logger } from '@/server/logger';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,7 +1,7 @@
-import { ThemeProvider } from '@/src/components/theme-provider';
-import { Toaster } from '@/src/components/ui/toaster';
-import { cn } from '@/src/lib/utils';
-import { env } from '@/src/server/env';
+import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
+import { cn } from '@/lib/utils';
+import { env } from '@/server/env';
 import { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';

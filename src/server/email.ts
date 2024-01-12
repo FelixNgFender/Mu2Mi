@@ -22,8 +22,8 @@
 // 	});
 // };
 // import { ServerClient } from 'postmark';
-import { env } from '@/src/server/env';
-import { logger } from '@/src/server/logger';
+import { env } from '@/server/env';
+import { logger } from '@/server/logger';
 import 'server-cli-only';
 
 // const transporter = new ServerClient(env.POSTMARK_API_KEY);

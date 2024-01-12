@@ -1,5 +1,5 @@
-import { buttonVariants } from '@/src/components/ui/button';
-import { cn } from '@/src/lib/utils';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 

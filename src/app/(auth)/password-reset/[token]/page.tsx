@@ -3,8 +3,8 @@ import {
     CardContent,
     CardHeader,
     CardTitle,
-} from '@/src/components/ui/card';
-import { getPageSession } from '@/src/server/auth';
+} from '@/components/ui/card';
+import { getPageSession } from '@/server/auth';
 import { redirect } from 'next/navigation';
 
 import { NewPasswordForm } from './_components/new-password-form';

@@ -1,5 +1,5 @@
-import { env } from '@/src/server/env';
-import { logger } from '@/src/server/logger';
+import { env } from '@/server/env';
+import { logger } from '@/server/logger';
 import { type PostgresJsDatabase, drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { type RedisClientType, createClient } from 'redis';

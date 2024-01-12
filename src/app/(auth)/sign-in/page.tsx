@@ -1,14 +1,14 @@
-import { Icons } from '@/src/components/icons';
-import { buttonVariants } from '@/src/components/ui/button';
+import { Icons } from '@/components/icons';
+import { buttonVariants } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardFooter,
     CardHeader,
     CardTitle,
-} from '@/src/components/ui/card';
-import { Separator } from '@/src/components/ui/separator';
-import { getPageSession } from '@/src/server/auth';
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { getPageSession } from '@/server/auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 

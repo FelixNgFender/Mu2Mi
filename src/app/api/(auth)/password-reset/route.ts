@@ -1,12 +1,12 @@
 import {
     passwordResetSchemaServer,
     passwordResetSchemaServerType,
-} from '@/src/schemas/server/password-reset';
-import { auth } from '@/src/server/auth';
-import { db } from '@/src/server/db';
-import { sendPasswordResetLink } from '@/src/server/email';
-import { user as userTable } from '@/src/server/schema';
-import { generatePasswordResetToken } from '@/src/server/token';
+} from '@/schemas/server/password-reset';
+import { auth } from '@/server/auth';
+import { db } from '@/server/db';
+import { sendPasswordResetLink } from '@/server/email';
+import { user as userTable } from '@/server/schema';
+import { generatePasswordResetToken } from '@/server/token';
 import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';

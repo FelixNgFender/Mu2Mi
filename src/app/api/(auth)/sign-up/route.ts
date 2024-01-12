@@ -1,10 +1,10 @@
 import {
     signUpSchemaServer,
     signUpSchemaServerType,
-} from '@/src/schemas/server/sign-up';
-import { auth } from '@/src/server/auth';
-import { sendEmailVerificationLink } from '@/src/server/email';
-import { generateEmailVerificationToken } from '@/src/server/token';
+} from '@/schemas/server/sign-up';
+import { auth } from '@/server/auth';
+import { sendEmailVerificationLink } from '@/server/email';
+import { generateEmailVerificationToken } from '@/server/token';
 import * as context from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
