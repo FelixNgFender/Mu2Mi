@@ -1,3 +1,4 @@
+import 'server-cli-only';
 import { z } from 'zod';
 
 const isString = z.string().min(1);

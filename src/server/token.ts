@@ -6,6 +6,7 @@ import {
 } from '@/src/server/schema';
 import { eq } from 'drizzle-orm';
 import { generateRandomString, isWithinExpiration } from 'lucia/utils';
+import 'server-cli-only';
 
 import { AppError, errorNames } from '../lib/error';
 

@@ -3,6 +3,7 @@ import { logger } from '@/src/server/logger';
 import { type PostgresJsDatabase, drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { type RedisClientType, createClient } from 'redis';
+import 'server-cli-only';
 
 export const queryClient = postgres(env.DATABASE_URL);
 export const db: PostgresJsDatabase = drizzle(queryClient, {

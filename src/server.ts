@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import next from 'next';
+import 'server-cli-only';
 
 import { queryClient, redisClient } from './server/db';
 import { env } from './server/env';

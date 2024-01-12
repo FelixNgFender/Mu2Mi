@@ -1,5 +1,6 @@
 import { AppError, errorNames } from '@/src/lib/error';
 import { NextResponse } from 'next/server';
+import 'server-cli-only';
 
 export type NextFunction = () => void;
 export type Middleware = (

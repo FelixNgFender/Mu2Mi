@@ -9,6 +9,7 @@ import 'lucia/polyfill/node';
 import * as context from 'next/headers';
 import path from 'path';
 import { cache } from 'react';
+import 'server-cli-only';
 
 import { queryClient, redisClient } from './db';
 

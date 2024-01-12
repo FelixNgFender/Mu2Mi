@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "prepare": "husky install",
-        "dev": "tsx src/server",
+        "dev": "RUNNING_IN_CLI=true tsx src/server",
         "build": "next build",
         "start": "NODE_ENV=production tsx src/server",
         "lint": "next lint",
@@ -40,6 +40,7 @@
         "react-dom": "^18",
         "react-hook-form": "^7.49.2",
         "redis": "^4.6.12",
+        "server-cli-only": "^0.2.2",
         "tailwind-merge": "^2.2.0",
         "tailwindcss-animate": "^1.0.7",
         "winston": "^3.11.0",
