@@ -4,16 +4,16 @@
     "private": true,
     "scripts": {
         "prepare": "husky install",
-        "dev": "RUNNING_IN_CLI=true tsx src/server",
+        "dev": "RUNNING_IN_CLI=true tsx -r dotenv/config src/server",
         "build": "next build",
         "start": "NODE_ENV=production tsx src/server",
         "lint": "next lint",
         "format": "prettier --write .",
-        "db:studio": "npx drizzle-kit studio",
-        "db:push": "npx drizzle-kit push:pg",
-        "db:introspect": "dpx drizzle-kit introspect:pg",
-        "db:generate": "npx drizzle-kit generate:pg",
-        "db:migrate": "node migrations/migrate"
+        "db:studio": "drizzle-kit studio",
+        "db:push": "drizzle-kit push:pg",
+        "db:introspect": "drizzle-kit introspect:pg",
+        "db:generate": "drizzle-kit generate:pg",
+        "db:migrate": "node -r dotenv/config migrations/migrate.mjs"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.3.4",
@@ -28,6 +28,7 @@
         "@radix-ui/react-toast": "^1.1.5",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.0",
+        "dotenv": "^16.3.1",
         "drizzle-orm": "^0.29.3",
         "express": "^4.18.2",
         "lucia": "^2.7.6",
@@ -53,7 +54,6 @@
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "autoprefixer": "^10.0.1",
-        "dotenv-cli": "^7.3.0",
         "drizzle-kit": "^0.20.7",
         "eslint": "^8",
         "eslint-config-next": "14.0.4",

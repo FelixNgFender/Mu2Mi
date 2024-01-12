@@ -1,11 +1,10 @@
-import 'dotenv/config';
+import { queryClient, redisClient } from '@/src/server/db';
+import { env } from '@/src/server/env';
+import { errorHandler } from '@/src/server/error';
+import { logger } from '@/src/server/logger';
 import express, { Request, Response } from 'express';
 import next from 'next';
 import 'server-cli-only';
-
-import { queryClient, redisClient } from './server/db';
-import { env } from './server/env';
-import { logger } from './server/logger';
 
 const dev = env.NODE_ENV !== 'production';
 const hostname = env.HOST || '127.0.0.1';
@@ -53,14 +52,9 @@ const cleanup = async (exitCode = 0) => {
             );
         });
 
-        process.on('uncaughtException', async (err) => {
-            console.error(err);
-            await cleanup(1);
-        });
-
-        process.on('unhandledRejection', async (err) => {
-            console.error(err);
-            await cleanup(1);
+        process.on('uncaughtException', async (err: Error) => {
+            errorHandler.handleError(err);
+            if (!errorHandler.isTrustedError(err)) await cleanup(1);
         });
 
         externalSignals.forEach((signal) => {

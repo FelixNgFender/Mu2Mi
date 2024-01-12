@@ -1,5 +1,6 @@
 import { db } from '@/src/server/db';
 import { env } from '@/src/server/env';
+import { AppError, errorNames } from '@/src/server/error';
 import {
     emailVerification as emailVerificationTable,
     passwordReset as passwordResetTable,
@@ -7,8 +8,6 @@ import {
 import { eq } from 'drizzle-orm';
 import { generateRandomString, isWithinExpiration } from 'lucia/utils';
 import 'server-cli-only';
-
-import { AppError, errorNames } from '../lib/error';
 
 const TOKEN_DURATION_MS = env.TOKEN_DURATION_S * 1000;
 

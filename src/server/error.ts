@@ -3,6 +3,8 @@ import {
     type ServerErrorHttpCode,
     httpStatus,
 } from '@/src/lib/http';
+import { logger } from '@/src/server/logger';
+import 'server-cli-only';
 
 type ApplicationErrorNames = {
     [key in keyof typeof applicationErrorNames]: string;
@@ -16,7 +18,6 @@ type HttpErrorNames = {
 
 const applicationErrorNames = {
     OAuthError: 'OAuthError',
-    MiddlewareError: 'MiddlewareError',
     TokenError: 'TokenError',
 };
 
@@ -85,3 +86,19 @@ export class HttpError extends AppError {
         this.httpCode = httpCode;
     }
 }
+
+class ErrorHandler {
+    public isTrustedError(error: Error) {
+        if (error instanceof AppError) return error.isOperational;
+        return false;
+    }
+
+    public async handleError(error: Error): Promise<void> {
+        logger.error(error);
+        // await sendMailToAdminIfCritical();
+        // await saveInOpsQueueIfCritical();
+        // await determineIfOperationalError();
+    }
+}
+
+export const errorHandler = new ErrorHandler();

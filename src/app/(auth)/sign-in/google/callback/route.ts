@@ -1,4 +1,4 @@
-import { AppError, errorNames } from '@/src/lib/error';
+import { AppError, errorNames } from '@/src/server/error';
 import { httpStatus } from '@/src/lib/http';
 import { auth, googleAuth } from '@/src/server/auth';
 import { db } from '@/src/server/db';

@@ -1,4 +1,4 @@
-import { HttpError, errorNames } from '@/src/lib/error';
+import { HttpError, errorNames } from '@/src/server/error';
 import { httpStatus } from '@/src/lib/http';
 import {
     signInSchemaServer,

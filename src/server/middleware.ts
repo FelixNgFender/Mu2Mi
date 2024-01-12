@@ -1,4 +1,4 @@
-import { AppError, errorNames } from '@/src/lib/error';
+import { logger } from '@/src/server/logger';
 import { NextResponse } from 'next/server';
 import 'server-cli-only';
 
@@ -29,9 +29,8 @@ export const handler =
 
         if (result) return result;
 
-        throw new AppError(
-            errorNames.Application.MiddlewareError,
+        // Don't use `AppError` here because it's an error in development
+        throw new Error(
             'Your handler or middleware must return a NextResponse!',
-            true,
         );
     };

@@ -1,3 +1,4 @@
+import { queryClient, redisClient } from '@/src/server/db';
 import { env } from '@/src/server/env';
 import { postgres as postgresAdapter } from '@lucia-auth/adapter-postgresql';
 import { redis as redisAdapter } from '@lucia-auth/adapter-session-redis';
@@ -10,8 +11,6 @@ import * as context from 'next/headers';
 import path from 'path';
 import { cache } from 'react';
 import 'server-cli-only';
-
-import { queryClient, redisClient } from './db';
 
 export const auth = lucia({
     env: env.NODE_ENV === 'development' ? 'DEV' : 'PROD',
