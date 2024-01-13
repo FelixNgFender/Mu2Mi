@@ -50,7 +50,7 @@ export const StudioSidebar = async ({ className }: StudioSidebarProps) => {
                                 <Button
                                     key={`${recentTrack.title}-${i}`}
                                     variant="ghost"
-                                    className="w-full justify-start font-normal"
+                                    className="w-full justify-start text-xs font-normal lg:text-sm"
                                 >
                                     {recentTrack.icon &&
                                         recentTrack.icon({

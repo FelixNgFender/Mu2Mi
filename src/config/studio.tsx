@@ -1,5 +1,12 @@
 import { MainNavItem, SidebarNavItem } from '@/lib/types/nav';
-import { Disc3, Mic2, PencilLine, Speaker, Split } from 'lucide-react';
+import {
+    Disc3,
+    KeyboardMusic,
+    Mic2,
+    PencilLine,
+    Speaker,
+    Split,
+} from 'lucide-react';
 
 interface StudioConfig {
     mainNav: MainNavItem[];
@@ -30,6 +37,7 @@ export const studioConfig: StudioConfig = {
         {
             title: 'Studio',
             href: '/',
+            icon: ({ className }) => <KeyboardMusic className={className} />,
         },
         {
             title: 'GitHub',
