@@ -3,8 +3,8 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { siteConfig } from '@/config/site';
-import { studioConfig } from '@/config/studio';
+import { siteConfig } from '@/lib/config/site';
+import { studioConfig } from '@/lib/config/studio';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link, { LinkProps } from 'next/link';

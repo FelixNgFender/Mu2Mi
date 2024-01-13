@@ -10,7 +10,7 @@ import {
     CommandList,
     CommandSeparator,
 } from '@/components/ui/command';
-import { studioConfig } from '@/config/studio';
+import { studioConfig } from '@/lib/config/studio';
 import { cn } from '@/lib/utils';
 import { DialogProps } from '@radix-ui/react-dialog';
 import { Circle, File, Laptop, Moon, Sun } from 'lucide-react';

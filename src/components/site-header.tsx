@@ -5,7 +5,7 @@ import { MainNav } from '@/components/main-nav';
 import { MobileNav } from '@/components/mobile-nav';
 import { ModeToggle as ThemeToggle } from '@/components/theme-toggle';
 import { buttonVariants } from '@/components/ui/button';
-import { siteConfig } from '@/config/site';
+import { siteConfig } from '@/lib/config/site';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
