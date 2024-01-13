@@ -34,7 +34,7 @@ const SignInPage = async () => {
                         className={buttonVariants({ variant: 'secondary' })}
                     >
                         <span>
-                            <Icons.google className="mr-2 h-4 w-4" />
+                            <Icons.google className="mr-2 h-4 w-4 fill-current" />
                         </span>
                         <span>Continue with Google</span>
                     </Link>
@@ -43,7 +43,7 @@ const SignInPage = async () => {
                         className={buttonVariants({ variant: 'secondary' })}
                     >
                         <span>
-                            <Icons.facebook className="mr-2 h-4 w-4" />
+                            <Icons.facebook className="mr-2 h-4 w-4 fill-current" />
                         </span>
                         <span>Continue with Facebook</span>
                     </Link>
@@ -52,16 +52,16 @@ const SignInPage = async () => {
                         className={buttonVariants({ variant: 'secondary' })}
                     >
                         <span>
-                            <Icons.apple className="mr-2 h-4 w-4" />
+                            <Icons.gitHub className="mr-2 h-4 w-4 fill-current" />
                         </span>
-                        <span>Continue with Apple</span>
+                        <span>Continue with GitHub</span>
                     </Link>
                     <Link
                         href="/auth/sign-in/twitter"
                         className={buttonVariants({ variant: 'secondary' })}
                     >
                         <span>
-                            <Icons.twitter className="mr-2 h-4 w-4" />
+                            <Icons.twitter className="mr-2 h-4 w-4 fill-current" />
                         </span>
                         <span>Continue with X</span>
                     </Link>

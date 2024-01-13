@@ -2,13 +2,11 @@ import { queryClient, redisClient } from '@/server/db';
 import { env } from '@/server/env';
 import { postgres as postgresAdapter } from '@lucia-auth/adapter-postgresql';
 import { redis as redisAdapter } from '@lucia-auth/adapter-session-redis';
-import { apple, facebook, google, twitter } from '@lucia-auth/oauth/providers';
-import fs from 'fs';
+import { facebook, github, google, twitter } from '@lucia-auth/oauth/providers';
 import { lucia } from 'lucia';
 import { nextjs_future } from 'lucia/middleware';
 import 'lucia/polyfill/node';
 import * as context from 'next/headers';
-import path from 'path';
 import { cache } from 'react';
 import 'server-cli-only';
 
@@ -57,21 +55,9 @@ export const googleAuth = google(auth, {
 // });
 
 // TODO: Implement routes
-// const certificatePath = path.join(
-//     process.cwd(),
-//     env.APPLE_CERT_PATH ?? '',
-// );
-
-// const certificate = fs.readFileSync(certificatePath, 'utf-8');
-
-// export const appleAuth = apple(auth, {
-//     clientId: env.APPLE_CLIENT_ID || '',
-//     redirectUri: env.APPLE_REDIRECT_URI || '',
-//     teamId: env.APPLE_TEAM_ID || '',
-//     keyId: env.APPLE_KEY_ID || '',
-//     certificate,
-//     scope: ['email', 'name'],
-//     responseMode: 'form_post',
+// export const githubAuth = github(auth, {
+// 	clientId: env.GITHUB_CLIENT_ID,
+// 	clientSecret: env.GITHUB_CLIENT_SECRET
 // });
 
 // TODO: Implement routes
