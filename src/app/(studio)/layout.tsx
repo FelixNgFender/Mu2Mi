@@ -1,4 +1,4 @@
-import { Sidebar } from '@/components/sidebar';
+import { StudioSidebar } from '@/components/studio-sidebar';
 import {
     ResizableHandle,
     ResizablePanel,
@@ -16,11 +16,11 @@ const StudioLayout = async ({ children }: StudioLayoutProps) => {
                 defaultSize={20}
                 minSize={20}
                 maxSize={50}
-                className="hidden lg:block"
+                className="hidden md:block"
             >
-                <Sidebar />
+                <StudioSidebar />
             </ResizablePanel>
-            <ResizableHandle className="hidden opacity-30 hover:opacity-100 lg:flex" />
+            <ResizableHandle className="hidden opacity-30 hover:opacity-100 md:flex" />
             <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
         </ResizablePanelGroup>
     );
