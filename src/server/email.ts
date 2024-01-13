@@ -32,7 +32,7 @@ export const sendEmailVerificationLink = async (
     email: string,
     token: string,
 ) => {
-    const url = `${env.ORIGIN}/email-verification/${token}`;
+    const url = `${env.ORIGIN}/auth/email-verification/${token}`;
 
     if (!env.ENABLE_EMAIL) {
         logger.info(`
@@ -56,7 +56,7 @@ Your email verification link is: ${url}
 };
 
 export const sendPasswordResetLink = async (email: string, token: string) => {
-    const url = `${env.ORIGIN}/password-reset/${token}`;
+    const url = `${env.ORIGIN}/auth/password-reset/${token}`;
 
     if (!env.ENABLE_EMAIL) {
         logger.info(`

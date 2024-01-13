@@ -1,3 +1,5 @@
+import { SiteHeader } from '@/components/site-header';
+import { TailwindIndicator } from '@/components/tailwind-indicator';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
@@ -17,16 +19,16 @@ export const metadata: Metadata = {
     metadataBase: new URL(env.ORIGIN),
 };
 
-export default function RootLayout({
-    children,
-}: {
+interface RootLayoutProps {
     children: React.ReactNode;
-}) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <body
                 className={cn(
-                    'flex min-h-screen flex-col bg-background font-sans antialiased',
+                    'min-h-screen bg-background font-sans antialiased',
                     fontSans.variable,
                 )}
             >
@@ -37,7 +39,12 @@ export default function RootLayout({
                     disableTransitionOnChange
                 >
                     <NextTopLoader />
-                    {children}
+                    <div className="relative flex min-h-screen flex-col bg-background">
+                        <SiteHeader />
+                        <main className="flex flex-1 flex-col">{children}</main>
+                        {/* <SiteFooter /> */}
+                    </div>
+                    <TailwindIndicator />
                     <Toaster />
                 </ThemeProvider>
             </body>
