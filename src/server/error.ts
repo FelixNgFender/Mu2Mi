@@ -3,7 +3,7 @@ import {
     type ServerErrorHttpCode,
     httpStatus,
 } from '@/lib/http';
-import { logger } from '@/server/logger';
+import { logger } from '@/lib/logger';
 import 'server-cli-only';
 
 type ApplicationErrorNames = {

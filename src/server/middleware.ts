@@ -1,4 +1,4 @@
-import { logger } from '@/server/logger';
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import 'server-cli-only';
 
