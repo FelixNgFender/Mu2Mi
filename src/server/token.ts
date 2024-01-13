@@ -3,7 +3,7 @@ import {
     emailVerification as emailVerificationTable,
     passwordReset as passwordResetTable,
 } from '@/db/schema';
-import { env } from '@/server/env';
+import { env } from '@/lib/env';
 import { AppError, errorNames } from '@/server/error';
 import { eq } from 'drizzle-orm';
 import { generateRandomString, isWithinExpiration } from 'lucia/utils';

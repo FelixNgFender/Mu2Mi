@@ -1,5 +1,5 @@
 import { queryClient, redisClient } from '@/db';
-import { env } from '@/server/env';
+import { env } from '@/lib/env';
 import { postgres as postgresAdapter } from '@lucia-auth/adapter-postgresql';
 import { redis as redisAdapter } from '@lucia-auth/adapter-session-redis';
 import { facebook, github, google, twitter } from '@lucia-auth/oauth/providers';

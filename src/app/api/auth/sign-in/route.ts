@@ -4,7 +4,7 @@ import {
     signInSchemaServerType,
 } from '@/schemas/server/sign-in';
 import { auth } from '@/lib/auth';
-import { env } from '@/server/env';
+import { env } from '@/lib/env';
 import { HttpError, errorNames } from '@/server/error';
 import { generateRandomString } from 'lucia/utils';
 import * as context from 'next/headers';

@@ -1,5 +1,5 @@
 import { queryClient, redisClient } from '@/db';
-import { env } from '@/server/env';
+import { env } from '@/lib/env';
 import { errorHandler } from '@/server/error';
 import { logger } from '@/server/logger';
 import express, { Request, Response } from 'express';

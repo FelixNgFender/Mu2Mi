@@ -1,4 +1,4 @@
-import { env } from '@/server/env';
+import { env } from '@/lib/env';
 import 'server-cli-only';
 import winston, { createLogger } from 'winston';
 
