@@ -15,63 +15,63 @@ export const POST = async (request: NextRequest) => {
     try {
         const data: signInSchemaServerType = await request.json();
         const { email, password, rememberMe } = data;
-        const storedDeviceCookieId = context.cookies().get('device_cookie')
-            ?.value;
-        const validDeviceCookie = isValidateDeviceCookie(
-            storedDeviceCookieId,
-            email,
-        );
+        // const storedDeviceCookieId = context.cookies().get('device_cookie')
+        //     ?.value;
+        // const validDeviceCookie = isValidateDeviceCookie(
+        //     storedDeviceCookieId,
+        //     email,
+        // );
 
-        if (!validDeviceCookie) {
-            context.cookies().set('device_cookie', '', {
-                path: '/',
-                secure: env.NODE_ENV === 'production',
-                maxAge: 0,
-                httpOnly: true,
-            });
-            const storedTimeout = loginTimeout.get(email) ?? null;
-            const timeoutUntil = storedTimeout?.timeoutUntil ?? 0;
-            if (Date.now() < timeoutUntil) {
-                throw new HttpError(
-                    errorNames.Http.ClientError.TooManyRequests,
-                    httpStatus.ClientError.TooManyRequests,
-                    `You've made too many login attempts. Please try again in ${Math.floor(
-                        (timeoutUntil - Date.now()) / 1000,
-                    )} seconds.`,
-                    true,
-                );
-            }
-            const timeoutSeconds = storedTimeout
-                ? storedTimeout.timeoutSeconds * 2
-                : env.TIMEOUT_DURATION_S;
-            loginTimeout.set(email, {
-                timeoutUntil: Date.now() + timeoutSeconds * 1000,
-                timeoutSeconds,
-            });
-            try {
-                await auth.useKey('email', email.toLowerCase(), password); // throws `LuciaError` if invalid
-            } catch {
-                throw new HttpError(
-                    errorNames.Http.ClientError.BadRequest,
-                    httpStatus.ClientError.BadRequest,
-                    `The email or password you entered is incorrect. You can try again in ${timeoutSeconds} seconds.`,
-                    true,
-                );
-            }
-            loginTimeout.delete(email);
-        }
+        // if (!validDeviceCookie) {
+        //     context.cookies().set('device_cookie', '', {
+        //         path: '/',
+        //         secure: env.NODE_ENV === 'production',
+        //         maxAge: 0,
+        //         httpOnly: true,
+        //     });
+        //     const storedTimeout = loginTimeout.get(email) ?? null;
+        //     const timeoutUntil = storedTimeout?.timeoutUntil ?? 0;
+        //     if (Date.now() < timeoutUntil) {
+        //         throw new HttpError(
+        //             errorNames.Http.ClientError.TooManyRequests,
+        //             httpStatus.ClientError.TooManyRequests,
+        //             `You've made too many login attempts. Please try again in ${Math.floor(
+        //                 (timeoutUntil - Date.now()) / 1000,
+        //             )} seconds.`,
+        //             true,
+        //         );
+        //     }
+        //     const timeoutSeconds = storedTimeout
+        //         ? storedTimeout.timeoutSeconds * 2
+        //         : env.TIMEOUT_DURATION_S;
+        //     loginTimeout.set(email, {
+        //         timeoutUntil: Date.now() + timeoutSeconds * 1000,
+        //         timeoutSeconds,
+        //     });
+        //     try {
+        //         await auth.useKey('email', email.toLowerCase(), password); // throws `LuciaError` if invalid
+        //     } catch {
+        //         throw new HttpError(
+        //             errorNames.Http.ClientError.BadRequest,
+        //             httpStatus.ClientError.BadRequest,
+        //             `The email or password you entered is incorrect. You can try again in ${timeoutSeconds} seconds.`,
+        //             true,
+        //         );
+        //     }
+        //     loginTimeout.delete(email);
+        // }
 
-        const newDeviceCookieId = generateRandomString(40);
-        deviceCookie.set(newDeviceCookieId, {
-            email,
-            attempts: 0,
-        });
-        context.cookies().set('device_cookie', newDeviceCookieId, {
-            path: '/',
-            secure: env.NODE_ENV === 'production',
-            maxAge: env.DEVICE_COOKIE_DURATION_S * 1000,
-            httpOnly: true,
-        });
+        // const newDeviceCookieId = generateRandomString(40);
+        // deviceCookie.set(newDeviceCookieId, {
+        //     email,
+        //     attempts: 0,
+        // });
+        // context.cookies().set('device_cookie', newDeviceCookieId, {
+        //     path: '/',
+        //     secure: env.NODE_ENV === 'production',
+        //     maxAge: env.DEVICE_COOKIE_DURATION_S * 1000,
+        //     httpOnly: true,
+        // });
 
         await signInSchemaServer.parseAsync({
             email,
