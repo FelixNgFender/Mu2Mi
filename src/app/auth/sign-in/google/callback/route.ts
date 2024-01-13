@@ -1,7 +1,7 @@
 import { httpStatus } from '@/lib/http';
 import { auth, googleAuth } from '@/lib/auth';
 import { db } from '@/db';
-import { AppError, errorNames } from '@/server/error';
+import { AppError, errorNames } from '@/lib/error';
 import { user as userTable } from '@/db/schema';
 import { OAuthRequestError } from '@lucia-auth/oauth';
 import { eq } from 'drizzle-orm';

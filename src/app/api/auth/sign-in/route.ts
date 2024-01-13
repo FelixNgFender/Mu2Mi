@@ -5,7 +5,7 @@ import {
 } from '@/schemas/server/sign-in';
 import { auth } from '@/lib/auth';
 import { env } from '@/lib/env';
-import { HttpError, errorNames } from '@/server/error';
+import { HttpError, errorNames } from '@/lib/error';
 import { generateRandomString } from 'lucia/utils';
 import * as context from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';

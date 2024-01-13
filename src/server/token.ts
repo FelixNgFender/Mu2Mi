@@ -4,7 +4,7 @@ import {
     passwordReset as passwordResetTable,
 } from '@/db/schema';
 import { env } from '@/lib/env';
-import { AppError, errorNames } from '@/server/error';
+import { AppError, errorNames } from '@/lib/error';
 import { eq } from 'drizzle-orm';
 import { generateRandomString, isWithinExpiration } from 'lucia/utils';
 import 'server-cli-only';
