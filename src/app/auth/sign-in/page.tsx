@@ -1,4 +1,3 @@
-import { SignInForm } from '@/components/auth/sign-in-form';
 import { Icons } from '@/components/icons';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -9,10 +8,12 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
 import { getPageSession } from '@/lib/auth';
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+
+import { SignInForm } from './sign-in-form';
 
 const SignInPage = async () => {
     const session = await getPageSession();

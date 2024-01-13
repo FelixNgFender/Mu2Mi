@@ -1,4 +1,3 @@
-import { PasswordResetForm } from '@/components/auth/password-reset-form';
 import {
     Card,
     CardContent,
@@ -6,6 +5,8 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+
+import { PasswordResetForm } from './password-reset-form';
 
 const PasswordResetPage = async () => {
     return (

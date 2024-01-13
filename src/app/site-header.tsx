@@ -1,13 +1,14 @@
-import { Account } from '@/components/account';
-import { CommandMenu } from '@/components/command-menu';
 import { Icons } from '@/components/icons';
-import { MainNav } from '@/components/main-nav';
-import { MobileNav } from '@/components/mobile-nav';
-import { ModeToggle as ThemeToggle } from '@/components/theme-toggle';
 import { buttonVariants } from '@/components/ui/button';
 import { siteConfig } from '@/lib/config/site';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+
+import { Account } from './account';
+import { CommandMenu } from './command-menu';
+import { MainNav } from './main-nav';
+import { MobileNav } from './mobile-nav';
+import { ModeToggle as ThemeToggle } from './theme-toggle';
 
 export function SiteHeader() {
     return (

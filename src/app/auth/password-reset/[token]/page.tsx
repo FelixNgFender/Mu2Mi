@@ -1,7 +1,8 @@
-import { NewPasswordForm } from '@/components/auth/new-password-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getPageSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+
+import { NewPasswordForm } from './new-password-form';
 
 const SignUpPage = async ({
     params,

@@ -1,4 +1,3 @@
-import { EmailVerificationForm } from '@/components/auth/email-verification-form';
 import {
     Card,
     CardContent,
@@ -8,6 +7,8 @@ import {
 } from '@/components/ui/card';
 import { getPageSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+
+import { EmailVerificationForm } from './email-verification-form';
 
 const EmailVerificationPage = async () => {
     const session = await getPageSession();

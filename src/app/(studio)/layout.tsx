@@ -1,9 +1,10 @@
-import { StudioSidebar } from '@/components/studio-sidebar';
 import {
     ResizableHandle,
     ResizablePanel,
     ResizablePanelGroup,
 } from '@/components/ui/resizable';
+
+import { StudioSidebar } from './studio-sidebar';
 
 interface StudioLayoutProps {
     children: React.ReactNode;

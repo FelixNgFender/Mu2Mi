@@ -1,4 +1,3 @@
-import { SignUpForm } from '@/components/auth/sign-up-form';
 import { Icons } from '@/components/icons';
 import { buttonVariants } from '@/components/ui/button';
 import {
@@ -12,6 +11,8 @@ import { Separator } from '@/components/ui/separator';
 import { getPageSession } from '@/lib/auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+
+import { SignUpForm } from './sign-up-form';
 
 const SignUpPage = async () => {
     const session = await getPageSession();

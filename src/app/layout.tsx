@@ -1,14 +1,14 @@
-import { SiteHeader } from '@/components/site-header';
-import { TailwindIndicator } from '@/components/tailwind-indicator';
-import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
-import { cn } from '@/lib/utils';
 import { env } from '@/lib/env';
+import { cn } from '@/lib/utils';
 import { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 
 import './globals.css';
+import { SiteHeader } from './site-header';
+import { TailwindIndicator } from './tailwind-indicator';
+import { ThemeProvider } from './theme-provider';
 
 const fontSans = FontSans({
     subsets: ['latin'],
