@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { getPageSession } from '@/server/auth';
+import { getPageSession } from '@/lib/auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 

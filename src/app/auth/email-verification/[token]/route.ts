@@ -1,4 +1,4 @@
-import { auth } from '@/server/auth';
+import { auth } from '@/lib/auth';
 import { validateEmailVerificationToken } from '@/server/token';
 import type { NextRequest } from 'next/server';
 

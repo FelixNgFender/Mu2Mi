@@ -2,7 +2,7 @@ import {
     passwordResetSchemaServer,
     passwordResetSchemaServerType,
 } from '@/schemas/server/password-reset';
-import { auth } from '@/server/auth';
+import { auth } from '@/lib/auth';
 import { db } from '@/db';
 import { sendPasswordResetLink } from '@/server/email';
 import { user as userTable } from '@/db/schema';

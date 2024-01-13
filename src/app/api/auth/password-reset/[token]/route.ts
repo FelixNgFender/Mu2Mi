@@ -2,7 +2,7 @@ import {
     newPasswordSchemaServer,
     newPasswordSchemaServerType,
 } from '@/schemas/server/new-password';
-import { auth } from '@/server/auth';
+import { auth } from '@/lib/auth';
 import { validatePasswordResetToken } from '@/server/token';
 import { type NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';

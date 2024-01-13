@@ -1,4 +1,4 @@
-import { auth } from '@/server/auth';
+import { auth } from '@/lib/auth';
 import * as context from 'next/headers';
 import type { NextRequest } from 'next/server';
 

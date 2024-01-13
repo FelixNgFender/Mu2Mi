@@ -3,7 +3,7 @@ import {
     signInSchemaServer,
     signInSchemaServerType,
 } from '@/schemas/server/sign-in';
-import { auth } from '@/server/auth';
+import { auth } from '@/lib/auth';
 import { env } from '@/server/env';
 import { HttpError, errorNames } from '@/server/error';
 import { generateRandomString } from 'lucia/utils';

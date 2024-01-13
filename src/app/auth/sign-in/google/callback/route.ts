@@ -1,5 +1,5 @@
 import { httpStatus } from '@/lib/http';
-import { auth, googleAuth } from '@/server/auth';
+import { auth, googleAuth } from '@/lib/auth';
 import { db } from '@/db';
 import { AppError, errorNames } from '@/server/error';
 import { user as userTable } from '@/db/schema';

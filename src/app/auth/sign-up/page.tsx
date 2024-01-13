@@ -9,7 +9,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { getPageSession } from '@/server/auth';
+import { getPageSession } from '@/lib/auth';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 

@@ -1,4 +1,4 @@
-import { auth } from '@/server/auth';
+import { auth } from '@/lib/auth';
 import { sendEmailVerificationLink } from '@/server/email';
 import { generateEmailVerificationToken } from '@/server/token';
 import type { NextRequest } from 'next/server';

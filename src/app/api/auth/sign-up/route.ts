@@ -2,7 +2,7 @@ import {
     signUpSchemaServer,
     signUpSchemaServerType,
 } from '@/schemas/server/sign-up';
-import { auth } from '@/server/auth';
+import { auth } from '@/lib/auth';
 import { sendEmailVerificationLink } from '@/server/email';
 import { generateEmailVerificationToken } from '@/server/token';
 import * as context from 'next/headers';
