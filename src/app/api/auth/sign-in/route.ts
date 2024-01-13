@@ -93,16 +93,16 @@ export const POST = async (request: NextRequest) => {
             },
         });
     } catch (e) {
-        if (e instanceof TooManyRequestsError) {
-            return NextResponse.json(
-                {
-                    error: e.message,
-                },
-                {
-                    status: 429,
-                },
-            );
-        }
+        // if (e instanceof TooManyRequestsError) {
+        //     return NextResponse.json(
+        //         {
+        //             error: e.message,
+        //         },
+        //         {
+        //             status: 429,
+        //         },
+        //     );
+        // }
         if (e instanceof ZodError) {
             return NextResponse.json(
                 {
@@ -124,44 +124,44 @@ export const POST = async (request: NextRequest) => {
     }
 };
 
-export const loginTimeout = new Map<
-    string,
-    {
-        timeoutUntil: number;
-        timeoutSeconds: number;
-    }
->();
+// export const loginTimeout = new Map<
+//     string,
+//     {
+//         timeoutUntil: number;
+//         timeoutSeconds: number;
+//     }
+// >();
 
-export const deviceCookie = new Map<
-    string,
-    {
-        email: string;
-        attempts: number;
-    }
->();
+// export const deviceCookie = new Map<
+//     string,
+//     {
+//         email: string;
+//         attempts: number;
+//     }
+// >();
 
-export const isValidateDeviceCookie = (
-    deviceCookieId: string | undefined,
-    email: string,
-) => {
-    if (!deviceCookieId) return false;
-    const deviceCookieAttributes = deviceCookie.get(deviceCookieId) ?? null;
-    if (!deviceCookieAttributes) return false;
-    const currentAttempts = deviceCookieAttributes.attempts + 1;
-    if (currentAttempts > 5 || deviceCookieAttributes.email !== email) {
-        deviceCookie.delete(deviceCookieId);
-        return false;
-    }
-    deviceCookie.set(deviceCookieId, {
-        email: email,
-        attempts: currentAttempts,
-    });
-    return true;
-};
+// export const isValidateDeviceCookie = (
+//     deviceCookieId: string | undefined,
+//     email: string,
+// ) => {
+//     if (!deviceCookieId) return false;
+//     const deviceCookieAttributes = deviceCookie.get(deviceCookieId) ?? null;
+//     if (!deviceCookieAttributes) return false;
+//     const currentAttempts = deviceCookieAttributes.attempts + 1;
+//     if (currentAttempts > 5 || deviceCookieAttributes.email !== email) {
+//         deviceCookie.delete(deviceCookieId);
+//         return false;
+//     }
+//     deviceCookie.set(deviceCookieId, {
+//         email: email,
+//         attempts: currentAttempts,
+//     });
+//     return true;
+// };
 
-export class TooManyRequestsError extends Error {
-    constructor(message: string) {
-        super(message);
-        this.name = 'TooManyRequestsError';
-    }
-}
+// export class TooManyRequestsError extends Error {
+//     constructor(message: string) {
+//         super(message);
+//         this.name = 'TooManyRequestsError';
+//     }
+// }

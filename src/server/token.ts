@@ -1,10 +1,10 @@
-import { db } from '@/server/db';
-import { env } from '@/server/env';
-import { AppError, errorNames } from '@/server/error';
+import { db } from '@/db';
 import {
     emailVerification as emailVerificationTable,
     passwordReset as passwordResetTable,
-} from '@/server/schema';
+} from '@/db/schema';
+import { env } from '@/server/env';
+import { AppError, errorNames } from '@/server/error';
 import { eq } from 'drizzle-orm';
 import { generateRandomString, isWithinExpiration } from 'lucia/utils';
 import 'server-cli-only';

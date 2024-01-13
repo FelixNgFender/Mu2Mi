@@ -3,9 +3,9 @@ import {
     passwordResetSchemaServerType,
 } from '@/schemas/server/password-reset';
 import { auth } from '@/server/auth';
-import { db } from '@/server/db';
+import { db } from '@/db';
 import { sendPasswordResetLink } from '@/server/email';
-import { user as userTable } from '@/server/schema';
+import { user as userTable } from '@/db/schema';
 import { generatePasswordResetToken } from '@/server/token';
 import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';

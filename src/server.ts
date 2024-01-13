@@ -1,4 +1,4 @@
-import { queryClient, redisClient } from '@/server/db';
+import { queryClient, redisClient } from '@/db';
 import { env } from '@/server/env';
 import { errorHandler } from '@/server/error';
 import { logger } from '@/server/logger';

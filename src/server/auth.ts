@@ -1,4 +1,4 @@
-import { queryClient, redisClient } from '@/server/db';
+import { queryClient, redisClient } from '@/db';
 import { env } from '@/server/env';
 import { postgres as postgresAdapter } from '@lucia-auth/adapter-postgresql';
 import { redis as redisAdapter } from '@lucia-auth/adapter-session-redis';
