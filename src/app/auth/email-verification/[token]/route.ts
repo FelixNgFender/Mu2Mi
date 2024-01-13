@@ -1,5 +1,5 @@
 import { auth } from '@/lib/auth';
-import { validateEmailVerificationToken } from '@/server/token';
+import { validateEmailVerificationToken } from '@/lib/token';
 import type { NextRequest } from 'next/server';
 
 export const GET = async (

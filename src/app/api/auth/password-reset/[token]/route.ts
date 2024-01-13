@@ -3,7 +3,7 @@ import {
     newPasswordSchemaServerType,
 } from '@/schemas/server/new-password';
 import { auth } from '@/lib/auth';
-import { validatePasswordResetToken } from '@/server/token';
+import { validatePasswordResetToken } from '@/lib/token';
 import { type NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 

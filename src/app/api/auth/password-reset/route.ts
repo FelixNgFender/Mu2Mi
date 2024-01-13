@@ -6,7 +6,7 @@ import { auth } from '@/lib/auth';
 import { db } from '@/db';
 import { sendPasswordResetLink } from '@/lib/email';
 import { user as userTable } from '@/db/schema';
-import { generatePasswordResetToken } from '@/server/token';
+import { generatePasswordResetToken } from '@/lib/token';
 import { eq } from 'drizzle-orm';
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
