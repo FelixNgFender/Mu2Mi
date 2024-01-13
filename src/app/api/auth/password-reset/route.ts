@@ -4,7 +4,7 @@ import {
 } from '@/schemas/server/password-reset';
 import { auth } from '@/lib/auth';
 import { db } from '@/db';
-import { sendPasswordResetLink } from '@/server/email';
+import { sendPasswordResetLink } from '@/lib/email';
 import { user as userTable } from '@/db/schema';
 import { generatePasswordResetToken } from '@/server/token';
 import { eq } from 'drizzle-orm';

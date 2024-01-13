@@ -3,7 +3,7 @@ import {
     signUpSchemaServerType,
 } from '@/schemas/server/sign-up';
 import { auth } from '@/lib/auth';
-import { sendEmailVerificationLink } from '@/server/email';
+import { sendEmailVerificationLink } from '@/lib/email';
 import { generateEmailVerificationToken } from '@/server/token';
 import * as context from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
