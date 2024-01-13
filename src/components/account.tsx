@@ -41,10 +41,14 @@ export const Account = async ({
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                    <Settings className="mr-2 h-5 w-5" />
-                    Settings
-                </DropdownMenuItem>
+                {session && (
+                    <DropdownMenuItem>
+                        <Link href="/settings" className="flex flex-1">
+                            <Settings className="mr-2 h-5 w-5" />
+                            Settings
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 {!session && (
                     <DropdownMenuItem>
                         <Link href="/auth/sign-in" className="flex flex-1">
