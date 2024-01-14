@@ -10,6 +10,7 @@ const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'production', 'test']),
 
     // Express
+    PROTOCOL: z.enum(['http', 'https']),
     PORT: isNumber,
     HOST: isString,
 
@@ -17,7 +18,6 @@ const envSchema = z.object({
     NEXT_MANUAL_SIG_HANDLE: isBoolean,
 
     // General
-    ORIGIN: isString,
     APP_LOGGING: isBoolean,
     LOG_LEVEL: z.enum([
         'error',
@@ -51,10 +51,19 @@ const envSchema = z.object({
 /**
  * Centralized environment variables for the application.
  */
-export let env: z.infer<typeof envSchema>;
+export let env: z.infer<typeof envSchema> & {
+    // Derived properties
+    readonly ORIGIN: string;
+};
 
 try {
-    env = envSchema.parse(process.env);
+    const parsedEnv = envSchema.parse(process.env);
+    env = {
+        ...parsedEnv,
+        get ORIGIN() {
+            return `${parsedEnv.PROTOCOL}://${parsedEnv.HOST}:${parsedEnv.PORT}`;
+        },
+    };
 } catch (err) {
     if (err instanceof z.ZodError) {
         const { fieldErrors } = err.flatten();

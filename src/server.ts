@@ -7,8 +7,8 @@ import next from 'next';
 import 'server-cli-only';
 
 const dev = env.NODE_ENV !== 'production';
-const hostname = env.HOST || '127.0.0.1';
-const port = env.PORT || 3000;
+const hostname = env.HOST;
+const port = env.PORT;
 
 /**
  * Most of the time the default Next.js server will be enough but there are times you'll want to run your own server to integrate into an existing application.
@@ -47,9 +47,7 @@ const cleanup = async (exitCode = 0) => {
 
         server.listen(port, hostname, (err?: any) => {
             if (err) throw err;
-            logger.info(
-                `> Ready on http://${hostname}:${port} - env ${env.NODE_ENV}`,
-            );
+            logger.info(`> Ready on ${env.ORIGIN} - env ${env.NODE_ENV}`);
         });
 
         process.on('uncaughtException', async (err: Error) => {

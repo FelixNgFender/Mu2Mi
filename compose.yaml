@@ -1,6 +1,79 @@
 version: '3.8'
 
+name: mu2mi
+
 services:
+    web:
+        container_name: web
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: web.Dockerfile
+            target: development
+        ports:
+            - ${WEB_PORT}:${WEB_PORT}
+        develop:
+            watch:
+                - path: ./package.json
+                  action: rebuild
+                - path: ./package-lock.json
+                  action: rebuild
+                - path: ./next.config.js
+                  action: rebuild
+                - path: .
+                  target: /app
+                  action: sync
+        environment:
+            - NODE_ENV=${NODE_ENV}
+
+            - PROTOCOL=${PROTOCOL}
+            - PORT=${PORT}
+            - HOST=${HOST}
+
+            - NEXT_MANUAL_SIG_HANDLE=${NEXT_MANUAL_SIG_HANDLE}
+
+            - APP_LOGGING=${APP_LOGGING}
+            - LOG_LEVEL=${LOG_LEVEL}
+            - ENABLE_EMAIL=${ENABLE_EMAIL}
+            - TOKEN_DURATION_S=${TOKEN_DURATION_S}
+            - AUTH_COOKIE_DURATION_S=${AUTH_COOKIE_DURATION_S}
+            - DEVICE_COOKIE_DURATION_S=${DEVICE_COOKIE_DURATION_S}
+            - TIMEOUT_DURATION_S=${TIMEOUT_DURATION_S}
+
+            - DATABASE_LOGGING=${DATABASE_LOGGING}
+            - DATABASE_URL=${DATABASE_URL}
+            - REDIS_URL=${REDIS_URL}
+
+            - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+            - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+            - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+
+            - FACEBOOK_CLIENT_ID=${FACEBOOK_CLIENT_ID}
+            - FACEBOOK_CLIENT_SECRET=${FACEBOOK_CLIENT_SECRET}
+            - FACEBOOK_REDIRECT_URI=${FACEBOOK_REDIRECT_URI}
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+            minio:
+                condition: service_healthy
+            web-migration:
+                condition: service_completed_successfully
+
+    web-migration:
+        build:
+            context: .
+            dockerfile: migration.Dockerfile
+            target: migration
+        container_name: web-migration
+        restart: on-failure
+        environment:
+            - DATABASE_URL=${DATABASE_URL}
+        depends_on:
+            postgres:
+                condition: service_healthy
+
     postgres:
         image: postgres:alpine
         container_name: postgres
@@ -37,7 +110,31 @@ services:
         ports:
             - ${REDIS_PORT}:${REDIS_PORT}
         healthcheck:
-            test: redis-cli ping
+            test: ['CMD', 'redis-cli', 'ping']
+            interval: 1s
+            timeout: 5s
+            retries: 10
+
+    minio:
+        image: bitnami/minio:latest
+        container_name: minio
+        restart: unless-stopped
+        environment:
+            - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+            - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+        ports:
+            - ${S3_PORT}:${S3_PORT}
+            - ${MINIO_CLIENT_PORT}:${MINIO_CLIENT_PORT}
+        volumes:
+            - minio_data:/bitnami/minio/data
+        healthcheck:
+            test:
+                [
+                    'CMD',
+                    'curl',
+                    '-f',
+                    'http://localhost:${S3_PORT}/minio/health/live',
+                ]
             interval: 1s
             timeout: 5s
             retries: 10
@@ -46,4 +143,6 @@ volumes:
     postgres-data:
         driver: local
     redis-data:
+        driver: local
+    minio_data:
         driver: local
