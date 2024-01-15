@@ -43,6 +43,12 @@ services:
             - DATABASE_LOGGING=${DATABASE_LOGGING}
             - DATABASE_URL=${DATABASE_URL}
             - REDIS_URL=${REDIS_URL}
+            - S3_ENDPOINT=${S3_ENDPOINT}
+            - S3_PORT=${S3_PORT}
+            - S3_USE_SSL=${S3_USE_SSL}
+            - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+            - S3_SECRET_KEY=${S3_SECRET_KEY}
+            - S3_BUCKET_NAME=${S3_BUCKET_NAME}
 
             - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
             - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
@@ -51,6 +57,10 @@ services:
             - FACEBOOK_CLIENT_ID=${FACEBOOK_CLIENT_ID}
             - FACEBOOK_CLIENT_SECRET=${FACEBOOK_CLIENT_SECRET}
             - FACEBOOK_REDIRECT_URI=${FACEBOOK_REDIRECT_URI}
+
+            - REPLICATE_API_TOKEN=${REPLICATE_API_TOKEN}
+            - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+            - TRACK_SEPARATION_MODEL_VERSION=${TRACK_SEPARATION_MODEL_VERSION}
         depends_on:
             postgres:
                 condition: service_healthy
@@ -59,6 +69,8 @@ services:
             minio:
                 condition: service_healthy
             web-migration:
+                condition: service_completed_successfully
+            bucket-creation:
                 condition: service_completed_successfully
 
     web-migration:
@@ -72,6 +84,25 @@ services:
             - DATABASE_URL=${DATABASE_URL}
         depends_on:
             postgres:
+                condition: service_healthy
+
+    bucket-creation:
+        build:
+            context: .
+            dockerfile: bucket-creation.Dockerfile
+            target: bucket-creation
+        container_name: bucket-creation
+        restart: on-failure
+        environment:
+            - S3_ENDPOINT=${S3_ENDPOINT}
+            - S3_PORT=${S3_PORT}
+            - S3_USE_SSL=${S3_USE_SSL}
+            - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+            - S3_SECRET_KEY=${S3_SECRET_KEY}
+            - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+            - S3_BUCKET_REGION=${S3_BUCKET_REGION}
+        depends_on:
+            minio:
                 condition: service_healthy
 
     postgres:
@@ -120,11 +151,11 @@ services:
         container_name: minio
         restart: unless-stopped
         environment:
-            - MINIO_ROOT_USER=${MINIO_ROOT_USER}
-            - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+            - MINIO_ROOT_USER=${S3_ACCESS_KEY}
+            - MINIO_ROOT_PASSWORD=${S3_SECRET_KEY}
         ports:
             - ${S3_PORT}:${S3_PORT}
-            - ${MINIO_CLIENT_PORT}:${MINIO_CLIENT_PORT}
+            - ${S3_CLIENT_PORT}:${S3_CLIENT_PORT}
         volumes:
             - minio_data:/bitnami/minio/data
         healthcheck:

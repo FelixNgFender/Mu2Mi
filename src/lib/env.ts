@@ -38,6 +38,12 @@ const envSchema = z.object({
     DATABASE_LOGGING: isBoolean,
     DATABASE_URL: isString,
     REDIS_URL: isString,
+    S3_ENDPOINT: isString,
+    S3_PORT: isNumber,
+    S3_USE_SSL: isBoolean,
+    S3_ACCESS_KEY: isString,
+    S3_SECRET_KEY: isString,
+    S3_BUCKET_NAME: isString,
 
     // Auth
     GOOGLE_CLIENT_ID: isString,
@@ -46,6 +52,11 @@ const envSchema = z.object({
     FACEBOOK_CLIENT_ID: isString,
     FACEBOOK_CLIENT_SECRET: isString,
     FACEBOOK_REDIRECT_URI: isString,
+
+    // Replicate
+    REPLICATE_API_TOKEN: isString,
+    WEBHOOK_SECRET: isString,
+    TRACK_SEPARATION_MODEL_VERSION: isString,
 });
 
 /**
