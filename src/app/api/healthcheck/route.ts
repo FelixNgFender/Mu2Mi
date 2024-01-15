@@ -1,5 +1,4 @@
-import { queryClient, redisClient } from '@/db';
-import { logger } from '@/lib/logger';
+import { fileStorageClient, queryClient, redisClient } from '@/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,10 +13,20 @@ export const GET = async () => {
             start -
             Number(databaseLatency)
         ).toFixed(2);
+        await fileStorageClient.bucketExists(
+            'bucket-name-of-a-non-existent-bucket',
+        );
+        const fileStorageLatency = (
+            performance.now() -
+            start -
+            Number(databaseLatency) -
+            Number(redisLatency)
+        ).toFixed(2);
         return Response.json({
             status: 200,
             databaseLatency: databaseLatency + 'ms',
             redisLatency: redisLatency + 'ms',
+            fileStorageLatency: fileStorageLatency + 'ms',
         });
     } catch (e) {
         return new Response(null, {
