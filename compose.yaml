@@ -147,25 +147,20 @@ services:
             retries: 10
 
     minio:
-        image: bitnami/minio:latest
+        image: quay.io/minio/minio:latest
         container_name: minio
         restart: unless-stopped
+        command: server /data --console-address ":${S3_CONSOLE_PORT}"
         environment:
             - MINIO_ROOT_USER=${S3_ACCESS_KEY}
             - MINIO_ROOT_PASSWORD=${S3_SECRET_KEY}
         ports:
             - ${S3_PORT}:${S3_PORT}
-            - ${S3_CLIENT_PORT}:${S3_CLIENT_PORT}
+            - ${S3_CONSOLE_PORT}:${S3_CONSOLE_PORT}
         volumes:
-            - minio_data:/bitnami/minio/data
+            - minio_data:/data
         healthcheck:
-            test:
-                [
-                    'CMD',
-                    'curl',
-                    '-f',
-                    'http://localhost:${S3_PORT}/minio/health/live',
-                ]
+            test: ['CMD', 'mc', 'ready', 'local']
             interval: 1s
             timeout: 5s
             retries: 10
