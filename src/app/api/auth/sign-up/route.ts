@@ -1,24 +1,30 @@
+import { auth } from '@/lib/auth';
+import { sendEmailVerificationLink } from '@/lib/email';
+import { errorHandler } from '@/lib/error';
+import { HttpResponse } from '@/lib/response';
+import { generateEmailVerificationToken } from '@/lib/token';
 import {
     signUpSchemaServer,
     signUpSchemaServerType,
-} from '@/schemas/server/sign-up';
-import { auth } from '@/lib/auth';
-import { sendEmailVerificationLink } from '@/lib/email';
-import { generateEmailVerificationToken } from '@/lib/token';
+} from '@/lib/validations/server/sign-up';
 import * as context from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
-import { ZodError } from 'zod';
+import { NextRequest } from 'next/server';
 
 export const POST = async (request: NextRequest) => {
     try {
         const data: signUpSchemaServerType = await request.json();
         const { email, password, confirmPassword } = data;
 
-        await signUpSchemaServer.parseAsync({
+        const result = await signUpSchemaServer.safeParseAsync({
             email,
             password,
             confirmPassword,
         });
+
+        if (!result.success) {
+            return HttpResponse.badRequest(result.error.format());
+        }
+
         const user = await auth.createUser({
             key: {
                 providerId: 'email',
@@ -42,30 +48,11 @@ export const POST = async (request: NextRequest) => {
         const token = await generateEmailVerificationToken(user.userId);
         await sendEmailVerificationLink(email, token);
 
-        return new Response(null, {
-            status: 302,
-            headers: {
-                Location: '/auth/email-verification',
-            },
+        return HttpResponse.redirect(undefined, {
+            Location: '/auth/email-verification',
         });
-    } catch (e) {
-        if (e instanceof ZodError) {
-            return NextResponse.json(
-                {
-                    errors: e.errors,
-                },
-                {
-                    status: 400,
-                },
-            );
-        }
-        return NextResponse.json(
-            {
-                error: 'Server error, please try again later',
-            },
-            {
-                status: 500,
-            },
-        );
+    } catch (err) {
+        errorHandler.handleError(err as Error);
+        return HttpResponse.internalServerError();
     }
 };

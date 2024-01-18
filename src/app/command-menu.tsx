@@ -10,7 +10,7 @@ import {
     CommandList,
     CommandSeparator,
 } from '@/components/ui/command';
-import { studioConfig } from '@/lib/config/studio';
+import { studioConfig } from '@/lib/configs/studio';
 import { cn } from '@/lib/utils';
 import { DialogProps } from '@radix-ui/react-dialog';
 import { Circle, File, Laptop, Moon, Sun } from 'lucide-react';
@@ -25,7 +25,10 @@ export function CommandMenu({ ...props }: DialogProps) {
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
-            if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || e.key === '/') {
+            if (
+                (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) ||
+                e.key === '/'
+            ) {
                 if (
                     (e.target instanceof HTMLElement &&
                         e.target.isContentEditable) ||
@@ -83,7 +86,6 @@ export function CommandMenu({ ...props }: DialogProps) {
                                         );
                                     }}
                                 >
-                                    {/* <File className="mr-2 h-4 w-4" /> */}
                                     {navItem.icon &&
                                         navItem.icon({
                                             className: 'mr-2 h-4 w-4',
@@ -105,7 +107,6 @@ export function CommandMenu({ ...props }: DialogProps) {
                                     }}
                                 >
                                     <div className="mr-2 flex h-4 w-4 items-center justify-center">
-                                        {/* <Circle className="h-3 w-3" /> */}
                                         {navItem.icon &&
                                             navItem.icon({
                                                 className: 'h-3 w-3',

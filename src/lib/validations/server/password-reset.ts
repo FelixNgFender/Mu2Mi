@@ -1,4 +1,4 @@
-import { signUpSchemaClient } from '@/schemas/client/sign-up';
+import { passwordResetSchemaClient } from '@/lib/validations/client/password-reset';
 import { db } from '@/db';
 import { user as userTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -9,18 +9,23 @@ import * as z from 'zod';
  * For **server-side** validation. If you use async refinements, you must use the
  * `parseAsync` method to parse data! Otherwise Zod will throw an error.
  */
-export const signUpSchemaServer = signUpSchemaClient.refine(
+export const passwordResetSchemaServer = passwordResetSchemaClient.refine(
     async ({ email }) => {
         const [user] = await db
             .select()
             .from(userTable)
             .where(eq(userTable.email, email.toLowerCase()));
-        return !user;
+        if (user) {
+            return true;
+        }
+        return false;
     },
     {
-        message: 'Email already taken',
+        message: 'User does not exist',
         path: ['email'],
     },
 );
 
-export type signUpSchemaServerType = z.infer<typeof signUpSchemaServer>;
+export type passwordResetSchemaServerType = z.infer<
+    typeof passwordResetSchemaServer
+>;

@@ -1,6 +1,6 @@
 import { Icons } from '@/components/icons';
 import { buttonVariants } from '@/components/ui/button';
-import { siteConfig } from '@/lib/config/site';
+import { siteConfig } from '@/lib/configs/site';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 

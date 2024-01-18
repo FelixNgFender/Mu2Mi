@@ -1,4 +1,6 @@
 import { auth } from '@/lib/auth';
+import { errorHandler } from '@/lib/error';
+import { HttpResponse } from '@/lib/response';
 import { validateEmailVerificationToken } from '@/lib/token';
 import type { NextRequest } from 'next/server';
 
@@ -25,16 +27,12 @@ export const GET = async (
             attributes: {},
         });
         const sessionCookie = auth.createSessionCookie(session);
-        return new Response(null, {
-            status: 302,
-            headers: {
-                Location: '/',
-                'Set-Cookie': sessionCookie.serialize(),
-            },
+        return HttpResponse.redirect(undefined, {
+            Location: '/',
+            'Set-Cookie': sessionCookie.serialize(),
         });
-    } catch {
-        return new Response('Invalid email verification link', {
-            status: 400,
-        });
+    } catch (err) {
+        errorHandler.handleError(err as Error);
+        return HttpResponse.badRequest('Invalid email verification link');
     }
 };

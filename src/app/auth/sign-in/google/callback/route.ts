@@ -1,8 +1,9 @@
-import { httpStatus } from '@/lib/http';
-import { auth, googleAuth } from '@/lib/auth';
 import { db } from '@/db';
-import { AppError, errorNames } from '@/lib/error';
 import { user as userTable } from '@/db/schema';
+import { auth, googleAuth } from '@/lib/auth';
+import { AppError, errorHandler, errorNames } from '@/lib/error';
+import { httpStatus } from '@/lib/http';
+import { HttpResponse } from '@/lib/response';
 import { OAuthRequestError } from '@lucia-auth/oauth';
 import { eq } from 'drizzle-orm';
 import { cookies, headers } from 'next/headers';
@@ -14,9 +15,7 @@ export const GET = async (request: NextRequest) => {
     const state = url.searchParams.get('state');
     const code = url.searchParams.get('code');
     if (!storedState || !state || storedState !== state || !code) {
-        return new Response(null, {
-            status: 400,
-        });
+        return HttpResponse.badRequest();
     }
     try {
         const { getExistingUser, googleUser, createUser, createKey } =
@@ -26,14 +25,14 @@ export const GET = async (request: NextRequest) => {
             if (existingUser) return existingUser;
             if (!googleUser.email_verified) {
                 throw new AppError(
-                    errorNames.Application.OAuthError,
+                    errorNames.validationError,
                     'Email not verified',
                     true,
                 );
             }
             if (!googleUser.email) {
                 throw new AppError(
-                    errorNames.Application.OAuthError,
+                    errorNames.validationError,
                     'Email not provided',
                     true,
                 );
@@ -73,20 +72,17 @@ export const GET = async (request: NextRequest) => {
             headers,
         });
         authRequest.setSession(session);
-        return new Response(null, {
-            status: httpStatus.Redirect.Found,
-            headers: {
-                Location: '/',
-            },
+        return HttpResponse.redirect(undefined, {
+            Location: '/',
         });
-    } catch (e) {
-        if (e instanceof OAuthRequestError) {
-            return new Response(null, {
-                status: httpStatus.ClientError.BadRequest,
-            });
+    } catch (err) {
+        if (err instanceof AppError) {
+            return HttpResponse.unprocessableEntity(err.message);
         }
-        return new Response(null, {
-            status: httpStatus.ServerError.InternalServerError,
-        });
+        if (err instanceof OAuthRequestError) {
+            return HttpResponse.badRequest();
+        }
+        errorHandler.handleError(err as Error);
+        return HttpResponse.internalServerError();
     }
 };

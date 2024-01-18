@@ -22,7 +22,11 @@ const StudioLayout = async ({ children }: StudioLayoutProps) => {
                 <StudioSidebar />
             </ResizablePanel>
             <ResizableHandle className="hidden opacity-30 hover:opacity-100 md:flex" />
-            <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
+            <ResizablePanel defaultSize={80}>
+                <section className="container relative flex h-full max-w-screen-lg flex-col space-y-4 py-4">
+                    {children}
+                </section>
+            </ResizablePanel>
         </ResizablePanelGroup>
     );
 };

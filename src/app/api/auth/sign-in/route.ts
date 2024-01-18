@@ -1,15 +1,12 @@
-import { httpStatus } from '@/lib/http';
+import { auth } from '@/lib/auth';
+import { errorHandler } from '@/lib/error';
+import { HttpResponse } from '@/lib/response';
 import {
     signInSchemaServer,
     signInSchemaServerType,
-} from '@/schemas/server/sign-in';
-import { auth } from '@/lib/auth';
-import { env } from '@/lib/env';
-import { HttpError, errorNames } from '@/lib/error';
-import { generateRandomString } from 'lucia/utils';
+} from '@/lib/validations/server/sign-in';
 import * as context from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
-import { ZodError } from 'zod';
+import { NextRequest } from 'next/server';
 
 export const POST = async (request: NextRequest) => {
     try {
@@ -73,11 +70,15 @@ export const POST = async (request: NextRequest) => {
         //     httpOnly: true,
         // });
 
-        await signInSchemaServer.parseAsync({
+        const result = await signInSchemaServer.safeParseAsync({
             email,
             password,
             rememberMe,
         });
+
+        if (!result.success) {
+            return HttpResponse.badRequest(result.error.format());
+        }
 
         const key = await auth.useKey('email', email.toLowerCase(), password);
         const session = await auth.createSession({
@@ -86,41 +87,12 @@ export const POST = async (request: NextRequest) => {
         });
         const authRequest = auth.handleRequest(request.method, context);
         authRequest.setSession(session);
-        return new Response(null, {
-            status: 302,
-            headers: {
-                Location: '/',
-            },
+        return HttpResponse.redirect(undefined, {
+            Location: '/',
         });
-    } catch (e) {
-        // if (e instanceof TooManyRequestsError) {
-        //     return NextResponse.json(
-        //         {
-        //             error: e.message,
-        //         },
-        //         {
-        //             status: 429,
-        //         },
-        //     );
-        // }
-        if (e instanceof ZodError) {
-            return NextResponse.json(
-                {
-                    errors: e.errors,
-                },
-                {
-                    status: 400,
-                },
-            );
-        }
-        return NextResponse.json(
-            {
-                error: 'Server error, please try again later',
-            },
-            {
-                status: 500,
-            },
-        );
+    } catch (err) {
+        errorHandler.handleError(err as Error);
+        return HttpResponse.internalServerError();
     }
 };
 

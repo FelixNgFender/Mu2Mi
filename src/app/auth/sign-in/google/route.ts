@@ -1,5 +1,6 @@
 import { googleAuth } from '@/lib/auth';
 import { env } from '@/lib/env';
+import { HttpResponse } from '@/lib/response';
 import * as context from 'next/headers';
 import type { NextRequest } from 'next/server';
 
@@ -11,10 +12,7 @@ export const GET = async (request: NextRequest) => {
         path: '/',
         maxAge: env.AUTH_COOKIE_DURATION_S,
     });
-    return new Response(null, {
-        status: 302,
-        headers: {
-            Location: url.toString(),
-        },
+    return HttpResponse.redirect(undefined, {
+        Location: url.toString(),
     });
 };

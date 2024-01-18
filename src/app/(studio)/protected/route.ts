@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth';
+import { HttpResponse } from '@/lib/response';
 import * as context from 'next/headers';
 import type { NextRequest } from 'next/server';
 
@@ -7,18 +8,12 @@ export const POST = async (request: NextRequest) => {
     // check if user is authenticated
     const session = await authRequest.validate();
     if (!session) {
-        return new Response(null, {
-            status: 401,
-        });
+        return HttpResponse.unauthorized();
     }
 
     if (!session.user.emailVerified) {
-        return new Response(null, {
-            status: 403,
-        });
+        return HttpResponse.unprocessableEntity('Email not verified');
     }
 
-    return new Response(JSON.stringify(session.user), {
-        status: 200,
-    });
+    return HttpResponse.success(session.user);
 };

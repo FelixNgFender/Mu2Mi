@@ -44,7 +44,7 @@ export const validateEmailVerificationToken = async (token: string) => {
             .where(eq(emailVerificationTable.id, token));
         if (!storedToken)
             throw new AppError(
-                errorNames.Application.TokenError,
+                errorNames.validationError,
                 'Invalid token',
                 true,
             );
@@ -55,11 +55,7 @@ export const validateEmailVerificationToken = async (token: string) => {
     });
     const tokenExpires = Number(storedToken.expires); // bigint => number conversion
     if (!isWithinExpiration(tokenExpires)) {
-        throw new AppError(
-            errorNames.Application.TokenError,
-            'Expired token',
-            true,
-        );
+        throw new AppError(errorNames.validationError, 'Expired token', true);
     }
     return storedToken.userId;
 };
@@ -96,7 +92,7 @@ export const validatePasswordResetToken = async (token: string) => {
             .where(eq(passwordResetTable.id, token));
         if (!storedToken)
             throw new AppError(
-                errorNames.Application.TokenError,
+                errorNames.validationError,
                 'Invalid token',
                 true,
             );
@@ -107,11 +103,7 @@ export const validatePasswordResetToken = async (token: string) => {
     });
     const tokenExpires = Number(storedToken.expires); // bigint => number conversion
     if (!isWithinExpiration(tokenExpires)) {
-        throw new AppError(
-            errorNames.Application.TokenError,
-            'Expired token',
-            true,
-        );
+        throw new AppError(errorNames.validationError, 'Expired token', true);
     }
     return storedToken.userId;
 };

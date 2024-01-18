@@ -1,4 +1,6 @@
 import { fileStorageClient, queryClient, redisClient } from '@/db';
+import { errorHandler } from '@/lib/error';
+import { HttpResponse } from '@/lib/response';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,15 +24,13 @@ export const GET = async () => {
             Number(databaseLatency) -
             Number(redisLatency)
         ).toFixed(2);
-        return Response.json({
-            status: 200,
+        return HttpResponse.success({
             databaseLatency: databaseLatency + 'ms',
             redisLatency: redisLatency + 'ms',
             fileStorageLatency: fileStorageLatency + 'ms',
         });
-    } catch (e) {
-        return new Response(null, {
-            status: 500,
-        });
+    } catch (err) {
+        errorHandler.handleError(err as Error);
+        return HttpResponse.internalServerError();
     }
 };

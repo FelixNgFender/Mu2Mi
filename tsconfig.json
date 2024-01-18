@@ -20,14 +20,16 @@
         ],
         "paths": {
             "@/*": ["./src/*"]
-        }
+        },
+        "noUncheckedIndexedAccess": true
     },
     "include": [
         "next-env.d.ts",
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "app.d.ts"
+        "app.d.ts",
+        "src/lib/types/replicate-openapi.d.ts"
     ],
     "exclude": ["node_modules"]
 }

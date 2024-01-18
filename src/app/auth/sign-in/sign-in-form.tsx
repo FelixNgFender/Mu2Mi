@@ -16,7 +16,7 @@ import { useToast } from '@/components/ui/use-toast';
 import {
     signInSchemaClient,
     signInSchemaClientType,
-} from '@/schemas/client/sign-in';
+} from '@/lib/validations/client/sign-in';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

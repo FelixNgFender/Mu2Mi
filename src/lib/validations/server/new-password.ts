@@ -1,4 +1,4 @@
-import { newPasswordSchemaClient } from '@/schemas/client/new-password';
+import { newPasswordSchemaClient } from '@/lib/validations/client/new-password';
 import 'server-cli-only';
 import * as z from 'zod';
 

@@ -16,7 +16,7 @@ import { useToast } from '@/components/ui/use-toast';
 import {
     passwordResetSchemaClient,
     passwordResetSchemaClientType,
-} from '@/schemas/client/password-reset';
+} from '@/lib/validations/client/password-reset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

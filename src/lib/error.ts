@@ -1,65 +1,28 @@
-import {
-    type ClientErrorHttpCode,
-    type ServerErrorHttpCode,
-    httpStatus,
-} from '@/lib/http';
+import { httpStatus } from '@/lib/http';
 import { logger } from '@/lib/logger';
 import 'server-cli-only';
 
-type ApplicationErrorNames = {
-    [key in keyof typeof applicationErrorNames]: string;
-};
+export const errorNames = {
+    startupError: 'StartupError',
+    validationError: 'ValidationError',
+    httpError: 'HttpError',
+} as const;
 
-type HttpErrorNames = {
-    [key in keyof typeof httpErrorNames]: {
-        [innerKey: string]: string;
-    };
-};
+export const httpErrorCodes = {
+    ...httpStatus.clientError,
+    ...httpStatus.serverError,
+} as const;
 
-const applicationErrorNames = {
-    OAuthError: 'OAuthError',
-    TokenError: 'TokenError',
-};
-
-const httpErrorNames = Object.entries(httpStatus)
-    .filter(([key]) => key === 'ClientError' || key === 'ServerError')
-    .reduce(
-        (acc, [key, value]) => {
-            acc[key] = Object.keys(value).reduce(
-                (innerAcc, innerKey) => {
-                    innerAcc[innerKey] = `Http${innerKey}`;
-                    return innerAcc;
-                },
-                {} as Record<string, string>,
-            );
-            return acc;
-        },
-        {} as Record<string, Record<string, string>>,
-    );
-
-export const errorNames: {
-    Application: ApplicationErrorNames;
-    Http: HttpErrorNames;
-} = {
-    Application: {
-        ...applicationErrorNames,
-    },
-    Http: {
-        ...httpErrorNames,
-    },
-};
-
-/**
- * Centralized error handler
- */
 export class AppError extends Error {
-    public readonly name: string;
+    public readonly name: (typeof errorNames)[keyof typeof errorNames];
     public readonly isOperational: boolean;
+    public readonly httpCode?: (typeof httpErrorCodes)[keyof typeof httpErrorCodes];
 
     constructor(
-        name: string,
+        name: (typeof errorNames)[keyof typeof errorNames],
         message: string | undefined,
         isOperational: boolean,
+        httpCode?: (typeof httpErrorCodes)[keyof typeof httpErrorCodes],
     ) {
         super(message);
 
@@ -67,38 +30,38 @@ export class AppError extends Error {
 
         this.name = name;
         this.isOperational = isOperational;
+        this.httpCode = httpCode;
 
         Error.captureStackTrace(this);
     }
 }
 
-export class HttpError extends AppError {
-    public readonly httpCode: ClientErrorHttpCode | ServerErrorHttpCode;
-
-    constructor(
-        name: string,
-        httpCode: ClientErrorHttpCode | ServerErrorHttpCode,
-        message: string | undefined,
-        isOperational: boolean,
-    ) {
-        super(name, message, isOperational);
-
-        this.httpCode = httpCode;
-    }
-}
-
 class ErrorHandler {
-    public isTrustedError(error: Error) {
+    isTrustedError(error: Error) {
         if (error instanceof AppError) return error.isOperational;
         return false;
     }
 
+    crashIfUntrustedError = (error: Error) => {
+        if (!this.isTrustedError(error)) {
+            process.exit(1);
+        }
+    };
+
+    /**
+     * Handle errors. In case you are using this inside route handlers, you also need to return a response to the client afterwards.
+     */
     public async handleError(error: Error): Promise<void> {
         logger.error(error);
         // await sendMailToAdminIfCritical();
         // await saveInOpsQueueIfCritical();
         // await determineIfOperationalError();
+        // await fireMonitoringMetric(error);
+        this.crashIfUntrustedError(error);
     }
 }
 
+/**
+ * Centralized error handler
+ */
 export const errorHandler = new ErrorHandler();

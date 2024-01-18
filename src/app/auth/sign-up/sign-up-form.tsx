@@ -14,7 +14,7 @@ import { useToast } from '@/components/ui/use-toast';
 import {
     signUpSchemaClient,
     signUpSchemaClientType,
-} from '@/schemas/client/sign-up';
+} from '@/lib/validations/client/sign-up';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

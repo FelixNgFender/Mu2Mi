@@ -1,11 +1,12 @@
+import { auth } from '@/lib/auth';
+import { errorHandler } from '@/lib/error';
+import { HttpResponse } from '@/lib/response';
+import { validatePasswordResetToken } from '@/lib/token';
 import {
     newPasswordSchemaServer,
     newPasswordSchemaServerType,
-} from '@/schemas/server/new-password';
-import { auth } from '@/lib/auth';
-import { validatePasswordResetToken } from '@/lib/token';
-import { type NextRequest, NextResponse } from 'next/server';
-import { ZodError } from 'zod';
+} from '@/lib/validations/server/new-password';
+import { type NextRequest } from 'next/server';
 
 export const POST = async (
     request: NextRequest,
@@ -21,11 +22,14 @@ export const POST = async (
         const data: newPasswordSchemaServerType = await request.json();
         const { password, confirmPassword } = data;
 
-        await newPasswordSchemaServer.parseAsync({
+        const result = await newPasswordSchemaServer.safeParseAsync({
             password,
             confirmPassword,
         });
 
+        if (!result.success) {
+            return HttpResponse.badRequest(result.error.format());
+        }
         const { token } = params;
         const userId = await validatePasswordResetToken(token);
         let user = await auth.getUser(userId);
@@ -41,31 +45,12 @@ export const POST = async (
             attributes: {},
         });
         const sessionCookie = auth.createSessionCookie(session);
-        return new Response(null, {
-            status: 302,
-            headers: {
-                Location: '/',
-                'Set-Cookie': sessionCookie.serialize(),
-            },
+        return HttpResponse.redirect(undefined, {
+            Location: '/',
+            'Set-Cookie': sessionCookie.serialize(),
         });
-    } catch (e) {
-        if (e instanceof ZodError) {
-            return NextResponse.json(
-                {
-                    errors: e.errors,
-                },
-                {
-                    status: 400,
-                },
-            );
-        }
-        return NextResponse.json(
-            {
-                error: 'Invalid or expired password reset link',
-            },
-            {
-                status: 400,
-            },
-        );
+    } catch (err) {
+        errorHandler.handleError(err as Error);
+        return HttpResponse.internalServerError();
     }
 };

@@ -2,7 +2,7 @@ import { queryClient, redisClient } from '@/db';
 import { env } from '@/lib/env';
 import { errorHandler } from '@/lib/error';
 import { logger } from '@/lib/logger';
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import next from 'next';
 import 'server-cli-only';
 
@@ -24,7 +24,7 @@ const externalSignals = ['SIGINT', 'SIGTERM'];
  * Tear down resources and gracefully exit the process.
  * @param exitCode Non-zero exit code indicates an error.
  */
-const cleanup = async (exitCode = 0) => {
+export const cleanup = async (exitCode = 0) => {
     await queryClient.end();
     await redisClient.quit();
     logger.info('Gracefully shutting down...');
@@ -50,9 +50,23 @@ const cleanup = async (exitCode = 0) => {
             logger.info(`> Ready on ${env.ORIGIN} - env ${env.NODE_ENV}`);
         });
 
+        server.use(
+            async (
+                err: Error,
+                req: Request,
+                res: Response,
+                next: NextFunction,
+            ) => {
+                await errorHandler.handleError(err);
+            },
+        );
+
+        process.on('unhandledRejection', (reason: string, p: Promise<any>) => {
+            throw reason;
+        });
+
         process.on('uncaughtException', async (err: Error) => {
             errorHandler.handleError(err);
-            if (!errorHandler.isTrustedError(err)) await cleanup(1);
         });
 
         externalSignals.forEach((signal) => {
@@ -61,7 +75,7 @@ const cleanup = async (exitCode = 0) => {
             });
         });
     } catch (err) {
-        logger.error(err);
+        logger.error(err); // Keep this here instead of using errorHandler to catch errors during startup.
         process.exit(1);
     }
 })();

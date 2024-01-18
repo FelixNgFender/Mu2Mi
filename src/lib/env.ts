@@ -44,6 +44,7 @@ const envSchema = z.object({
     S3_ACCESS_KEY: isString,
     S3_SECRET_KEY: isString,
     S3_BUCKET_NAME: isString,
+    S3_PRESIGNED_URL_EXPIRATION_S: isNumber,
 
     // Auth
     GOOGLE_CLIENT_ID: isString,
