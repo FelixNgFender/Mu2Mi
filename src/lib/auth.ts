@@ -45,14 +45,12 @@ export const googleAuth = google(auth, {
     ],
 });
 
-// TODO: Implement routes
-// TODO: Get new client ID and secret
-// export const facebookAuth = facebook(auth, {
-//     clientId: env.FACEBOOK_CLIENT_ID,
-//     clientSecret: env.FACEBOOK_CLIENT_SECRET,
-//     redirectUri: env.FACEBOOK_REDIRECT_URI,
-//     scope: ['email', 'public_profile'],
-// });
+export const facebookAuth = facebook(auth, {
+    clientId: env.FACEBOOK_CLIENT_ID,
+    clientSecret: env.FACEBOOK_CLIENT_SECRET,
+    redirectUri: env.FACEBOOK_REDIRECT_URI,
+    scope: ['email', 'public_profile'],
+});
 
 // TODO: Implement routes
 // export const githubAuth = github(auth, {
