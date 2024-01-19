@@ -3,7 +3,7 @@ import 'server-cli-only';
 import winston, { createLogger } from 'winston';
 
 const { transports, format } = winston;
-const { combine, colorize, simple, timestamp, json } = format;
+const { combine, colorize, simple, timestamp, json, errors, splat } = format;
 const { Console } = transports;
 
 /**
@@ -11,23 +11,13 @@ const { Console } = transports;
  */
 export const logger = createLogger({
     level: env.LOG_LEVEL,
-    format: combine(timestamp(), json()),
+    format: combine(timestamp(), errors({ stack: true }), splat(), json()),
     defaultMeta: { service: 'web' },
-    // TODO: Add proper transports
+    // https://12factor.net/logs
     transports: [
-        new transports.File({
-            filename: 'error.log',
-            level: 'error',
-            dirname: 'logs',
+        new Console({
+            format: combine(colorize(), simple()),
         }),
-        new transports.File({ filename: 'combined.log', dirname: 'logs' }),
-        ...(env.NODE_ENV === 'development'
-            ? [
-                  new Console({
-                      format: combine(colorize(), simple()),
-                  }),
-              ]
-            : []),
     ],
     silent: !env.APP_LOGGING,
 });
