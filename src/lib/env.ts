@@ -53,6 +53,8 @@ const envSchema = z.object({
     FACEBOOK_CLIENT_ID: isString,
     FACEBOOK_CLIENT_SECRET: isString,
     FACEBOOK_REDIRECT_URI: isString,
+    GITHUB_CLIENT_ID: isString,
+    GITHUB_CLIENT_SECRET: isString,
 
     // Replicate
     REPLICATE_API_TOKEN: isString,

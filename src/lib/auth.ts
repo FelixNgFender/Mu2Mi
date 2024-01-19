@@ -52,11 +52,10 @@ export const facebookAuth = facebook(auth, {
     scope: ['email', 'public_profile'],
 });
 
-// TODO: Implement routes
-// export const githubAuth = github(auth, {
-// 	clientId: env.GITHUB_CLIENT_ID,
-// 	clientSecret: env.GITHUB_CLIENT_SECRET
-// });
+export const githubAuth = github(auth, {
+    clientId: env.GITHUB_CLIENT_ID,
+    clientSecret: env.GITHUB_CLIENT_SECRET,
+});
 
 // TODO: Implement routes
 // export const twitterAuth = twitter(auth, {
