@@ -56,15 +56,6 @@ const SignUpPage = async () => {
                         </span>
                         <span>Sign up with GitHub</span>
                     </Link>
-                    <Link
-                        href="/auth/sign-in/twitter"
-                        className={buttonVariants({ variant: 'secondary' })}
-                    >
-                        <span>
-                            <Icons.twitter className="mr-2 h-4 w-4 fill-current" />
-                        </span>
-                        <span>Sign up with X</span>
-                    </Link>
                 </div>
                 <div className="flex items-center">
                     <Separator className="flex-1" />

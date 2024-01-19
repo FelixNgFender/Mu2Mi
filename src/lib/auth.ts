@@ -2,7 +2,7 @@ import { queryClient, redisClient } from '@/db';
 import { env } from '@/lib/env';
 import { postgres as postgresAdapter } from '@lucia-auth/adapter-postgresql';
 import { redis as redisAdapter } from '@lucia-auth/adapter-session-redis';
-import { facebook, github, google, twitter } from '@lucia-auth/oauth/providers';
+import { facebook, github, google } from '@lucia-auth/oauth/providers';
 import { lucia } from 'lucia';
 import { nextjs_future } from 'lucia/middleware';
 import 'lucia/polyfill/node';
@@ -56,14 +56,6 @@ export const githubAuth = github(auth, {
     clientId: env.GITHUB_CLIENT_ID,
     clientSecret: env.GITHUB_CLIENT_SECRET,
 });
-
-// TODO: Implement routes
-// export const twitterAuth = twitter(auth, {
-//     clientId: env.TWITTER_CLIENT_ID,
-//     clientSecret: env.TWITTER_CLIENT_SECRET,
-//     redirectUri: env.TWITTER_REDIRECT_URI,
-//     scope: ['email', 'public_profile'],
-// });
 
 export type Auth = typeof auth;
 

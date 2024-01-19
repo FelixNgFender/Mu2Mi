@@ -57,15 +57,6 @@ const SignInPage = async () => {
                         </span>
                         <span>Continue with GitHub</span>
                     </Link>
-                    <Link
-                        href="/auth/sign-in/twitter"
-                        className={buttonVariants({ variant: 'secondary' })}
-                    >
-                        <span>
-                            <Icons.twitter className="mr-2 h-4 w-4 fill-current" />
-                        </span>
-                        <span>Continue with X</span>
-                    </Link>
                 </div>
 
                 <div className="flex items-center">
