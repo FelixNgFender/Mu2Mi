@@ -28,8 +28,8 @@
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "app.d.ts",
-        "src/lib/types/replicate-openapi.d.ts"
+        "src/types/app.d.ts",
+        "src/types/replicate-openapi.d.ts"
     ],
     "exclude": ["node_modules"]
 }

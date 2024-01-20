@@ -1,4 +1,4 @@
-import { MainNavItem, SidebarNavItem } from '@/lib/types/nav';
+import { MainNavItem, SidebarNavItem } from '@/types/nav';
 import {
     Disc3,
     KeyboardMusic,
