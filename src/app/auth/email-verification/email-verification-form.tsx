@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
+import { httpStatus } from '@/lib/http';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -16,15 +17,19 @@ export const EmailVerificationForm = () => {
         const response = await fetch('/api/auth/email-verification', {
             method: 'POST',
         });
-        if (response.status >= 400) {
+        if (
+            response.status === httpStatus.clientError.unauthorized ||
+            response.status === httpStatus.clientError.unprocessableEntity ||
+            response.status === httpStatus.serverError.internalServerError
+        ) {
             const responseData = await response.json();
             toast({
                 variant: 'destructive',
-                title: 'Uh oh! Something went wrong.',
-                description: responseData.error,
+                title: responseData.message || 'Uh oh! Something went wrong.',
+                description: responseData.error || '',
             });
         }
-        if (response.status === 200) {
+        if (response.status === httpStatus.success.ok) {
             toast({
                 title: 'Email verification link sent!',
                 description: 'Check your inbox for the link.',

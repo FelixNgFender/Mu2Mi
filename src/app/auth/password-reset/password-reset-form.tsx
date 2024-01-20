@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
+import { httpStatus } from '@/lib/http';
 import {
     passwordResetSchemaClient,
     passwordResetSchemaClientType,
@@ -48,9 +49,10 @@ export const PasswordResetForm = () => {
         });
         // TODO: For users previously signed in with OAuth, this flow seems to work until
         // the new password is set. Investigate?
-        if (response.status === 400) {
+        if (response.status === httpStatus.clientError.badRequest) {
             const responseData = await response.json();
-            for (const error of responseData.errors) {
+            const errors = JSON.parse(responseData.error);
+            for (const error of errors) {
                 for (const path of error.path) {
                     form.setError(path, {
                         type: path,
@@ -59,15 +61,15 @@ export const PasswordResetForm = () => {
                 }
             }
         }
-        if (response.status === 500) {
+        if (response.status === httpStatus.serverError.internalServerError) {
             const responseData = await response.json();
             toast({
                 variant: 'destructive',
-                title: 'Uh oh! Something went wrong.',
-                description: responseData.error,
+                title: responseData.message || 'Uh oh! Something went wrong.',
+                description: responseData.error || '',
             });
         }
-        if (response.status === 200) {
+        if (response.status === httpStatus.success.ok) {
             toast({
                 title: 'Password reset link sent!',
                 description: 'Check your inbox for the link.',

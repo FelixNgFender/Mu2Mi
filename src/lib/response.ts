@@ -24,35 +24,35 @@ export class HttpResponse {
 
     static badRequest(error?: Record<string, unknown> | string) {
         return NextResponse.json(
-            { message: 'Bad request', error },
+            { message: "Oops! We couldn't understand your request.", error },
             { status: clientError.badRequest },
         );
     }
 
     static unauthorized() {
         return NextResponse.json(
-            { message: 'Unauthorized' },
+            { message: 'Sorry, you need to be signed in to do that.' },
             { status: clientError.unauthorized },
         );
     }
 
     static forbidden() {
         return NextResponse.json(
-            { message: 'Forbidden' },
+            { message: "Sorry, you don't have permission to access this." },
             { status: clientError.forbidden },
         );
     }
 
     static notFound() {
         return NextResponse.json(
-            { message: 'Not found' },
+            { message: "Sorry, we couldn't find what you were looking for." },
             { status: clientError.notFound },
         );
     }
 
     static tooManyRequests(headers?: HeadersInit) {
         return NextResponse.json(
-            { message: 'Too many requests' },
+            { message: "You're doing that too much. Please slow down." },
             { status: clientError.tooManyRequests, headers },
         );
     }
@@ -60,7 +60,7 @@ export class HttpResponse {
     static unprocessableEntity(error?: Record<string, unknown> | string) {
         return NextResponse.json(
             {
-                message: 'Unprocessable entity',
+                message: "Oops! We couldn't process your request.",
                 error,
             },
             { status: clientError.unprocessableEntity },
@@ -69,7 +69,10 @@ export class HttpResponse {
 
     static internalServerError() {
         return NextResponse.json(
-            { message: 'Internal server error' },
+            {
+                message:
+                    "Oops! Something went wrong on our end. We're looking into it.",
+            },
             { status: serverError.internalServerError },
         );
     }

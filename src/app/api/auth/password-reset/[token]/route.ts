@@ -28,7 +28,7 @@ export const POST = async (
         });
 
         if (!result.success) {
-            return HttpResponse.badRequest(result.error.format());
+            return HttpResponse.badRequest(JSON.stringify(result.error.issues));
         }
         const { token } = params;
         const userId = await validatePasswordResetToken(token);

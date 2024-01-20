@@ -22,7 +22,7 @@ export const POST = async (request: NextRequest) => {
         });
 
         if (!result.success) {
-            return HttpResponse.badRequest(result.error.format());
+            return HttpResponse.badRequest(JSON.stringify(result.error.issues));
         }
 
         const user = await auth.createUser({

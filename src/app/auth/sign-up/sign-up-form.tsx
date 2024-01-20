@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
+import { httpStatus } from '@/lib/http';
 import {
     signUpSchemaClient,
     signUpSchemaClientType,
@@ -47,9 +48,10 @@ export const SignUpForm = () => {
             body: JSON.stringify(data),
             redirect: 'manual',
         });
-        if (response.status === 400) {
+        if (response.status === httpStatus.clientError.badRequest) {
             const responseData = await response.json();
-            for (const error of responseData.errors) {
+            const errors = JSON.parse(responseData.error);
+            for (const error of errors) {
                 for (const path of error.path) {
                     form.setError(path, {
                         type: path,
@@ -58,12 +60,12 @@ export const SignUpForm = () => {
                 }
             }
         }
-        if (response.status === 500) {
+        if (response.status === httpStatus.serverError.internalServerError) {
             const responseData = await response.json();
             toast({
                 variant: 'destructive',
-                title: 'Uh oh! Something went wrong.',
-                description: responseData.error,
+                title: responseData.message || 'Uh oh! Something went wrong.',
+                description: responseData.error || '',
             });
         }
         if (response.status === 0) {

@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
+import { httpStatus } from '@/lib/http';
 import {
     newPasswordSchemaClient,
     newPasswordSchemaClientType,
@@ -51,32 +52,24 @@ export const NewPasswordForm = ({ token }: { token: string }) => {
             },
             redirect: 'manual',
         });
-        if (response.status === 400) {
+        if (response.status === httpStatus.clientError.badRequest) {
             const responseData = await response.json();
-            if (responseData.error) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Uh oh! Something went wrong.',
-                    description: responseData.error,
-                });
-            }
-            if (responseData.errors) {
-                for (const error of responseData.errors) {
-                    for (const path of error.path) {
-                        form.setError(path, {
-                            type: path,
-                            message: error.message,
-                        });
-                    }
+            const errors = JSON.parse(responseData.error);
+            for (const error of errors) {
+                for (const path of error.path) {
+                    form.setError(path, {
+                        type: path,
+                        message: error.message,
+                    });
                 }
             }
         }
-        if (response.status === 500) {
+        if (response.status === httpStatus.serverError.internalServerError) {
             const responseData = await response.json();
             toast({
                 variant: 'destructive',
-                title: 'Uh oh! Something went wrong.',
-                description: responseData.error,
+                title: responseData.message || 'Uh oh! Something went wrong.',
+                description: responseData.error || '',
             });
         }
         if (response.status === 0) {
