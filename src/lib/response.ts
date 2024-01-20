@@ -9,7 +9,7 @@ const { clientError, serverError } = httpStatus;
  */
 export class HttpResponse {
     static success(body?: Record<string, unknown>, headers?: HeadersInit) {
-        return NextResponse.json(body, {
+        return NextResponse.json(body || {}, {
             status: httpStatus.success.ok,
             headers,
         });

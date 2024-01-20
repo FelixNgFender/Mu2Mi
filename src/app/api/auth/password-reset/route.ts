@@ -31,8 +31,8 @@ export const POST = async (request: NextRequest) => {
 
         const user = auth.transformDatabaseUser({
             ...storedUser,
-            username_lower: storedUser!.usernameLower,
-            email_verified: storedUser!.emailVerified,
+            username_lower: storedUser.usernameLower,
+            email_verified: storedUser.emailVerified,
         });
         const token = await generatePasswordResetToken(user.userId);
         await sendPasswordResetLink(user.email, token);
