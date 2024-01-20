@@ -1,5 +1,3 @@
-import { db } from '@/db';
-import { user as userTable } from '@/db/schema';
 import { auth } from '@/lib/auth';
 import { sendPasswordResetLink } from '@/lib/email';
 import { errorHandler } from '@/lib/error';
@@ -9,7 +7,7 @@ import {
     passwordResetSchemaServer,
     passwordResetSchemaServerType,
 } from '@/lib/validations/server/password-reset';
-import { eq } from 'drizzle-orm';
+import { userModel } from '@/models/user';
 import { NextRequest } from 'next/server';
 
 export const POST = async (request: NextRequest) => {
@@ -25,13 +23,14 @@ export const POST = async (request: NextRequest) => {
             return HttpResponse.badRequest(result.error.format());
         }
 
-        const [storedUser] = await db
-            .select()
-            .from(userTable)
-            .where(eq(userTable.email, email.toLowerCase()));
-        // already checked email exists in the schema parse above, so safe to assert here
+        const storedUser = await userModel.findOneByEmail(email);
+
+        if (!storedUser) {
+            return HttpResponse.badRequest();
+        }
+
         const user = auth.transformDatabaseUser({
-            ...storedUser!,
+            ...storedUser,
             username_lower: storedUser!.usernameLower,
             email_verified: storedUser!.emailVerified,
         });

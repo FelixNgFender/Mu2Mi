@@ -1,11 +1,8 @@
-import { db } from '@/db';
-import { user as userTable } from '@/db/schema';
 import { auth, googleAuth } from '@/lib/auth';
 import { AppError, errorHandler, errorNames } from '@/lib/error';
-import { httpStatus } from '@/lib/http';
 import { HttpResponse } from '@/lib/response';
+import { userModel } from '@/models/user';
 import { OAuthRequestError } from '@lucia-auth/oauth';
-import { eq } from 'drizzle-orm';
 import { cookies, headers } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
@@ -37,10 +34,9 @@ export const GET = async (request: NextRequest) => {
                     true,
                 );
             }
-            const [existingDatabaseUserWithEmail] = await db
-                .select()
-                .from(userTable)
-                .where(eq(userTable.email, googleUser.email));
+            const existingDatabaseUserWithEmail = await userModel.findOneByEmail(
+                googleUser.email,
+            );
             if (existingDatabaseUserWithEmail) {
                 // transform `UserSchema` to `User`
                 const user = auth.transformDatabaseUser({

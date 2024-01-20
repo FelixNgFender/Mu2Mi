@@ -1,15 +1,18 @@
 import { env } from '@/lib/env';
 import { AppError, errorNames } from '@/lib/error';
 import { logger } from '@/lib/logger';
-import { type PostgresJsDatabase, drizzle } from 'drizzle-orm/postgres-js';
+import { drizzle } from 'drizzle-orm/postgres-js';
 import { Client as MinioClient } from 'minio';
 import postgres from 'postgres';
 import { type RedisClientType, createClient } from 'redis';
 import 'server-cli-only';
 
+import * as schema from './schema';
+
 const queryClient = postgres(env.DATABASE_URL);
-const db: PostgresJsDatabase = drizzle(queryClient, {
+const db = drizzle(queryClient, {
     logger: env.DATABASE_LOGGING,
+    schema,
 });
 
 const globalForRedis = global as unknown as { redisClient: RedisClientType };

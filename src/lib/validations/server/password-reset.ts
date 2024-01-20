@@ -1,7 +1,5 @@
 import { passwordResetSchemaClient } from '@/lib/validations/client/password-reset';
-import { db } from '@/db';
-import { user as userTable } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { userModel } from '@/models/user';
 import 'server-cli-only';
 import * as z from 'zod';
 
@@ -11,14 +9,8 @@ import * as z from 'zod';
  */
 export const passwordResetSchemaServer = passwordResetSchemaClient.refine(
     async ({ email }) => {
-        const [user] = await db
-            .select()
-            .from(userTable)
-            .where(eq(userTable.email, email.toLowerCase()));
-        if (user) {
-            return true;
-        }
-        return false;
+        const user = await userModel.findOneByEmail(email);
+        return !!user;
     },
     {
         message: 'User does not exist',

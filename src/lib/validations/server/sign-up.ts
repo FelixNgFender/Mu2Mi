@@ -1,7 +1,5 @@
 import { signUpSchemaClient } from '@/lib/validations/client/sign-up';
-import { db } from '@/db';
-import { user as userTable } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { userModel } from '@/models/user';
 import 'server-cli-only';
 import * as z from 'zod';
 
@@ -11,10 +9,7 @@ import * as z from 'zod';
  */
 export const signUpSchemaServer = signUpSchemaClient.refine(
     async ({ email }) => {
-        const [user] = await db
-            .select()
-            .from(userTable)
-            .where(eq(userTable.email, email.toLowerCase()));
+        const user = await userModel.findOneByEmail(email);
         return !user;
     },
     {

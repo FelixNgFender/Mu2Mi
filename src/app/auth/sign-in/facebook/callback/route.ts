@@ -1,10 +1,8 @@
-import { db } from '@/db';
-import { user as userTable } from '@/db/schema';
 import { auth, facebookAuth } from '@/lib/auth';
 import { AppError, errorHandler, errorNames } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
+import { userModel } from '@/models/user';
 import { OAuthRequestError } from '@lucia-auth/oauth';
-import { eq } from 'drizzle-orm';
 import { cookies, headers } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
@@ -29,10 +27,9 @@ export const GET = async (request: NextRequest) => {
                     true,
                 );
             }
-            const [existingDatabaseUserWithEmail] = await db
-                .select()
-                .from(userTable)
-                .where(eq(userTable.email, facebookUser.email));
+            const existingDatabaseUserWithEmail = await userModel.findOneByEmail(
+                facebookUser.email,
+            );
             if (existingDatabaseUserWithEmail) {
                 // transform `UserSchema` to `User`
                 const user = auth.transformDatabaseUser({
