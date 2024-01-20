@@ -26,7 +26,9 @@ export function CommandMenu({ ...props }: DialogProps) {
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
             if (
-                (e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey)) ||
+                (e.key &&
+                    e.key.toLowerCase() === 'k' &&
+                    (e.metaKey || e.ctrlKey)) ||
                 e.key === '/'
             ) {
                 if (
