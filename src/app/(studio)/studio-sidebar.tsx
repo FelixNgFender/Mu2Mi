@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { buttonVariants } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { studioConfig } from '@/lib/configs/studio';
+import { studioConfig } from '@/config/studio';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
