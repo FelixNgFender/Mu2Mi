@@ -91,7 +91,7 @@ export const POST = async (request: NextRequest) => {
             Location: '/',
         });
     } catch (err) {
-        errorHandler.handleError(err as Error);
+        await errorHandler.handleError(err as Error);
         return HttpResponse.internalServerError();
     }
 };

@@ -66,7 +66,7 @@ export const cleanup = async (exitCode = 0) => {
         });
 
         process.on('uncaughtException', async (err: Error) => {
-            errorHandler.handleError(err);
+            await errorHandler.handleError(err);
         });
 
         externalSignals.forEach((signal) => {

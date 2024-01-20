@@ -32,7 +32,7 @@ export const GET = async (
             'Set-Cookie': sessionCookie.serialize(),
         });
     } catch (err) {
-        errorHandler.handleError(err as Error);
+        await errorHandler.handleError(err as Error);
         return HttpResponse.badRequest('Invalid email verification link');
     }
 };

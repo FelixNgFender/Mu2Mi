@@ -30,7 +30,7 @@ export const GET = async () => {
             fileStorageLatency: fileStorageLatency + 'ms',
         });
     } catch (err) {
-        errorHandler.handleError(err as Error);
+        await errorHandler.handleError(err as Error);
         return HttpResponse.internalServerError();
     }
 };

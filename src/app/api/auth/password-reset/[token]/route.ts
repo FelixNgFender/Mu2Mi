@@ -50,7 +50,7 @@ export const POST = async (
             'Set-Cookie': sessionCookie.serialize(),
         });
     } catch (err) {
-        errorHandler.handleError(err as Error);
+        await errorHandler.handleError(err as Error);
         return HttpResponse.internalServerError();
     }
 };

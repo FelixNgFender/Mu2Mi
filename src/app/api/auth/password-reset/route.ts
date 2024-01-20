@@ -39,7 +39,7 @@ export const POST = async (request: NextRequest) => {
         await sendPasswordResetLink(user.email, token);
         return HttpResponse.success();
     } catch (err) {
-        errorHandler.handleError(err as Error);
+        await errorHandler.handleError(err as Error);
         return HttpResponse.internalServerError();
     }
 };

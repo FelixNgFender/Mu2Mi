@@ -42,7 +42,7 @@ class ErrorHandler {
         return false;
     }
 
-    crashIfUntrustedError = (error: Error) => {
+    crashIfUntrustedError = async (error: Error) => {
         if (!this.isTrustedError(error)) {
             process.exit(1);
         }
@@ -57,7 +57,7 @@ class ErrorHandler {
         // await saveInOpsQueueIfCritical();
         // await determineIfOperationalError();
         // await fireMonitoringMetric(error);
-        this.crashIfUntrustedError(error);
+        await this.crashIfUntrustedError(error);
     }
 }
 

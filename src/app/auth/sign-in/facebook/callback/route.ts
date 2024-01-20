@@ -74,7 +74,7 @@ export const GET = async (request: NextRequest) => {
         if (err instanceof OAuthRequestError) {
             return HttpResponse.badRequest();
         }
-        errorHandler.handleError(err as Error);
+        await errorHandler.handleError(err as Error);
         return HttpResponse.internalServerError();
     }
 };
