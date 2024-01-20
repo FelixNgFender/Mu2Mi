@@ -6,7 +6,7 @@ import { generatePasswordResetToken } from '@/lib/token';
 import {
     passwordResetSchemaServer,
     passwordResetSchemaServerType,
-} from '@/lib/validations/server/password-reset';
+} from '@/validations/server/password-reset';
 import { userModel } from '@/models/user';
 import { NextRequest } from 'next/server';
 

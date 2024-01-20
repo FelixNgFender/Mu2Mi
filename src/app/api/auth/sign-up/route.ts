@@ -6,7 +6,7 @@ import { generateEmailVerificationToken } from '@/lib/token';
 import {
     signUpSchemaServer,
     signUpSchemaServerType,
-} from '@/lib/validations/server/sign-up';
+} from '@/validations/server/sign-up';
 import * as context from 'next/headers';
 import { NextRequest } from 'next/server';
 

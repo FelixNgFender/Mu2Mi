@@ -4,7 +4,7 @@ import { HttpResponse } from '@/lib/response';
 import {
     signInSchemaServer,
     signInSchemaServerType,
-} from '@/lib/validations/server/sign-in';
+} from '@/validations/server/sign-in';
 import * as context from 'next/headers';
 import { NextRequest } from 'next/server';
 

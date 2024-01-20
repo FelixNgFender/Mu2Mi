@@ -5,7 +5,7 @@ import { validatePasswordResetToken } from '@/lib/token';
 import {
     newPasswordSchemaServer,
     newPasswordSchemaServerType,
-} from '@/lib/validations/server/new-password';
+} from '@/validations/server/new-password';
 import { type NextRequest } from 'next/server';
 
 export const POST = async (

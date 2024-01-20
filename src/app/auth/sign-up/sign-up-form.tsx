@@ -15,7 +15,7 @@ import { httpStatus } from '@/lib/http';
 import {
     signUpSchemaClient,
     signUpSchemaClientType,
-} from '@/lib/validations/client/sign-up';
+} from '@/validations/client/sign-up';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

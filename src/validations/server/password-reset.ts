@@ -1,4 +1,4 @@
-import { passwordResetSchemaClient } from '@/lib/validations/client/password-reset';
+import { passwordResetSchemaClient } from '@/validations/client/password-reset';
 import { userModel } from '@/models/user';
 import 'server-cli-only';
 import * as z from 'zod';

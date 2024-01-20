@@ -17,7 +17,7 @@ import { httpStatus } from '@/lib/http';
 import {
     signInSchemaClient,
     signInSchemaClientType,
-} from '@/lib/validations/client/sign-in';
+} from '@/validations/client/sign-in';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

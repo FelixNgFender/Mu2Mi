@@ -17,7 +17,7 @@ import { httpStatus } from '@/lib/http';
 import {
     passwordResetSchemaClient,
     passwordResetSchemaClientType,
-} from '@/lib/validations/client/password-reset';
+} from '@/validations/client/password-reset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

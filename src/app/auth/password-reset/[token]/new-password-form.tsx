@@ -17,11 +17,11 @@ import { httpStatus } from '@/lib/http';
 import {
     newPasswordSchemaClient,
     newPasswordSchemaClientType,
-} from '@/lib/validations/client/new-password';
+} from '@/validations/client/new-password';
 import {
     passwordResetSchemaClient,
     passwordResetSchemaClientType,
-} from '@/lib/validations/client/password-reset';
+} from '@/validations/client/password-reset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';

@@ -1,4 +1,4 @@
-import { signInSchemaClient } from '@/lib/validations/client/sign-in';
+import { signInSchemaClient } from '@/validations/client/sign-in';
 import { auth } from '@/lib/auth';
 import 'server-cli-only';
 import * as z from 'zod';
