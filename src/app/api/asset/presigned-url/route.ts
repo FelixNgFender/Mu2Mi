@@ -2,7 +2,7 @@ import { fileStorageClient } from '@/db';
 import { db } from '@/db';
 import { asset as assetTable } from '@/db/schema';
 import { auth } from '@/lib/auth';
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 import { logger } from '@/lib/logger';
 import { HttpResponse } from '@/lib/response';
 import { InferInsertModel } from 'drizzle-orm';

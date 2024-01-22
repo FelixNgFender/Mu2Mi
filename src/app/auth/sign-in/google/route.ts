@@ -1,5 +1,5 @@
 import { googleAuth } from '@/lib/auth';
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 import { HttpResponse } from '@/lib/response';
 import * as context from 'next/headers';
 import type { NextRequest } from 'next/server';

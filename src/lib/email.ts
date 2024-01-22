@@ -22,7 +22,7 @@
 // 	});
 // };
 // import { ServerClient } from 'postmark';
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 import { logger } from '@/lib/logger';
 import 'server-cli-only';
 

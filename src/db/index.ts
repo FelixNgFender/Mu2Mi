@@ -1,4 +1,4 @@
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 import { AppError, errorNames } from '@/lib/error';
 import { logger } from '@/lib/logger';
 import { drizzle } from 'drizzle-orm/postgres-js';

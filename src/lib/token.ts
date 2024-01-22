@@ -1,4 +1,4 @@
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 import { AppError, errorNames } from '@/lib/error';
 import { emailVerificationModel } from '@/models/email-verification';
 import { passwordResetModel } from '@/models/password-reset';

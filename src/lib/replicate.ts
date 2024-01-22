@@ -1,5 +1,5 @@
 import { TrackSeparationModelInputSchema } from '@/app/(studio)/(separation)/separation/new/_schemas/changeme';
-import { env } from '@/lib/env';
+import { env } from '@/config/env';
 import Replicate from 'replicate';
 import 'server-cli-only';
 import { number } from 'zod';
