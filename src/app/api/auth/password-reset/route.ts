@@ -3,11 +3,11 @@ import { sendPasswordResetLink } from '@/lib/email';
 import { errorHandler } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
 import { generatePasswordResetToken } from '@/lib/token';
+import { userModel } from '@/models/user';
 import {
     passwordResetSchemaServer,
     passwordResetSchemaServerType,
 } from '@/validations/server/password-reset';
-import { userModel } from '@/models/user';
 import { NextRequest } from 'next/server';
 
 export const POST = async (request: NextRequest) => {

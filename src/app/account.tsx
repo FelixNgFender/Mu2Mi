@@ -5,8 +5,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
 import { getPageSession } from '@/lib/auth';
+import { cn } from '@/lib/utils';
 import { LogIn, LogOut, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';

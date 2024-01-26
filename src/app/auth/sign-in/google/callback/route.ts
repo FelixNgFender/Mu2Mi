@@ -34,9 +34,8 @@ export const GET = async (request: NextRequest) => {
                     true,
                 );
             }
-            const existingDatabaseUserWithEmail = await userModel.findOneByEmail(
-                googleUser.email,
-            );
+            const existingDatabaseUserWithEmail =
+                await userModel.findOneByEmail(googleUser.email);
             if (existingDatabaseUserWithEmail) {
                 // transform `UserSchema` to `User`
                 const user = auth.transformDatabaseUser({

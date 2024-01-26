@@ -1,5 +1,5 @@
-import { signUpSchemaClient } from '@/validations/client/sign-up';
 import { userModel } from '@/models/user';
+import { signUpSchemaClient } from '@/validations/client/sign-up';
 import 'server-cli-only';
 import * as z from 'zod';
 

@@ -1,3 +1,1 @@
-import { paths, components } from './replicate-openapi';
-
-
+import { components, paths } from './replicate-openapi';

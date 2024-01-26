@@ -1,5 +1,5 @@
-import { githubAuth } from '@/lib/auth';
 import { env } from '@/config/env';
+import { githubAuth } from '@/lib/auth';
 import { HttpResponse } from '@/lib/response';
 import * as context from 'next/headers';
 import type { NextRequest } from 'next/server';

@@ -27,9 +27,8 @@ export const GET = async (request: NextRequest) => {
                     true,
                 );
             }
-            const existingDatabaseUserWithEmail = await userModel.findOneByEmail(
-                facebookUser.email,
-            );
+            const existingDatabaseUserWithEmail =
+                await userModel.findOneByEmail(facebookUser.email);
             if (existingDatabaseUserWithEmail) {
                 // transform `UserSchema` to `User`
                 const user = auth.transformDatabaseUser({

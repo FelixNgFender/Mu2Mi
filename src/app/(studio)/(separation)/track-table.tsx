@@ -307,7 +307,7 @@ export function TrackTable() {
                             .getColumn('name')
                             ?.setFilterValue(event.target.value)
                     }
-                    className="max-w-sm mr-2"
+                    className="mr-2 max-w-sm"
                 />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
