@@ -6,6 +6,7 @@ import { Inter as FontSans } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 
 import './globals.css';
+import QueryProvider from './query-provider';
 import { SiteHeader } from './site-header';
 import { TailwindIndicator } from './tailwind-indicator';
 import { ThemeProvider } from './theme-provider';
@@ -32,21 +33,25 @@ export default function RootLayout({ children }: RootLayoutProps) {
                     fontSans.variable,
                 )}
             >
-                <ThemeProvider
-                    attribute="class"
-                    defaultTheme="system"
-                    enableSystem
-                    disableTransitionOnChange
-                >
-                    <NextTopLoader />
-                    <div className="relative flex min-h-screen flex-col bg-background">
-                        <SiteHeader />
-                        <main className="flex flex-1 flex-col">{children}</main>
-                        {/* <SiteFooter /> */}
-                    </div>
-                    <TailwindIndicator />
-                    <Toaster />
-                </ThemeProvider>
+                <QueryProvider>
+                    <ThemeProvider
+                        attribute="class"
+                        defaultTheme="system"
+                        enableSystem
+                        disableTransitionOnChange
+                    >
+                        <NextTopLoader />
+                        <div className="relative flex min-h-screen flex-col bg-background">
+                            <SiteHeader />
+                            <main className="flex flex-1 flex-col">
+                                {children}
+                            </main>
+                            {/* <SiteFooter /> */}
+                        </div>
+                        <TailwindIndicator />
+                        <Toaster />
+                    </ThemeProvider>
+                </QueryProvider>
             </body>
         </html>
     );
