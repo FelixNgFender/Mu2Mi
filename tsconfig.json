@@ -28,7 +28,7 @@
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "src/types/app.d.ts",
+        "src/app.d.ts",
         "src/types/replicate-openapi.d.ts"
     ],
     "exclude": ["node_modules"]
