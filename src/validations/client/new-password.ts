@@ -110,6 +110,6 @@ export const newPasswordSchemaClient = z
         }
     });
 
-export type newPasswordSchemaClientType = z.infer<
+export type NewPasswordSchemaClientType = z.infer<
     typeof newPasswordSchemaClient
 >;

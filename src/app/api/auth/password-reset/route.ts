@@ -6,13 +6,13 @@ import { generatePasswordResetToken } from '@/lib/token';
 import { userModel } from '@/models/user';
 import {
     passwordResetSchemaServer,
-    passwordResetSchemaServerType,
+    PasswordResetSchemaServerType,
 } from '@/validations/server/password-reset';
 import { NextRequest } from 'next/server';
 
 export const POST = async (request: NextRequest) => {
     try {
-        const data: passwordResetSchemaServerType = await request.json();
+        const data: PasswordResetSchemaServerType = await request.json();
         const { email } = data;
 
         const result = await passwordResetSchemaServer.safeParseAsync({

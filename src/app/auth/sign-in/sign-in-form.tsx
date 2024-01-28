@@ -16,7 +16,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { httpStatus } from '@/lib/http';
 import {
     signInSchemaClient,
-    signInSchemaClientType,
+    SignInSchemaClientType,
 } from '@/validations/client/sign-in';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -28,7 +28,7 @@ export const SignInForm = () => {
     // 1. Define your form.
     const { toast } = useToast();
     const router = useRouter();
-    const form = useForm<signInSchemaClientType>({
+    const form = useForm<SignInSchemaClientType>({
         resolver: zodResolver(signInSchemaClient),
         defaultValues: {
             email: '',
@@ -38,7 +38,7 @@ export const SignInForm = () => {
     });
 
     // 2. Define a submit handler.
-    const onSubmit = async (data: signInSchemaClientType) => {
+    const onSubmit = async (data: SignInSchemaClientType) => {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
         const response = await fetch('/api/auth/sign-in', {

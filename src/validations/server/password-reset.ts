@@ -18,6 +18,6 @@ export const passwordResetSchemaServer = passwordResetSchemaClient.refine(
     },
 );
 
-export type passwordResetSchemaServerType = z.infer<
+export type PasswordResetSchemaServerType = z.infer<
     typeof passwordResetSchemaServer
 >;

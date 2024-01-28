@@ -16,7 +16,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { httpStatus } from '@/lib/http';
 import {
     passwordResetSchemaClient,
-    passwordResetSchemaClientType,
+    PasswordResetSchemaClientType,
 } from '@/validations/client/password-reset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -28,7 +28,7 @@ export const PasswordResetForm = () => {
     // 1. Define your form.
     const { toast } = useToast();
     const router = useRouter();
-    const form = useForm<passwordResetSchemaClientType>({
+    const form = useForm<PasswordResetSchemaClientType>({
         resolver: zodResolver(passwordResetSchemaClient),
         defaultValues: {
             email: '',
@@ -36,7 +36,7 @@ export const PasswordResetForm = () => {
     });
 
     // 2. Define a submit handler.
-    const onSubmit = async (data: passwordResetSchemaClientType) => {
+    const onSubmit = async (data: PasswordResetSchemaClientType) => {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
         const response = await fetch('/api/auth/password-reset', {

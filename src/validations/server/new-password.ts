@@ -8,6 +8,6 @@ import * as z from 'zod';
  */
 export const newPasswordSchemaServer = newPasswordSchemaClient;
 
-export type newPasswordSchemaServerType = z.infer<
+export type NewPasswordSchemaServerType = z.infer<
     typeof newPasswordSchemaServer
 >;

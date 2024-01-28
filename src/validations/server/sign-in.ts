@@ -26,4 +26,4 @@ export const signInSchemaServer = signInSchemaClient.superRefine(
     },
 );
 
-export type signInSchemaServerType = z.infer<typeof signInSchemaServer>;
+export type SignInSchemaServerType = z.infer<typeof signInSchemaServer>;

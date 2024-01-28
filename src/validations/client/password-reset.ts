@@ -7,6 +7,6 @@ export const passwordResetSchemaClient = z.object({
     email: z.string().email({ message: 'Invalid email address.' }),
 });
 
-export type passwordResetSchemaClientType = z.infer<
+export type PasswordResetSchemaClientType = z.infer<
     typeof passwordResetSchemaClient
 >;

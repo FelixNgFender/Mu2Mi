@@ -3,14 +3,14 @@ import { errorHandler } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
 import {
     signInSchemaServer,
-    signInSchemaServerType,
+    SignInSchemaServerType,
 } from '@/validations/server/sign-in';
 import * as context from 'next/headers';
 import { NextRequest } from 'next/server';
 
 export const POST = async (request: NextRequest) => {
     try {
-        const data: signInSchemaServerType = await request.json();
+        const data: SignInSchemaServerType = await request.json();
         const { email, password, rememberMe } = data;
         // const storedDeviceCookieId = context.cookies().get('device_cookie')
         //     ?.value;

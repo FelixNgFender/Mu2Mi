@@ -18,4 +18,4 @@ export const signUpSchemaServer = signUpSchemaClient.refine(
     },
 );
 
-export type signUpSchemaServerType = z.infer<typeof signUpSchemaServer>;
+export type SignUpSchemaServerType = z.infer<typeof signUpSchemaServer>;

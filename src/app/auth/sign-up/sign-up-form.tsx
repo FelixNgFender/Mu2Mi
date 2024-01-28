@@ -14,7 +14,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { httpStatus } from '@/lib/http';
 import {
     signUpSchemaClient,
-    signUpSchemaClientType,
+    SignUpSchemaClientType,
 } from '@/validations/client/sign-up';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -26,7 +26,7 @@ export const SignUpForm = () => {
     // 1. Define your form.
     const { toast } = useToast();
     const router = useRouter();
-    const form = useForm<signUpSchemaClientType>({
+    const form = useForm<SignUpSchemaClientType>({
         resolver: zodResolver(signUpSchemaClient),
         defaultValues: {
             email: '',
@@ -36,7 +36,7 @@ export const SignUpForm = () => {
     });
 
     // 2. Define a submit handler.
-    const onSubmit = async (data: signUpSchemaClientType) => {
+    const onSubmit = async (data: SignUpSchemaClientType) => {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
         // Run on the client.

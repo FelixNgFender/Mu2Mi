@@ -5,14 +5,14 @@ import { HttpResponse } from '@/lib/response';
 import { generateEmailVerificationToken } from '@/lib/token';
 import {
     signUpSchemaServer,
-    signUpSchemaServerType,
+    SignUpSchemaServerType,
 } from '@/validations/server/sign-up';
 import * as context from 'next/headers';
 import { NextRequest } from 'next/server';
 
 export const POST = async (request: NextRequest) => {
     try {
-        const data: signUpSchemaServerType = await request.json();
+        const data: SignUpSchemaServerType = await request.json();
         const { email, password, confirmPassword } = data;
 
         const result = await signUpSchemaServer.safeParseAsync({

@@ -4,7 +4,7 @@ import { HttpResponse } from '@/lib/response';
 import { validatePasswordResetToken } from '@/lib/token';
 import {
     newPasswordSchemaServer,
-    newPasswordSchemaServerType,
+    NewPasswordSchemaServerType,
 } from '@/validations/server/new-password';
 import { type NextRequest } from 'next/server';
 
@@ -19,7 +19,7 @@ export const POST = async (
     },
 ) => {
     try {
-        const data: newPasswordSchemaServerType = await request.json();
+        const data: NewPasswordSchemaServerType = await request.json();
         const { password, confirmPassword } = data;
 
         const result = await newPasswordSchemaServer.safeParseAsync({

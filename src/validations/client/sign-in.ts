@@ -100,4 +100,4 @@ export const signInSchemaClient = z
         }
     });
 
-export type signInSchemaClientType = z.infer<typeof signInSchemaClient>;
+export type SignInSchemaClientType = z.infer<typeof signInSchemaClient>;
