@@ -1,5 +1,5 @@
 import { env } from '@/config/env';
-import { AppError, errorNames } from '@/lib/error';
+import { errorHandler } from '@/lib/error';
 import { logger } from '@/lib/logger';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { Client as MinioClient } from 'minio';
@@ -26,13 +26,12 @@ if (env.NODE_ENV === 'development') {
 
 if (!redisClient.isOpen) {
     redisClient
-        .on('error', (err) => logger.error('Redis Client Error', err))
+        .on('error', async (err) => {
+            await errorHandler.handleError(err);
+        })
         .on('ready', () => logger.info('Redis Client Ready'))
         .connect();
 }
-// TODO: Potential memory leak here due to opening multiple database connections
-// Still temporary solution
-// Potential solution: move DB connection logic to Express custom server
 
 const fileStorageClient = new MinioClient({
     endPoint: env.S3_ENDPOINT,
@@ -41,18 +40,5 @@ const fileStorageClient = new MinioClient({
     accessKey: env.S3_ACCESS_KEY,
     secretKey: env.S3_SECRET_KEY,
 });
-
-(async () => {
-    const exists = await fileStorageClient.bucketExists(env.S3_BUCKET_NAME);
-    if (exists) {
-        logger.info(`Bucket ${env.S3_BUCKET_NAME} exists.`);
-    } else {
-        throw new AppError(
-            errorNames.startupError,
-            `Bucket ${env.S3_BUCKET_NAME} does not exist.`,
-            false,
-        );
-    }
-})();
 
 export { queryClient, db, redisClient, fileStorageClient };
