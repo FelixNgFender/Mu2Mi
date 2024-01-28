@@ -3,80 +3,6 @@ version: '3.8'
 name: mu2mi
 
 services:
-    web:
-        container_name: web
-        restart: unless-stopped
-        build:
-            context: .
-            dockerfile: web.Dockerfile
-            target: development
-        ports:
-            - ${WEB_PORT}:${WEB_PORT}
-        develop:
-            watch:
-                - path: ./package.json
-                  action: rebuild
-                - path: ./package-lock.json
-                  action: rebuild
-                - path: ./next.config.js
-                  action: rebuild
-                - path: .
-                  target: /app
-                  action: sync
-        environment:
-            - NODE_ENV=${NODE_ENV}
-
-            - PROTOCOL=${PROTOCOL}
-            - PORT=${PORT}
-            - HOST=${HOST}
-
-            - NEXT_MANUAL_SIG_HANDLE=${NEXT_MANUAL_SIG_HANDLE}
-
-            - APP_LOGGING=${APP_LOGGING}
-            - LOG_LEVEL=${LOG_LEVEL}
-            - ENABLE_EMAIL=${ENABLE_EMAIL}
-            - TOKEN_DURATION_S=${TOKEN_DURATION_S}
-            - AUTH_COOKIE_DURATION_S=${AUTH_COOKIE_DURATION_S}
-            - DEVICE_COOKIE_DURATION_S=${DEVICE_COOKIE_DURATION_S}
-            - TIMEOUT_DURATION_S=${TIMEOUT_DURATION_S}
-
-            - DATABASE_LOGGING=${DATABASE_LOGGING}
-            - DATABASE_URL=${DATABASE_URL}
-            - REDIS_URL=${REDIS_URL}
-            - S3_ENDPOINT=${S3_ENDPOINT}
-            - S3_PORT=${S3_PORT}
-            - S3_USE_SSL=${S3_USE_SSL}
-            - S3_ACCESS_KEY=${S3_ACCESS_KEY}
-            - S3_SECRET_KEY=${S3_SECRET_KEY}
-            - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-            - S3_PRESIGNED_URL_EXPIRATION_S=${S3_PRESIGNED_URL_EXPIRATION_S}
-
-            - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-            - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-            - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
-
-            - FACEBOOK_CLIENT_ID=${FACEBOOK_CLIENT_ID}
-            - FACEBOOK_CLIENT_SECRET=${FACEBOOK_CLIENT_SECRET}
-            - FACEBOOK_REDIRECT_URI=${FACEBOOK_REDIRECT_URI}
-
-            - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-            - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
-
-            - REPLICATE_API_TOKEN=${REPLICATE_API_TOKEN}
-            - WEBHOOK_SECRET=${WEBHOOK_SECRET}
-            - TRACK_SEPARATION_MODEL_VERSION=${TRACK_SEPARATION_MODEL_VERSION}
-        depends_on:
-            postgres:
-                condition: service_healthy
-            redis:
-                condition: service_healthy
-            minio:
-                condition: service_healthy
-            web-migration:
-                condition: service_completed_successfully
-            bucket-creation:
-                condition: service_completed_successfully
-
     web-migration:
         build:
             context: .
@@ -89,6 +15,7 @@ services:
         depends_on:
             postgres:
                 condition: service_healthy
+        network_mode: host
 
     bucket-creation:
         build:
@@ -108,9 +35,10 @@ services:
         depends_on:
             minio:
                 condition: service_healthy
+        network_mode: host
 
     postgres:
-        image: postgres:alpine
+        image: postgres:16.1-alpine3.19
         container_name: postgres
         restart: unless-stopped
         environment:
@@ -136,7 +64,7 @@ services:
             retries: 10
 
     redis:
-        image: redis:alpine
+        image: redis:7.2.4-alpine
         container_name: redis
         restart: unless-stopped
         command: redis-server --save 60 1 --loglevel warning
@@ -151,7 +79,7 @@ services:
             retries: 10
 
     minio:
-        image: quay.io/minio/minio:latest
+        image: quay.io/minio/minio:RELEASE.2024-01-18T22-51-28Z
         container_name: minio
         restart: unless-stopped
         command: server /data --console-address ":${S3_CONSOLE_PORT}"
