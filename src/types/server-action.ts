@@ -1,5 +1,6 @@
 type ActionResultSuccess = {
     success: true;
+    data?: any;
 };
 
 type ActionResultFailure = {

@@ -22,9 +22,8 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { assetConfig } from '@/config/asset';
+import { AssetConfig, assetConfig } from '@/config/asset';
 import { httpStatus } from '@/lib/http';
-import { signedUrlBodySchemaClient } from '@/validations/client/asset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -36,6 +35,7 @@ import {
     SeparationFormSchemaType,
     models,
 } from './_schemas/changeme';
+import { getPresignedUrl } from './actions';
 
 const steps = [
     {
@@ -93,42 +93,49 @@ export const SeparationForm = () => {
     };
 
     const handleFileUpload = async (file: File) => {
-        const response = await fetch('/api/asset/presigned-url', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                type: file.type,
-                size: file.size,
-                checksum: await computeSHA256(file),
-            }),
+        const result = await getPresignedUrl({
+            type: file.type as AssetConfig['allowedFileTypes'][number],
+            size: file.size,
+            checksum: await computeSHA256(file),
         });
-        const responseData = await response.json();
-        if (
-            response.status === httpStatus.clientError.unauthorized.code ||
-            response.status ===
-                httpStatus.clientError.unprocessableEntity.code ||
-            response.status === httpStatus.clientError.badRequest.code ||
-            response.status ===
-                httpStatus.serverError.internalServerError.code ||
-            response.status !== httpStatus.success.ok.code
-        ) {
-            toast({
-                variant: 'destructive',
-                title: responseData.message || 'Uh oh! Something went wrong.',
-                description: responseData.error || '',
-            });
-            return;
+        if (!result) return;
+        if (!result.success) {
+            try {
+                const errors = JSON.parse(result.error);
+                for (const error of errors) {
+                    for (const path of error.path) {
+                        form.setError(path, {
+                            type: path,
+                            message: error.message,
+                        });
+                    }
+                }
+            } catch (e) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Uh oh! Something went wrong.',
+                    description: result.error,
+                });
+            }
         }
-
-        const { url, id: fileId } = responseData;
-        await uploadFile(url, file);
-        return fileId;
+        if (result.success) {
+            const { url, id: fileId } = result.data;
+            if (!url || !fileId) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Uh oh! Something went wrong.',
+                    description: 'Missing URL or file ID.',
+                });
+                return;
+            }
+            await uploadFile(url, file);
+            return fileId;
+        }
     };
 
     const uploadFile = async (url: string, file: File) => {
         try {
+            // Don't use Server Actions here because we can upload directly to S3
             await fetch(url, {
                 method: 'PUT',
                 headers: {
@@ -164,7 +171,14 @@ export const SeparationForm = () => {
             return;
         }
         const fileId = await handleFileUpload(file);
-        if (!fileId) return;
+        if (!fileId) {
+            toast({
+                variant: 'destructive',
+                title: 'Uh oh! Something went wrong.',
+                description: 'File failed to upload. Please try again.',
+            });
+            return;
+        }
         form.reset();
     };
 

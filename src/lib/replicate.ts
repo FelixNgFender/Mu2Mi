@@ -1,4 +1,4 @@
-import { TrackSeparationModelInputSchema } from '@/app/studio/(separation)/separation/new/_schemas/changeme';
+import { TrackSeparationModelInputSchema } from '@/app/studio/(separation)/new/_schemas/changeme';
 import { env } from '@/config/env';
 import Replicate from 'replicate';
 import 'server-cli-only';

@@ -13,7 +13,7 @@ export const SeparationHeader = () => {
                     Track Separation
                 </h1>
                 <Link
-                    href="studio/separation/new"
+                    href="studio/new"
                     className={cn(buttonVariants({ variant: 'default' }))}
                 >
                     <LucideUpload className="mr-2 h-4 w-4" />
