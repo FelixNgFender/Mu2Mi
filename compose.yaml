@@ -3,19 +3,19 @@ version: '3.8'
 name: mu2mi
 
 services:
-    web-migration:
-        build:
-            context: .
-            dockerfile: migration.Dockerfile
-            target: migration
-        container_name: web-migration
-        restart: on-failure
-        environment:
-            - DATABASE_URL=${DATABASE_URL}
-        depends_on:
-            postgres:
-                condition: service_healthy
-        network_mode: host
+    # web-migration:
+    #     build:
+    #         context: .
+    #         dockerfile: migration.Dockerfile
+    #         target: migration
+    #     container_name: web-migration
+    #     restart: on-failure
+    #     environment:
+    #         - DATABASE_URL=${DATABASE_URL}
+    #     depends_on:
+    #         postgres:
+    #             condition: service_healthy
+    #     network_mode: host
 
     bucket-creation:
         build:
@@ -42,23 +42,14 @@ services:
         container_name: postgres
         restart: unless-stopped
         environment:
-            - PG_USER=${PG_USER}
-            - POSTGRES_USER=${POSTGRES_USER}
+            - PGUSER=postgres
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-            - POSTGRES_DB=${POSTGRES_DB}
-            - POSTGRES_PORT=${POSTGRES_PORT}
-            - POSTGRES_MULTIPLE_DATABASES=${POSTGRES_MULTIPLE_DATABASES}
         volumes:
             - postgres-data:/var/lib/postgresql/data
-            - ./docker/init-postgres.sh:/docker-entrypoint-initdb.d/init.sh
         ports:
             - ${POSTGRES_PORT}:${POSTGRES_PORT}
         healthcheck:
-            test:
-                [
-                    'CMD-SHELL',
-                    'pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}',
-                ]
+            test: ['CMD-SHELL', 'pg_isready']
             interval: 1s
             timeout: 5s
             retries: 10
