@@ -1,11 +1,6 @@
-import { httpStatus } from '@/lib/http';
+import { HttpErrorCodes, httpStatus } from '@/lib/http';
 import { logger } from '@/lib/logger';
 import 'server-cli-only';
-
-export const httpErrorCodes = {
-    ...httpStatus.clientError,
-    ...httpStatus.serverError,
-} as const;
 
 export class AppError extends Error {
     public readonly name:
@@ -14,13 +9,13 @@ export class AppError extends Error {
         | 'FatalError'
         | 'HttpError';
     public readonly isOperational: boolean;
-    public readonly httpCode?: (typeof httpErrorCodes)[keyof typeof httpErrorCodes];
+    public readonly httpCode?: HttpErrorCodes;
 
     constructor(
         name: 'StartupError' | 'ValidationError' | 'FatalError' | 'HttpError',
         message: string | undefined,
         isOperational: boolean,
-        httpCode?: (typeof httpErrorCodes)[keyof typeof httpErrorCodes],
+        httpCode?: HttpErrorCodes,
     ) {
         super(message);
 

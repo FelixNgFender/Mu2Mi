@@ -3,6 +3,7 @@
 import { auth, getUserSession } from '@/lib/auth';
 import { sendEmailVerificationCode } from '@/lib/email';
 import { errorHandler } from '@/lib/error';
+import { httpStatus } from '@/lib/http';
 import { generateEmailVerificationCode } from '@/lib/token';
 import { emailVerificationModel } from '@/models/email-verification';
 import { userModel } from '@/models/user';
@@ -17,13 +18,13 @@ export const verifyCode = async (code: string): Promise<ActionResult> => {
     if (!user) {
         return {
             success: false,
-            error: 'Sorry, you need to be signed in to do that',
+            error: httpStatus.clientError.unauthorized.humanMessage,
         };
     }
     if (user.emailVerified) {
         return {
             success: false,
-            error: 'Your email is already verified',
+            error: httpStatus.clientError.badRequest.humanMessage,
         };
     }
 
@@ -34,7 +35,9 @@ export const verifyCode = async (code: string): Promise<ActionResult> => {
     if (!result.success) {
         return {
             success: false,
-            error: result.error.issues[0]?.message ?? 'Invalid code',
+            error:
+                result.error.issues[0]?.message ??
+                httpStatus.clientError.badRequest.humanMessage,
         };
     }
 
@@ -44,19 +47,19 @@ export const verifyCode = async (code: string): Promise<ActionResult> => {
     if (!databaseCode || databaseCode.code !== code) {
         return {
             success: false,
-            error: 'Invalid code',
+            error: httpStatus.clientError.badRequest.humanMessage,
         };
     }
     if (!isWithinExpirationDate(databaseCode.expiresAt)) {
         return {
             success: false,
-            error: 'Expired code',
+            error: httpStatus.clientError.badRequest.humanMessage,
         };
     }
     if (user.email !== databaseCode.email) {
         return {
             success: false,
-            error: 'Invalid code',
+            error: httpStatus.clientError.badRequest.humanMessage,
         };
     }
 
@@ -80,13 +83,13 @@ export const resendCode = async (): Promise<ActionResult> => {
     if (!user) {
         return {
             success: false,
-            error: 'Sorry, you need to be signed in to do that',
+            error: httpStatus.clientError.unauthorized.humanMessage,
         };
     }
     if (user.emailVerified) {
         return {
             success: false,
-            error: 'Your email is already verified',
+            error: httpStatus.clientError.badRequest.humanMessage,
         };
     }
 

@@ -1,6 +1,7 @@
 'use server';
 
 import { auth } from '@/lib/auth';
+import { httpStatus } from '@/lib/http';
 import { passwordResetModel } from '@/models/password-reset';
 import { userModel } from '@/models/user';
 import { ActionResult } from '@/types/server-action';
@@ -32,14 +33,14 @@ export const setNewPassword = async (
     if (!storedToken || !isWithinExpirationDate(storedToken.expiresAt)) {
         return {
             success: false,
-            error: 'Invalid token',
+            error: httpStatus.clientError.badRequest.humanMessage,
         };
     }
     const user = await userModel.findOne(storedToken.userId);
     if (!user) {
         return {
             success: false,
-            error: 'Invalid token',
+            error: httpStatus.clientError.badRequest.humanMessage,
         };
     }
     await auth.invalidateUserSessions(user.id);

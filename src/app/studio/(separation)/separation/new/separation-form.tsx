@@ -106,11 +106,13 @@ export const SeparationForm = () => {
         });
         const responseData = await response.json();
         if (
-            response.status === httpStatus.clientError.unauthorized ||
-            response.status === httpStatus.clientError.unprocessableEntity ||
-            response.status === httpStatus.clientError.badRequest ||
-            response.status === httpStatus.serverError.internalServerError ||
-            response.status !== httpStatus.success.ok
+            response.status === httpStatus.clientError.unauthorized.code ||
+            response.status ===
+                httpStatus.clientError.unprocessableEntity.code ||
+            response.status === httpStatus.clientError.badRequest.code ||
+            response.status ===
+                httpStatus.serverError.internalServerError.code ||
+            response.status !== httpStatus.success.ok.code
         ) {
             toast({
                 variant: 'destructive',

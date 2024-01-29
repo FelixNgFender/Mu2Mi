@@ -1,6 +1,7 @@
 'use server';
 
 import { auth, getUserSession } from '@/lib/auth';
+import { httpStatus } from '@/lib/http';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -12,7 +13,7 @@ export const signOut = async (): Promise<ActionResult> => {
     const { session } = await getUserSession();
     if (!session) {
         return {
-            error: 'Unauthorized',
+            error: httpStatus.clientError.unauthorized.humanMessage,
         };
     }
 

@@ -53,7 +53,7 @@ export const POST = async (request: NextRequest) => {
                 'HttpError',
                 'Failed to create asset',
                 true,
-                httpStatus.serverError.internalServerError,
+                httpStatus.serverError.internalServerError.code,
             );
 
         return HttpResponse.success({

@@ -1,6 +1,7 @@
 'use server';
 
 import { sendPasswordResetLink } from '@/lib/email';
+import { httpStatus } from '@/lib/http';
 import { generatePasswordResetToken } from '@/lib/token';
 import { userModel } from '@/models/user';
 import { ActionResult } from '@/types/server-action';
@@ -26,7 +27,7 @@ export const requestPasswordReset = async (
     if (!user || !user.emailVerified) {
         return {
             success: false,
-            error: 'Invalid email address',
+            error: httpStatus.clientError.badRequest.humanMessage,
         };
     }
 

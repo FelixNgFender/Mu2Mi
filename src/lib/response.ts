@@ -9,70 +9,69 @@ const { clientError, serverError } = httpStatus;
 export class HttpResponse {
     static success(body?: Record<string, unknown>, headers?: HeadersInit) {
         return NextResponse.json(body || {}, {
-            status: httpStatus.success.ok,
+            status: httpStatus.success.ok.code,
             headers,
         });
     }
 
     static redirect(body?: BodyInit, headers?: HeadersInit) {
         return new Response(body, {
-            status: httpStatus.redirect.found,
+            status: httpStatus.redirect.found.code,
             headers,
         });
     }
 
     static badRequest(error?: Record<string, unknown> | string) {
         return NextResponse.json(
-            { message: "Oops! We couldn't understand your request.", error },
-            { status: clientError.badRequest },
+            { message: clientError.badRequest.humanMessage, error },
+            { status: clientError.badRequest.code },
         );
     }
 
     static unauthorized() {
         return NextResponse.json(
-            { message: 'Sorry, you need to be signed in to do that.' },
-            { status: clientError.unauthorized },
+            { message: clientError.unauthorized.humanMessage },
+            { status: clientError.unauthorized.code },
         );
     }
 
     static forbidden() {
         return NextResponse.json(
-            { message: "Sorry, you don't have permission to access this." },
-            { status: clientError.forbidden },
+            { message: clientError.forbidden.humanMessage },
+            { status: clientError.forbidden.code },
         );
     }
 
     static notFound() {
         return NextResponse.json(
-            { message: "Sorry, we couldn't find what you were looking for." },
-            { status: clientError.notFound },
+            { message: clientError.notFound.humanMessage },
+            { status: clientError.notFound.code },
         );
     }
 
     static tooManyRequests(headers?: HeadersInit) {
         return NextResponse.json(
-            { message: "You're doing that too much. Please slow down." },
-            { status: clientError.tooManyRequests, headers },
+            { message: clientError.tooManyRequests.humanMessage },
+            { status: clientError.tooManyRequests.code, headers },
         );
     }
 
     static unprocessableEntity(error?: Record<string, unknown> | string) {
         return NextResponse.json(
             {
-                message: "Oops! We couldn't process your request.",
+                message: clientError.unprocessableEntity.humanMessage,
                 error,
             },
-            { status: clientError.unprocessableEntity },
+            { status: clientError.unprocessableEntity.code },
         );
     }
 
     static internalServerError() {
         return NextResponse.json(
             {
-                message:
-                    "Oops! Something went wrong on our end. We're looking into it.",
+                message: serverError.internalServerError.humanMessage,
             },
-            { status: serverError.internalServerError },
+            { status: serverError.internalServerError.code },
         );
     }
 }
