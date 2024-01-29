@@ -11,7 +11,8 @@ export const SignOutButton = () => {
         <button
             onClick={async () => {
                 const result = await signOut();
-                if (result && !result.success) {
+                if (!result) return;
+                if (!result.success) {
                     toast({
                         variant: 'destructive',
                         title: 'Uh oh! Something went wrong.',

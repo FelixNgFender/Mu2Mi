@@ -32,7 +32,8 @@ export const SignInForm = () => {
 
     const onSubmit = async (data: SignInSchemaClientType) => {
         const result = await signIn(data);
-        if (result && !result.success) {
+        if (!result) return;
+        if (!result.success) {
             const errors = JSON.parse(result.error);
             for (const error of errors) {
                 for (const path of error.path) {

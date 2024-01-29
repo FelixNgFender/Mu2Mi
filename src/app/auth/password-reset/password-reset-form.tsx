@@ -34,6 +34,7 @@ export const PasswordResetForm = () => {
 
     const onSubmit = async (data: PasswordResetSchemaClientType) => {
         const result = await requestPasswordReset(data);
+        if (!result) return;
         if (!result.success) {
             try {
                 const errors = JSON.parse(result.error);

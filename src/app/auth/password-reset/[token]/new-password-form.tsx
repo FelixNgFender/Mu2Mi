@@ -32,7 +32,8 @@ export const NewPasswordForm = ({ token }: { token: string }) => {
 
     const onSubmit = async (data: NewPasswordSchemaClientType) => {
         const result = await setNewPassword(data, token);
-        if (result && !result.success) {
+        if (!result) return;
+        if (!result.success) {
             try {
                 const errors = JSON.parse(result.error);
                 for (const error of errors) {

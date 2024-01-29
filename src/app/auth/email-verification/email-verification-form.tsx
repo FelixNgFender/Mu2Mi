@@ -49,7 +49,8 @@ export const EmailVerificationForm = () => {
         if (parsed.success) setError(undefined);
 
         const result = await verifyCode(code);
-        if (result && !result.success) {
+        if (!result) return;
+        if (!result.success) {
             setError(result.error);
             setIsSubmitting(false);
             return;
