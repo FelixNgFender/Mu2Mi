@@ -6,7 +6,9 @@ import { cookies } from 'next/headers';
 
 export const GET = async () => {
     const state = generateState();
-    const url = await githubAuth.createAuthorizationURL(state);
+    const url = await githubAuth.createAuthorizationURL(state, {
+        scopes: ['user:email'],
+    });
     cookies().set('github_oauth_state', state, {
         path: '/',
         secure: env.NODE_ENV === 'production',

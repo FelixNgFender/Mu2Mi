@@ -24,36 +24,8 @@ export const GET = async (request: NextRequest) => {
             },
         });
         const githubUser: GitHubUser = await githubUserResponse.json();
-
         if (!githubUser.email) {
-            // if email isn't public, request from github's email endpoint
-            const emailsResponse = await fetch(
-                'https://api.github.com/user/emails',
-                {
-                    headers: {
-                        Authorization: `Bearer ${tokens.accessToken}`,
-                    },
-                },
-            );
-            const emails = await emailsResponse.json();
-
-            const primaryEmail =
-                emails.find((email: { primary: any }) => email.primary) ?? null;
-            if (!primaryEmail) {
-                throw new AppError(
-                    'ValidationError',
-                    'Email not provided',
-                    true,
-                );
-            }
-            if (!primaryEmail.verified) {
-                throw new AppError(
-                    'ValidationError',
-                    'Email not verified',
-                    true,
-                );
-            }
-            githubUser.email = primaryEmail.email as string;
+            throw new AppError('ValidationError', 'Email not provided', true);
         }
 
         const existingUserWithEmail = await userModel.findOneByEmail(
