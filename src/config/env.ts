@@ -29,10 +29,7 @@ const envSchema = z.object({
         'silly',
     ]),
     ENABLE_EMAIL: isBoolean,
-    TOKEN_DURATION_S: isNumber,
     AUTH_COOKIE_DURATION_S: isNumber,
-    DEVICE_COOKIE_DURATION_S: isNumber,
-    TIMEOUT_DURATION_S: isNumber,
 
     // Database
     DATABASE_LOGGING: isBoolean,
