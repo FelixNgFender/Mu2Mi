@@ -7,73 +7,108 @@ import {
     integer,
     pgEnum,
     pgTable,
+    primaryKey,
     serial,
+    text,
     timestamp,
     uuid,
     varchar,
 } from 'drizzle-orm/pg-core';
 
-export const user = pgTable('auth_user', {
-    id: varchar('id', {
-        length: 15, // change this when using custom user ids
-    }).primaryKey(),
-    username: varchar('username', {
-        length: 32,
-    }).notNull(),
-    usernameLower: varchar('username_lower', {
-        length: 32,
-    }).notNull(),
-    email: varchar('email', {
-        length: 255,
-    })
-        .unique()
-        .notNull(),
+export const userTable = pgTable('user', {
+    id: text('id').primaryKey(),
+    email: text('email').unique().notNull(),
     emailVerified: boolean('email_verified').notNull().default(false),
+    username: text('username').unique().notNull(),
+    usernameLower: text('username_lower').unique().notNull(),
+    hashedPassword: text('hashed_password'),
     // other user attributes
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const key = pgTable(
-    'user_key',
+export interface DatabaseUser {
+    id: string;
+    email: string;
+    emailVerified: boolean;
+    username: string;
+    usernameLower: string;
+    hashedPassword?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export const sessionTable = pgTable(
+    'session',
     {
-        id: varchar('id', {
-            length: 255,
-        }).primaryKey(),
-        userId: varchar('user_id', {
-            length: 15,
-        })
+        id: text('id').primaryKey(),
+        userId: text('user_id')
             .notNull()
-            .references(() => user.id, {
+            .references(() => userTable.id, {
                 onDelete: 'cascade',
             }),
-        hashedPassword: varchar('hashed_password', {
-            length: 255,
-        }),
+        expiresAt: timestamp('expires_at', {
+            withTimezone: true,
+            mode: 'date',
+        }).notNull(),
     },
     (table) => {
         return {
-            userIdIdx: index('user_key_user_id_idx').on(table.userId),
+            userIdIdx: index('session_user_id_idx').on(table.userId),
         };
     },
 );
 
-export const emailVerification = pgTable(
-    'email_verification_token',
+export const providerId = pgEnum('provider_id', [
+    'github',
+    'google',
+    'facebook',
+]);
+
+export const oauthAccountTable = pgTable(
+    'oauth_account',
     {
-        id: varchar('id', {
-            length: 128,
-        }).primaryKey(), // Token to send inside the verification link
-        userId: varchar('user_id', {
-            length: 15,
-        })
+        providerId: providerId('provider_id').notNull(),
+        providerUserId: text('provider_user_id').notNull(),
+        userId: text('user_id')
             .notNull()
-            .references(() => user.id, {
+            .references(() => userTable.id, {
                 onDelete: 'cascade',
             }),
-        expires: bigint('expires', {
-            mode: 'number',
-        }).notNull(), // Expiration (in milliseconds)
+    },
+    (table) => {
+        return {
+            oauthAccountPk: primaryKey({
+                columns: [table.providerId, table.providerUserId],
+            }),
+            providerIdIdx: index('oauth_account_provider_id_idx').on(
+                table.providerId,
+            ),
+            providerUserIdIdx: index('oauth_account_provider_user_id_idx').on(
+                table.providerUserId,
+            ),
+            userIdIdx: index('oauth_account_user_id_idx').on(table.userId),
+        };
+    },
+);
+
+export const emailVerificationTable = pgTable(
+    'email_verification_code',
+    {
+        id: serial('id').primaryKey(),
+        code: varchar('code', {
+            length: 6,
+        }).notNull(),
+        userId: text('user_id')
+            .notNull()
+            .references(() => userTable.id, {
+                onDelete: 'cascade',
+            }),
+        email: text('email').notNull(),
+        expiresAt: timestamp('expires_at', {
+            withTimezone: true,
+            mode: 'date',
+        }).notNull(),
     },
     (table) => {
         return {
@@ -82,22 +117,19 @@ export const emailVerification = pgTable(
     },
 );
 
-export const passwordReset = pgTable(
+export const passwordResetTable = pgTable(
     'password_reset_token',
     {
-        id: varchar('id', {
-            length: 128,
-        }).primaryKey(), // Token to send inside the reset link
-        userId: varchar('user_id', {
-            length: 15,
-        })
+        id: text('id').primaryKey(), // Token to send inside the reset link
+        userId: text('user_id')
             .notNull()
-            .references(() => user.id, {
+            .references(() => userTable.id, {
                 onDelete: 'cascade',
             }),
-        expires: bigint('expires', {
-            mode: 'number',
-        }).notNull(), // Expiration (in milliseconds)
+        expiresAt: timestamp('expires_at', {
+            withTimezone: true,
+            mode: 'date',
+        }).notNull(),
     },
     (table) => {
         return {
@@ -106,24 +138,26 @@ export const passwordReset = pgTable(
     },
 );
 
+export const mimeType = pgEnum('mime_type', [
+    'audio/mpeg',
+    'audio/wav',
+    'audio/flac',
+    'audio/mp4',
+    'audio/mov',
+    'audio/wma',
+]);
+
 export const asset = pgTable(
     'asset',
     {
         id: serial('id').primaryKey(),
-        userId: varchar('user_id', {
-            length: 15,
-        })
+        userId: text('user_id')
             .notNull()
-            .references(() => user.id, {
+            .references(() => userTable.id, {
                 onDelete: 'cascade',
             }),
-        name: varchar('name', {
-            length: 255,
-        }).notNull(),
-        mimeType: varchar('mime_type', {
-            length: 255,
-        }).notNull(),
-        size: bigint('size', { mode: 'number' }).notNull(),
+        url: text('url').notNull(),
+        mimeType: mimeType('mime_type').notNull(),
         createdAt: timestamp('created_at').defaultNow(),
         updatedAt: timestamp('updated_at').defaultNow(),
     },
@@ -141,11 +175,9 @@ export const track = pgTable(
         // no need to use UUID since track IDs are not sensitive
         // but useful technique, so keep it here for future reference
         uuid: uuid('uuid').notNull().defaultRandom().unique(),
-        userId: varchar('user_id', {
-            length: 15,
-        })
+        userId: text('user_id')
             .notNull()
-            .references(() => user.id, {
+            .references(() => userTable.id, {
                 onDelete: 'cascade',
             }),
         taskId: bigint('task_id', { mode: 'number' })
@@ -183,12 +215,8 @@ export const track = pgTable(
             () => asset.id,
             { onDelete: 'cascade' },
         ),
-        title: varchar('title', {
-            length: 255,
-        }).notNull(),
-        artist: varchar('artist', {
-            length: 255,
-        }),
+        title: text('title').notNull(),
+        artist: text('artist'),
         stems: integer('stems').notNull(), // TODO: add CHECK constraint here once Drizzle has added support for it
         includesMidi: boolean('includes_midi').notNull(),
         tempo: integer('tempo').notNull(),

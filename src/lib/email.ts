@@ -28,17 +28,15 @@ import 'server-cli-only';
 
 // const transporter = new ServerClient(env.POSTMARK_API_KEY);
 
-export const sendEmailVerificationLink = async (
+export const sendEmailVerificationCode = async (
     email: string,
-    token: string,
+    code: string,
 ) => {
-    const url = `${env.ORIGIN}/auth/email-verification/${token}`;
-
     if (!env.ENABLE_EMAIL) {
         logger.info(`
 =======================================
 New email received at: ${email}
-Your email verification link is: ${url}
+Your email verification code is: ${code}
 =======================================
         `);
         return;

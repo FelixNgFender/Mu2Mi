@@ -1,58 +1,70 @@
 import { env } from '@/config/env';
 import { fileStorageClient } from '@/db';
-import { db } from '@/db';
-import { asset as assetTable } from '@/db/schema';
-import { auth } from '@/lib/auth';
-import { logger } from '@/lib/logger';
+import { getUserSession } from '@/lib/auth';
+import { AppError, errorHandler } from '@/lib/error';
+import { httpStatus } from '@/lib/http';
 import { HttpResponse } from '@/lib/response';
-import { InferInsertModel } from 'drizzle-orm';
+import { assetModel } from '@/models/asset';
+import {
+    SignedUrlBodySchemaServerType,
+    signedUrlBodySchemaServer,
+} from '@/validations/server/asset';
+import crypto from 'crypto';
 import { NextRequest } from 'next/server';
 
-// fileStorageClient.presignedPutObject
-
-export const GET = async (request: NextRequest) => {
-    const authRequest = auth.handleRequest(request);
-    const session = await authRequest.validate();
-    if (!session) {
+export const POST = async (request: NextRequest) => {
+    const { user } = await getUserSession();
+    if (!user) {
         return HttpResponse.unauthorized();
     }
-    if (!session.user.emailVerified) {
+
+    if (!user.emailVerified) {
         return HttpResponse.unprocessableEntity('Email not verified');
     }
-    const searchParams = request.nextUrl.searchParams;
-    const name = searchParams.get('name');
-    const type = searchParams.get('type');
-    const size = searchParams.get('size');
-    if (!name || !type || !size) {
-        return HttpResponse.unprocessableEntity('Missing name or type');
-    }
 
-    // The uploaded asset will be stored in the S3 bucket
-    // with a name matching the id (PK) of the `asset` table
-    const asset = await createAsset({
-        userId: session.user.userId,
-        name,
-        mimeType: type,
-        size: Number(size),
+    const data: SignedUrlBodySchemaServerType = await request.json();
+    const { type, size, checksum } = data;
+
+    const result = signedUrlBodySchemaServer.safeParse({
+        type,
+        size,
+        checksum,
     });
 
-    // TODO: handle error, centralize logging
-    if (!asset) {
-        return HttpResponse.internalServerError();
+    if (!result.success) {
+        return HttpResponse.badRequest(JSON.stringify(result.error.issues));
     }
-    let presignedUrl = '';
+
     try {
-        presignedUrl = await fileStorageClient.presignedPutObject(
+        const url = await fileStorageClient.presignedPutObject(
             env.S3_BUCKET_NAME,
-            `${session.user.userId}/${name}.${type}`,
+            generateFileName(),
             env.S3_PRESIGNED_URL_EXPIRATION_S,
         );
+
+        const newAsset = await assetModel.createOne({
+            mimeType: type,
+            url,
+            userId: user.id,
+        });
+
+        if (!newAsset)
+            throw new AppError(
+                'HttpError',
+                'Failed to create asset',
+                true,
+                httpStatus.serverError.internalServerError,
+            );
+
+        return HttpResponse.success({
+            url,
+            id: newAsset.id,
+        });
     } catch (err) {
-        logger.error(err);
+        errorHandler.handleError(err as Error);
+        return HttpResponse.internalServerError();
     }
-    return HttpResponse.success({ presignedUrl });
 };
 
-const createAsset = async (asset: InferInsertModel<typeof assetTable>) => {
-    return (await db.insert(assetTable).values(asset).returning())[0];
-};
+const generateFileName = (bytes = 32) =>
+    crypto.randomBytes(bytes).toString('hex');

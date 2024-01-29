@@ -2,24 +2,22 @@ import { httpStatus } from '@/lib/http';
 import { logger } from '@/lib/logger';
 import 'server-cli-only';
 
-export const errorNames = {
-    startupError: 'StartupError',
-    validationError: 'ValidationError',
-    httpError: 'HttpError',
-} as const;
-
 export const httpErrorCodes = {
     ...httpStatus.clientError,
     ...httpStatus.serverError,
 } as const;
 
 export class AppError extends Error {
-    public readonly name: (typeof errorNames)[keyof typeof errorNames];
+    public readonly name:
+        | 'StartupError'
+        | 'ValidationError'
+        | 'FatalError'
+        | 'HttpError';
     public readonly isOperational: boolean;
     public readonly httpCode?: (typeof httpErrorCodes)[keyof typeof httpErrorCodes];
 
     constructor(
-        name: (typeof errorNames)[keyof typeof errorNames],
+        name: 'StartupError' | 'ValidationError' | 'FatalError' | 'HttpError',
         message: string | undefined,
         isOperational: boolean,
         httpCode?: (typeof httpErrorCodes)[keyof typeof httpErrorCodes],

@@ -1,8 +1,7 @@
-import 'server-cli-only';
-
 export const register = async () => {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
-        await import('lucia/polyfill/node');
+        // const { webcrypto } = await import('node:crypto');
+        // globalThis.crypto = webcrypto as Crypto;
 
         if (!process.env.NEXT_MANUAL_SIG_HANDLE) {
             return;

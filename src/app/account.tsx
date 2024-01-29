@@ -5,11 +5,12 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getPageSession } from '@/lib/auth';
+import { getUserSession } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 import { LogIn, LogOut, Settings, User } from 'lucide-react';
 import Link from 'next/link';
-import * as React from 'react';
+
+import { SignOutButton } from './sign-out-button';
 
 interface ModeToggleProps {
     variant?:
@@ -30,7 +31,7 @@ export const Account = async ({
     className,
     size = 'icon',
 }: ModeToggleProps) => {
-    const session = await getPageSession();
+    const { session } = await getUserSession();
     if (!session)
         return (
             <Link
@@ -51,16 +52,13 @@ export const Account = async ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuItem>
-                    <Link href="/settings" className="flex flex-1">
+                    <Link href="/studio/settings" className="flex flex-1">
                         <Settings className="mr-2 h-5 w-5" />
                         Settings
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <LogOut className="mr-2 h-5 w-5" />
-                    <form action="/api/auth/sign-out" method="post">
-                        <input type="submit" value="Sign out" />
-                    </form>
+                    <SignOutButton />
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

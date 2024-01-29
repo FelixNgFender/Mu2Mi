@@ -2,33 +2,35 @@ import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { getPageSession } from '@/lib/auth';
-import { redirect } from 'next/navigation';
 
-import { EmailVerificationForm } from './email-verification-form';
+import {
+    EmailVerificationForm,
+    ResendVerificationCodeButton,
+} from './email-verification-form';
 
 const EmailVerificationPage = async () => {
-    const session = await getPageSession();
-    if (!session) redirect('/auth/sign-in');
-    if (session.user.emailVerified) redirect('/');
     return (
-        <Card>
+        <Card className="max-w-md">
             <CardHeader>
                 <CardTitle className="bg-gradient !bg-cover !bg-clip-text !bg-center text-transparent">
-                    Email verification
+                    Verify your email
                 </CardTitle>
                 <CardDescription>
                     <p className="text-sm text-muted-foreground">
-                        Your email verification link was sent to your inbox.
+                        We have sent a code to your email address
                     </p>
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">
                 <EmailVerificationForm />
             </CardContent>
+            <CardFooter>
+                <ResendVerificationCodeButton />
+            </CardFooter>
         </Card>
     );
 };

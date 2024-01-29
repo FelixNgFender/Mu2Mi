@@ -8,19 +8,11 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { getPageSession } from '@/lib/auth';
-import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 
 import { SignInForm } from './sign-in-form';
 
 const SignInPage = async () => {
-    const session = await getPageSession();
-    if (session) {
-        if (!session.user.emailVerified) redirect('/auth/email-verification');
-        redirect('/');
-    }
     return (
         <Card>
             <CardHeader>

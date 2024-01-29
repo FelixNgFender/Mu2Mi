@@ -1,6 +1,5 @@
 import { httpStatus } from '@/lib/http';
 import { NextResponse } from 'next/server';
-import 'server-cli-only';
 
 const { clientError, serverError } = httpStatus;
 

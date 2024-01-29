@@ -1,6 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getPageSession } from '@/lib/auth';
-import { redirect } from 'next/navigation';
 
 import { NewPasswordForm } from './new-password-form';
 
@@ -11,11 +9,6 @@ const SignUpPage = async ({
         token: string;
     };
 }) => {
-    const session = await getPageSession();
-    if (session) {
-        if (!session.user.emailVerified) redirect('/auth/email-verification');
-        redirect('/');
-    }
     return (
         <Card>
             <CardHeader>

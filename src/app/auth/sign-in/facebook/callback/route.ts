@@ -1,65 +1,87 @@
 import { auth, facebookAuth } from '@/lib/auth';
-import { AppError, errorHandler, errorNames } from '@/lib/error';
+import { AppError, errorHandler } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
+import { oAuthAccountModel } from '@/models/oauth-account';
 import { userModel } from '@/models/user';
-import { OAuthRequestError } from '@lucia-auth/oauth';
-import { cookies, headers } from 'next/headers';
+import { OAuth2RequestError } from 'arctic';
+import { generateId } from 'lucia';
+import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
 export const GET = async (request: NextRequest) => {
-    const storedState = cookies().get('facebook_oauth_state')?.value;
     const url = new URL(request.url);
-    const state = url.searchParams.get('state');
     const code = url.searchParams.get('code');
-    if (!storedState || !state || storedState !== state || !code) {
+    const state = url.searchParams.get('state');
+    const storedState = cookies().get('facebook_oauth_state')?.value ?? null;
+    if (!code || !state || !storedState || state !== storedState) {
         return HttpResponse.badRequest();
     }
     try {
-        const { getExistingUser, facebookUser, createUser, createKey } =
-            await facebookAuth.validateCallback(code);
-        const getUser = async () => {
-            const existingUser = await getExistingUser();
-            if (existingUser) return existingUser;
-            if (!facebookUser.email) {
-                throw new AppError(
-                    errorNames.validationError,
-                    'Email not provided',
-                    true,
-                );
-            }
-            const existingDatabaseUserWithEmail =
-                await userModel.findOneByEmail(facebookUser.email);
-            if (existingDatabaseUserWithEmail) {
-                // transform `UserSchema` to `User`
-                const user = auth.transformDatabaseUser({
-                    ...existingDatabaseUserWithEmail,
-                    username_lower: existingDatabaseUserWithEmail.usernameLower,
-                    email_verified: existingDatabaseUserWithEmail.emailVerified,
-                    // put more snake_case to camelCase transformations here
-                });
-                await createKey(user.userId);
-                return user;
-            }
-            return await createUser({
-                attributes: {
-                    username: facebookUser.name,
-                    username_lower: facebookUser.name.toLowerCase(),
-                    email: facebookUser.email,
-                    email_verified: !!facebookUser.email,
-                },
-            });
-        };
+        const tokens = await facebookAuth.validateAuthorizationCode(code);
+        const fields = ['id', 'name', 'email'].join(',');
+        const facebookUserResponse = await fetch(
+            `https://graph.facebook.com/me?fields=${fields}&access_token=${tokens.accessToken}`,
+        );
+        const facebookUser: FacebookUser = await facebookUserResponse.json();
 
-        const user = await getUser();
-        const session = await auth.createSession({
-            userId: user.userId,
-            attributes: {},
-        });
-        const authRequest = auth.handleRequest(request.method, {
-            cookies,
-            headers,
-        });
-        authRequest.setSession(session);
+        // Facebook doesn't return unverified emails
+        // We just simply doesn't allow users to sign in with Facebook
+        // if they don't have a verified email or their Facebook account doesn't have an email
+        if (!facebookUser.email) {
+            throw new AppError('ValidationError', 'Email not provided', true);
+        }
+        const existingUserWithEmail = await userModel.findOneByEmail(
+            facebookUser.email,
+        );
+        if (existingUserWithEmail) {
+            const existingOAuthAccount =
+                await oAuthAccountModel.findOneByProviderIdAndProviderUserId(
+                    'facebook',
+                    facebookUser.id,
+                );
+            if (!existingOAuthAccount) {
+                await oAuthAccountModel.createOne({
+                    providerId: 'facebook',
+                    providerUserId: facebookUser.id,
+                    userId: existingUserWithEmail.id,
+                });
+            }
+            const session = await auth.createSession(
+                existingUserWithEmail.id,
+                {},
+            );
+            const sessionCookie = auth.createSessionCookie(session.id);
+            cookies().set(
+                sessionCookie.name,
+                sessionCookie.value,
+                sessionCookie.attributes,
+            );
+            return HttpResponse.redirect(undefined, {
+                Location: '/',
+            });
+        }
+
+        const userId = generateId(15);
+
+        await userModel.createOneWithOAuthAccount(
+            {
+                id: userId,
+                email: facebookUser.email.toLowerCase(),
+                emailVerified: true,
+                username: facebookUser.name,
+                usernameLower: facebookUser.name.toLowerCase(),
+            },
+            'facebook',
+            facebookUser.id,
+        );
+
+        const session = await auth.createSession(userId, {});
+        const sessionCookie = auth.createSessionCookie(session.id);
+        cookies().set(
+            sessionCookie.name,
+            sessionCookie.value,
+            sessionCookie.attributes,
+        );
         return HttpResponse.redirect(undefined, {
             Location: '/',
         });
@@ -67,10 +89,16 @@ export const GET = async (request: NextRequest) => {
         if (err instanceof AppError) {
             return HttpResponse.unprocessableEntity(err.message);
         }
-        if (err instanceof OAuthRequestError) {
+        if (err instanceof OAuth2RequestError) {
             return HttpResponse.badRequest();
         }
         await errorHandler.handleError(err as Error);
         return HttpResponse.internalServerError();
     }
 };
+
+interface FacebookUser {
+    id: string;
+    name: string;
+    email?: string;
+}

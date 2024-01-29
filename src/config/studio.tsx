@@ -32,11 +32,13 @@ const tracks = [
     '月色ホライズン',
 ];
 
+export const baseStudioPath = '/studio';
+
 export const studioConfig: StudioConfig = {
     mainNav: [
         {
             title: 'Studio',
-            href: '/',
+            href: baseStudioPath,
             icon: ({ className }) => <KeyboardMusic className={className} />,
         },
         {
@@ -51,25 +53,25 @@ export const studioConfig: StudioConfig = {
             items: [
                 {
                     title: 'Track Separation',
-                    href: '/',
+                    href: `${baseStudioPath}`,
                     items: [],
                     icon: ({ className }) => <Split className={className} />,
                 },
                 {
                     title: 'Voice Studio',
-                    href: '/voice',
+                    href: `${baseStudioPath}/voice`,
                     items: [],
                     icon: ({ className }) => <Mic2 className={className} />,
                 },
                 {
                     title: 'Mastering',
-                    href: '/mastering',
+                    href: `${baseStudioPath}/mastering`,
                     items: [],
                     icon: ({ className }) => <Speaker className={className} />,
                 },
                 {
                     title: 'Lyrics Writer',
-                    href: '/lyrics',
+                    href: `${baseStudioPath}/lyrics`,
                     items: [],
                     icon: ({ className }) => (
                         <PencilLine className={className} />

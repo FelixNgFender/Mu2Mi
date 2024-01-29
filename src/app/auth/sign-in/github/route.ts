@@ -1,16 +1,18 @@
 import { env } from '@/config/env';
 import { githubAuth } from '@/lib/auth';
 import { HttpResponse } from '@/lib/response';
-import * as context from 'next/headers';
-import type { NextRequest } from 'next/server';
+import { generateState } from 'arctic';
+import { cookies } from 'next/headers';
 
-export const GET = async (request: NextRequest) => {
-    const [url, state] = await githubAuth.getAuthorizationUrl();
-    context.cookies().set('github_oauth_state', state, {
-        httpOnly: true,
-        secure: env.NODE_ENV === 'production',
+export const GET = async () => {
+    const state = generateState();
+    const url = await githubAuth.createAuthorizationURL(state);
+    cookies().set('github_oauth_state', state, {
         path: '/',
+        secure: env.NODE_ENV === 'production',
+        httpOnly: true,
         maxAge: env.AUTH_COOKIE_DURATION_S,
+        sameSite: 'lax',
     });
     return HttpResponse.redirect(undefined, {
         Location: url.toString(),

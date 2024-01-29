@@ -1,6 +1,6 @@
 import { db } from '@/db';
-import { passwordReset as passwordResetTable } from '@/db/schema';
-import { AppError, errorNames } from '@/lib/error';
+import { passwordResetTable } from '@/db/schema';
+import { AppError } from '@/lib/error';
 import { eq } from 'drizzle-orm';
 import 'server-cli-only';
 
@@ -8,7 +8,7 @@ type NewPasswordResetToken = typeof passwordResetTable.$inferInsert;
 
 class PasswordResetModel {
     async findManyByUserId(userId: string) {
-        return await db.query.passwordReset.findMany({
+        return await db.query.passwordResetTable.findMany({
             where: eq(passwordResetTable.userId, userId),
         });
     }
@@ -21,24 +21,22 @@ class PasswordResetModel {
             .then((tokens) => tokens[0]);
     }
 
-    /**
-     * @throws {AppError} if token is invalid or expired
-     */
-    async validateAndDeletePasswordResetToken(token: string) {
+    async deleteAllByUserId(userId: string) {
+        return await db
+            .delete(passwordResetTable)
+            .where(eq(passwordResetTable.userId, userId));
+    }
+
+    async validateAndDelete(token: string) {
         return await db.transaction(async (tx) => {
-            const [storedToken] = await tx
-                .select()
-                .from(passwordResetTable)
-                .where(eq(passwordResetTable.id, token));
-            if (!storedToken)
-                throw new AppError(
-                    errorNames.validationError,
-                    'Invalid token',
-                    true,
-                );
-            await tx
-                .delete(passwordResetTable)
-                .where(eq(passwordResetTable.id, storedToken.id));
+            const storedToken = await tx.query.passwordResetTable.findFirst({
+                where: eq(passwordResetTable.id, token),
+            });
+            if (storedToken) {
+                await tx
+                    .delete(passwordResetTable)
+                    .where(eq(passwordResetTable.id, storedToken.id));
+            }
             return storedToken;
         });
     }

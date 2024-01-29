@@ -1,74 +1,35 @@
-import { env } from '@/config/env';
-import { AppError, errorNames } from '@/lib/error';
+import { AppError } from '@/lib/error';
 import { emailVerificationModel } from '@/models/email-verification';
 import { passwordResetModel } from '@/models/password-reset';
-import { generateRandomString, isWithinExpiration } from 'lucia/utils';
+import { generateId } from 'lucia';
+import { TimeSpan, createDate } from 'oslo';
+import { alphabet, generateRandomString } from 'oslo/crypto';
 import 'server-cli-only';
 
-const TOKEN_DURATION_MS = env.TOKEN_DURATION_S * 1000;
-
-export const generateEmailVerificationToken = async (userId: string) => {
-    const storedUserTokens =
-        await emailVerificationModel.findManyByUserId(userId);
-    if (storedUserTokens.length > 0) {
-        const reusableStoredToken = storedUserTokens.find((token) => {
-            // check if expiration is within 1 hour
-            // and reuse the token if true
-            return isWithinExpiration(
-                Number(token.expires) - TOKEN_DURATION_MS / 2,
-            );
-        });
-        if (reusableStoredToken) return reusableStoredToken.id;
-    }
-    const token = generateRandomString(63);
+export const generateEmailVerificationCode = async (
+    userId: string,
+    email: string,
+): Promise<string> => {
+    await emailVerificationModel.deleteAllByUserId(userId);
+    const code = generateRandomString(6, alphabet('0-9'));
     await emailVerificationModel.createOne({
-        id: token,
-        userId: userId,
-        expires: new Date().getTime() + TOKEN_DURATION_MS,
+        userId,
+        email,
+        code,
+        expiresAt: createDate(new TimeSpan(5, 'm')),
     });
-
-    return token;
+    return code;
 };
 
-export const validateEmailVerificationToken = async (token: string) => {
-    const storedToken =
-        await emailVerificationModel.validateAndDeleteEmailVerificationToken(
-            token,
-        );
-    const tokenExpires = Number(storedToken.expires); // bigint => number conversion
-    if (!isWithinExpiration(tokenExpires)) {
-        throw new AppError(errorNames.validationError, 'Expired token', true);
-    }
-    return storedToken.userId;
-};
-
-export const generatePasswordResetToken = async (userId: string) => {
-    const storedUserTokens = await passwordResetModel.findManyByUserId(userId);
-    if (storedUserTokens.length > 0) {
-        const reusableStoredToken = storedUserTokens.find((token) => {
-            // check if expiration is within 1 hour
-            // and reuse the token if true
-            return isWithinExpiration(
-                Number(token.expires) - TOKEN_DURATION_MS / 2,
-            );
-        });
-        if (reusableStoredToken) return reusableStoredToken.id;
-    }
-    const token = generateRandomString(63);
+export const generatePasswordResetToken = async (
+    userId: string,
+): Promise<string> => {
+    await passwordResetModel.deleteAllByUserId(userId);
+    const tokenId = generateId(40);
     await passwordResetModel.createOne({
-        id: token,
+        id: tokenId,
         userId: userId,
-        expires: new Date().getTime() + TOKEN_DURATION_MS,
+        expiresAt: createDate(new TimeSpan(2, 'h')),
     });
-    return token;
-};
-
-export const validatePasswordResetToken = async (token: string) => {
-    const storedToken =
-        await passwordResetModel.validateAndDeletePasswordResetToken(token);
-    const tokenExpires = Number(storedToken.expires); // bigint => number conversion
-    if (!isWithinExpiration(tokenExpires)) {
-        throw new AppError(errorNames.validationError, 'Expired token', true);
-    }
-    return storedToken.userId;
+    return tokenId;
 };

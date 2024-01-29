@@ -1,46 +1,38 @@
 import { db } from '@/db';
-import { emailVerification as emailVerificationTable } from '@/db/schema';
-import { AppError, errorNames } from '@/lib/error';
+import { emailVerificationTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import 'server-cli-only';
 
-type NewEmailVerificationToken = typeof emailVerificationTable.$inferInsert;
+type NewEmailVerificationCode = typeof emailVerificationTable.$inferInsert;
 
 class EmailVerificationModel {
-    async findManyByUserId(userId: string) {
-        return await db.query.emailVerification.findMany({
-            where: eq(emailVerificationTable.userId, userId),
-        });
-    }
-
-    async createOne(token: NewEmailVerificationToken) {
+    async createOne(token: NewEmailVerificationCode) {
         return await db
             .insert(emailVerificationTable)
             .values(token)
             .returning()
-            .then((tokens) => tokens[0]);
+            .then((codes) => codes[0]);
     }
 
-    /**
-     * @throws {AppError} if token is invalid or expired
-     */
-    async validateAndDeleteEmailVerificationToken(token: string) {
+    async validateAndDelete(userId: string) {
         return await db.transaction(async (tx) => {
-            const [storedToken] = await tx
-                .select()
-                .from(emailVerificationTable)
-                .where(eq(emailVerificationTable.id, token));
-            if (!storedToken)
-                throw new AppError(
-                    errorNames.validationError,
-                    'Invalid token',
-                    true,
-                );
-            await tx
-                .delete(emailVerificationTable)
-                .where(eq(emailVerificationTable.userId, storedToken.userId));
-            return storedToken;
+            const databaseCode =
+                await tx.query.emailVerificationTable.findFirst({
+                    where: eq(emailVerificationTable.userId, userId),
+                });
+            if (databaseCode) {
+                await tx
+                    .delete(emailVerificationTable)
+                    .where(eq(emailVerificationTable.userId, userId));
+                return databaseCode;
+            }
         });
+    }
+
+    async deleteAllByUserId(userId: string) {
+        return await db
+            .delete(emailVerificationTable)
+            .where(eq(emailVerificationTable.userId, userId));
     }
 }
 

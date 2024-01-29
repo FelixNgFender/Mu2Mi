@@ -9,6 +9,7 @@ import 'server-cli-only';
 
 import * as schema from './schema';
 
+// TODO: PostgresError: sorry, too many clients already
 const queryClient = postgres(env.DATABASE_URL);
 const db = drizzle(queryClient, {
     logger: env.DATABASE_LOGGING,

@@ -13,19 +13,16 @@ import {
 import { Input } from '@/components/ui/input';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
-import { httpStatus } from '@/lib/http';
-import {
-    passwordResetSchemaClient,
-    PasswordResetSchemaClientType,
-} from '@/validations/client/password-reset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { requestPasswordReset } from './actions';
 
 export const PasswordResetForm = () => {
-    // 1. Define your form.
     const { toast } = useToast();
     const router = useRouter();
     const form = useForm<PasswordResetSchemaClientType>({
@@ -35,41 +32,27 @@ export const PasswordResetForm = () => {
         },
     });
 
-    // 2. Define a submit handler.
     const onSubmit = async (data: PasswordResetSchemaClientType) => {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        const response = await fetch('/api/auth/password-reset', {
-            method: 'POST',
-            body: JSON.stringify(data),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            redirect: 'manual',
-        });
-        // TODO: For users previously signed in with OAuth, this flow seems to work until
-        // the new password is set. Investigate?
-        if (response.status === httpStatus.clientError.badRequest) {
-            const responseData = await response.json();
-            const errors = JSON.parse(responseData.error);
-            for (const error of errors) {
-                for (const path of error.path) {
-                    form.setError(path, {
-                        type: path,
-                        message: error.message,
-                    });
+        const result = await requestPasswordReset(data);
+        if (!result.success) {
+            try {
+                const errors = JSON.parse(result.error);
+                for (const error of errors) {
+                    for (const path of error.path) {
+                        form.setError(path, {
+                            type: path,
+                            message: error.message,
+                        });
+                    }
                 }
+            } catch (e) {
+                form.setError('email', {
+                    type: 'email',
+                    message: result.error,
+                });
             }
         }
-        if (response.status === httpStatus.serverError.internalServerError) {
-            const responseData = await response.json();
-            toast({
-                variant: 'destructive',
-                title: responseData.message || 'Uh oh! Something went wrong.',
-                description: responseData.error || '',
-            });
-        }
-        if (response.status === httpStatus.success.ok) {
+        if (result.success) {
             toast({
                 title: 'Password reset link sent!',
                 description: 'Check your inbox for the link.',
@@ -139,3 +122,12 @@ export const PasswordResetForm = () => {
         </Form>
     );
 };
+
+/**
+ * For **client-side** validation
+ */
+const passwordResetSchemaClient = z.object({
+    email: z.string().email({ message: 'Invalid email address.' }),
+});
+
+type PasswordResetSchemaClientType = z.infer<typeof passwordResetSchemaClient>;

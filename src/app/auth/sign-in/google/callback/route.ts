@@ -1,72 +1,104 @@
 import { auth, googleAuth } from '@/lib/auth';
-import { AppError, errorHandler, errorNames } from '@/lib/error';
+import { AppError, errorHandler } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
+import { oAuthAccountModel } from '@/models/oauth-account';
 import { userModel } from '@/models/user';
-import { OAuthRequestError } from '@lucia-auth/oauth';
-import { cookies, headers } from 'next/headers';
+import { OAuth2RequestError } from 'arctic';
+import { generateId } from 'lucia';
+import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
 export const GET = async (request: NextRequest) => {
-    const storedState = cookies().get('google_oauth_state')?.value;
     const url = new URL(request.url);
-    const state = url.searchParams.get('state');
     const code = url.searchParams.get('code');
-    if (!storedState || !state || storedState !== state || !code) {
+    const state = url.searchParams.get('state');
+    const storedState = cookies().get('google_oauth_state')?.value ?? null;
+    const storedCodeVerifier =
+        cookies().get('google_oauth_code_verifier')?.value ?? null;
+    if (
+        !code ||
+        !state ||
+        !storedState ||
+        state !== storedState ||
+        !storedCodeVerifier
+    ) {
         return HttpResponse.badRequest();
     }
     try {
-        const { getExistingUser, googleUser, createUser, createKey } =
-            await googleAuth.validateCallback(code);
-        const getUser = async () => {
-            const existingUser = await getExistingUser();
-            if (existingUser) return existingUser;
-            if (!googleUser.email_verified) {
-                throw new AppError(
-                    errorNames.validationError,
-                    'Email not verified',
-                    true,
-                );
-            }
-            if (!googleUser.email) {
-                throw new AppError(
-                    errorNames.validationError,
-                    'Email not provided',
-                    true,
-                );
-            }
-            const existingDatabaseUserWithEmail =
-                await userModel.findOneByEmail(googleUser.email);
-            if (existingDatabaseUserWithEmail) {
-                // transform `UserSchema` to `User`
-                const user = auth.transformDatabaseUser({
-                    ...existingDatabaseUserWithEmail,
-                    username_lower: existingDatabaseUserWithEmail.usernameLower,
-                    email_verified: existingDatabaseUserWithEmail.emailVerified,
-                    // put more snake_case to camelCase transformations here
-                });
-                await createKey(user.userId);
-                return user;
-            }
-            return await createUser({
-                attributes: {
-                    username: googleUser.name,
-                    username_lower: googleUser.name.toLowerCase(),
-                    email: googleUser.email,
-                    email_verified: googleUser.email_verified,
+        const tokens = await googleAuth.validateAuthorizationCode(
+            code,
+            storedCodeVerifier,
+        );
+        const googleUserResponse = await fetch(
+            'https://openidconnect.googleapis.com/v1/userinfo',
+            {
+                headers: {
+                    Authorization: `Bearer ${tokens.accessToken}`,
                 },
-            });
-        };
+            },
+        );
+        const googleUser: GoogleUser = await googleUserResponse.json();
+        if (!googleUser.email) {
+            throw new AppError('ValidationError', 'Email not provided', true);
+        }
+        // Don't bother to verify unverified emails from Google with a verification code
+        // Deny'em entry! 😎😎😎
+        if (!googleUser.email_verified) {
+            throw new AppError('ValidationError', 'Email not verified', true);
+        }
 
-        const user = await getUser();
-        const session = await auth.createSession({
-            userId: user.userId,
-            attributes: {},
-        });
-        const authRequest = auth.handleRequest(request.method, {
-            cookies,
-            headers,
-        });
-        authRequest.setSession(session);
+        const existingUserWithEmail = await userModel.findOneByEmail(
+            googleUser.email,
+        );
+        if (existingUserWithEmail) {
+            const existingOAuthAccount =
+                await oAuthAccountModel.findOneByProviderIdAndProviderUserId(
+                    'facebook',
+                    googleUser.sub,
+                );
+            if (!existingOAuthAccount) {
+                await oAuthAccountModel.createOne({
+                    providerId: 'facebook',
+                    providerUserId: googleUser.sub,
+                    userId: existingUserWithEmail.id,
+                });
+            }
+            const session = await auth.createSession(
+                existingUserWithEmail.id,
+                {},
+            );
+            const sessionCookie = auth.createSessionCookie(session.id);
+            cookies().set(
+                sessionCookie.name,
+                sessionCookie.value,
+                sessionCookie.attributes,
+            );
+            return HttpResponse.redirect(undefined, {
+                Location: '/',
+            });
+        }
+
+        const userId = generateId(15);
+
+        await userModel.createOneWithOAuthAccount(
+            {
+                id: userId,
+                email: googleUser.email.toLowerCase(),
+                emailVerified: googleUser.email_verified,
+                username: googleUser.name,
+                usernameLower: googleUser.name.toLowerCase(),
+            },
+            'facebook',
+            googleUser.sub,
+        );
+
+        const session = await auth.createSession(userId, {});
+        const sessionCookie = auth.createSessionCookie(session.id);
+        cookies().set(
+            sessionCookie.name,
+            sessionCookie.value,
+            sessionCookie.attributes,
+        );
         return HttpResponse.redirect(undefined, {
             Location: '/',
         });
@@ -74,10 +106,17 @@ export const GET = async (request: NextRequest) => {
         if (err instanceof AppError) {
             return HttpResponse.unprocessableEntity(err.message);
         }
-        if (err instanceof OAuthRequestError) {
+        if (err instanceof OAuth2RequestError) {
             return HttpResponse.badRequest();
         }
         await errorHandler.handleError(err as Error);
         return HttpResponse.internalServerError();
     }
 };
+
+interface GoogleUser {
+    sub: string;
+    name: string;
+    email: string;
+    email_verified: boolean;
+}

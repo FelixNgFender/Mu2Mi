@@ -10,22 +10,15 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
-import { httpStatus } from '@/lib/http';
-import {
-    signUpSchemaClient,
-    SignUpSchemaClientType,
-} from '@/validations/client/sign-up';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { signUp } from './actions';
 
 export const SignUpForm = () => {
-    // 1. Define your form.
-    const { toast } = useToast();
-    const router = useRouter();
     const form = useForm<SignUpSchemaClientType>({
         resolver: zodResolver(signUpSchemaClient),
         defaultValues: {
@@ -35,22 +28,10 @@ export const SignUpForm = () => {
         },
     });
 
-    // 2. Define a submit handler.
     const onSubmit = async (data: SignUpSchemaClientType) => {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        // Run on the client.
-        const response = await fetch('/api/auth/sign-up', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-            redirect: 'manual',
-        });
-        if (response.status === httpStatus.clientError.badRequest) {
-            const responseData = await response.json();
-            const errors = JSON.parse(responseData.error);
+        const result = await signUp(data);
+        if (result && !result.success) {
+            const errors = JSON.parse(result.error);
             for (const error of errors) {
                 for (const path of error.path) {
                     form.setError(path, {
@@ -59,19 +40,6 @@ export const SignUpForm = () => {
                     });
                 }
             }
-        }
-        if (response.status === httpStatus.serverError.internalServerError) {
-            const responseData = await response.json();
-            toast({
-                variant: 'destructive',
-                title: responseData.message || 'Uh oh! Something went wrong.',
-                description: responseData.error || '',
-            });
-        }
-        if (response.status === 0) {
-            // redirected
-            // when using `redirect: "manual"`, response status 0 is returned
-            return router.refresh();
         }
     };
 
@@ -138,14 +106,14 @@ export const SignUpForm = () => {
                 <p className="text-sm italic text-muted-foreground">
                     By signing up, you agree to our{' '}
                     <Link
-                        href="/terms"
+                        href="/legal/terms"
                         className="underline underline-offset-2 hover:text-primary"
                     >
                         Terms of Service
                     </Link>{' '}
                     and{' '}
                     <Link
-                        href="/privacy"
+                        href="/legal/privacy"
                         className="underline underline-offset-2 hover:text-primary"
                     >
                         Privacy Policy
@@ -167,3 +135,116 @@ export const SignUpForm = () => {
         </Form>
     );
 };
+
+/**
+ * For **client-side** validation
+ */
+const signUpSchemaClient = z
+    .object({
+        email: z.string().email({ message: 'Invalid email address.' }),
+        password: z
+            .string()
+            .min(8, {
+                message: 'Password must be at least 8 characters long',
+            })
+            .max(64, {
+                message: 'Password must be at most 64 characters long',
+            }),
+        confirmPassword: z
+            .string()
+            .min(8, {
+                message: 'Password must be at least 8 characters long',
+            })
+            .max(64, {
+                message: 'Password must be at most 64 characters long',
+            }),
+    })
+    .refine(({ password, confirmPassword }) => password === confirmPassword, {
+        message: 'Passwords do not match',
+        path: ['confirmPassword'],
+    })
+    .superRefine(({ password }, ctx) => {
+        const containsUppercase = (ch: string) => /[A-Z]/.test(ch);
+        const containsLowercase = (ch: string) => /[a-z]/.test(ch);
+        const containsSpecialChar = (ch: string) =>
+            /[`!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?~ ]/.test(ch);
+        let countOfUpperCase = 0,
+            countOfLowerCase = 0,
+            countOfNumbers = 0,
+            countOfSpecialChar = 0;
+
+        for (let i = 0; i < password.length; i++) {
+            let ch = password.charAt(i);
+            if (!isNaN(+ch)) countOfNumbers++;
+            else if (containsUppercase(ch)) countOfUpperCase++;
+            else if (containsLowercase(ch)) countOfLowerCase++;
+            else if (containsSpecialChar(ch)) countOfSpecialChar++;
+        }
+
+        let errObj = {
+            upperCase: {
+                pass: true,
+                message:
+                    'Password must contain at least one uppercase character.',
+            },
+            lowerCase: {
+                pass: true,
+                message:
+                    'Password must contain at least one lowercase character.',
+            },
+            specialCh: {
+                pass: true,
+                message:
+                    'Password must contain at least one special character.',
+            },
+            totalNumber: {
+                pass: true,
+                message:
+                    'Password must contain at least one numeric character.',
+            },
+        };
+
+        if (countOfLowerCase < 1) {
+            errObj = {
+                ...errObj,
+                lowerCase: { ...errObj.lowerCase, pass: false },
+            };
+        }
+        if (countOfNumbers < 1) {
+            errObj = {
+                ...errObj,
+                totalNumber: { ...errObj.totalNumber, pass: false },
+            };
+        }
+        if (countOfUpperCase < 1) {
+            errObj = {
+                ...errObj,
+                upperCase: { ...errObj.upperCase, pass: false },
+            };
+        }
+        if (countOfSpecialChar < 1) {
+            errObj = {
+                ...errObj,
+                specialCh: { ...errObj.specialCh, pass: false },
+            };
+        }
+
+        if (
+            countOfLowerCase < 1 ||
+            countOfUpperCase < 1 ||
+            countOfSpecialChar < 1 ||
+            countOfNumbers < 1
+        ) {
+            for (let key in errObj) {
+                if (!errObj[key as keyof typeof errObj].pass) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ['password'],
+                        message: errObj[key as keyof typeof errObj].message,
+                    });
+                }
+            }
+        }
+    });
+
+type SignUpSchemaClientType = z.infer<typeof signUpSchemaClient>;
