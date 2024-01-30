@@ -3,7 +3,7 @@ import { env } from '@/config/env';
 import { cn } from '@/lib/utils';
 import { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
-import NextTopLoader from 'nextjs-toploader';
+// import NextTopLoader from 'nextjs-toploader';
 
 import './globals.css';
 import QueryProvider from './query-provider';
@@ -40,7 +40,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                         enableSystem
                         disableTransitionOnChange
                     >
-                        <NextTopLoader />
+                        {/* <NextTopLoader /> */}
                         <div className="relative flex min-h-screen flex-col bg-background">
                             <SiteHeader />
                             <main className="flex flex-1 flex-col">
