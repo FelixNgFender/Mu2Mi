@@ -2,7 +2,7 @@ export const register = async () => {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
         // const { webcrypto } = await import('node:crypto');
         // globalThis.crypto = webcrypto as Crypto;
-
+        await import('server-only');
         if (!process.env.NEXT_MANUAL_SIG_HANDLE) {
             return;
         }

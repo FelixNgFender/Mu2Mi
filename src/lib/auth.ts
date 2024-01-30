@@ -2,14 +2,13 @@ import { env } from '@/config/env';
 import { db } from '@/db';
 import { sessionTable, userTable } from '@/db/schema';
 import type { DatabaseUser } from '@/db/schema';
-import { AppError, errorHandler } from '@/lib/error';
 import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 import { Facebook, GitHub, Google } from 'arctic';
 import { Lucia, TimeSpan } from 'lucia';
 import type { Session, User } from 'lucia';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
-import 'server-cli-only';
+import 'server-only';
 
 const adapter = new DrizzlePostgreSQLAdapter(db, sessionTable, userTable);
 

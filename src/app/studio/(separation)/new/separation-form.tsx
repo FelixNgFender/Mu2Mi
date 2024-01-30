@@ -1,7 +1,9 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { getPresignedUrl } from '@/app/studio/uploads/actions';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Dropzone } from '@/components/ui/dropzone';
 import {
     Form,
     FormControl,
@@ -22,26 +24,23 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { AssetConfig, assetConfig } from '@/config/asset';
-import { httpStatus } from '@/lib/http';
+import { assetConfig } from '@/config/asset';
+import { models } from '@/types/replicate';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 
-import {
-    SeparationFormSchema,
-    SeparationFormSchemaType,
-    models,
-} from './_schemas/changeme';
-import { getPresignedUrl } from './actions';
+import { separateTrack } from './actions';
 
 const steps = [
     {
         id: 'Step 1',
         name: 'Select file',
-        fields: [],
+        fields: ['file'],
     },
     {
         id: 'Step 2',
@@ -71,6 +70,7 @@ export const SeparationForm = () => {
     const form = useForm<SeparationFormSchemaType>({
         resolver: zodResolver(SeparationFormSchema),
         defaultValues: {
+            file: null,
             model_name: 'htdemucs',
             stem: undefined,
             clip_mode: 'rescale',
@@ -81,106 +81,6 @@ export const SeparationForm = () => {
             output_format: 'mp3',
         },
     });
-
-    const computeSHA256 = async (file: File) => {
-        const buffer = await file.arrayBuffer();
-        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray
-            .map((b) => b.toString(16).padStart(2, '0'))
-            .join('');
-        return hashHex;
-    };
-
-    const handleFileUpload = async (file: File) => {
-        const result = await getPresignedUrl({
-            type: file.type as AssetConfig['allowedFileTypes'][number],
-            size: file.size,
-            checksum: await computeSHA256(file),
-        });
-        if (!result) return;
-        if (!result.success) {
-            try {
-                const errors = JSON.parse(result.error);
-                for (const error of errors) {
-                    for (const path of error.path) {
-                        form.setError(path, {
-                            type: path,
-                            message: error.message,
-                        });
-                    }
-                }
-            } catch (e) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Uh oh! Something went wrong.',
-                    description: result.error,
-                });
-            }
-        }
-        if (result.success) {
-            const { url, id: fileId } = result.data;
-            if (!url || !fileId) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Uh oh! Something went wrong.',
-                    description: 'Missing URL or file ID.',
-                });
-                return;
-            }
-            await uploadFile(url, file);
-            return fileId;
-        }
-    };
-
-    const uploadFile = async (url: string, file: File) => {
-        try {
-            // Don't use Server Actions here because we can upload directly to S3
-            await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': file.type,
-                },
-                body: file,
-            });
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Uh oh! Something went wrong.',
-                description: (error as Error).message || '',
-            });
-        }
-    };
-
-    const handleFileChange = async (
-        event: React.ChangeEvent<HTMLInputElement>,
-    ) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        setFile(file);
-    };
-
-    const onSubmit = async (data: SeparationFormSchemaType) => {
-        if (!file) {
-            toast({
-                variant: 'destructive',
-                title: 'No file selected',
-                description: 'Please select a file to upload.',
-            });
-            setCurrentStep(-1);
-            return;
-        }
-        const fileId = await handleFileUpload(file);
-        if (!fileId) {
-            toast({
-                variant: 'destructive',
-                title: 'Uh oh! Something went wrong.',
-                description: 'File failed to upload. Please try again.',
-            });
-            return;
-        }
-        form.reset();
-    };
 
     type FieldName = keyof SeparationFormSchemaType;
 
@@ -206,6 +106,133 @@ export const SeparationForm = () => {
         if (currentStep > 0) {
             setPreviousStep(currentStep);
             setCurrentStep((step) => step - 1);
+        }
+    };
+
+    const computeSHA256 = async (file: File) => {
+        const buffer = await file.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+            .map((b) => b.toString(16).padStart(2, '0'))
+            .join('');
+        return hashHex;
+    };
+
+    const uploadFile = async (url: string, file: File) => {
+        try {
+            // Don't use Server Actions here because we can upload directly to S3
+            await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': file.type,
+                },
+                body: file,
+            });
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Uh oh! Something went wrong.',
+                description: (error as Error).message || '',
+            });
+        }
+    };
+
+    const handleFileUpload = async (file: File) => {
+        const result = await getPresignedUrl({
+            type: file.type as (typeof assetConfig.allowedMimeTypes)[number],
+            size: file.size,
+            checksum: await computeSHA256(file),
+        });
+        if (!result) return;
+        if (!result.success) {
+            try {
+                const errors = JSON.parse(result.error);
+                for (const error of errors) {
+                    for (const path of error.path) {
+                        form.setError(path, {
+                            type: path,
+                            message: error.message,
+                        });
+                    }
+                }
+                setCurrentStep(-1);
+            } catch (e) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Uh oh! Something went wrong.',
+                    description: result.error,
+                });
+            }
+        }
+        if (result.success) {
+            const { url, assetId } = result.data;
+            await uploadFile(url, file);
+            return assetId;
+        }
+    };
+
+    const onSubmit = async (data: SeparationFormSchemaType) => {
+        toast({
+            description: 'Your file is being uploaded.',
+        });
+        const assetId = await handleFileUpload(data.file);
+        if (!assetId) {
+            toast({
+                variant: 'destructive',
+                title: 'Uh oh! Something went wrong.',
+                description: 'File failed to upload. Please try again.',
+            });
+            form.reset();
+            setCurrentStep(-1);
+            return;
+        }
+
+        // asset has been uploaded to db and file storage, now separate track
+        const result = await separateTrack({
+            originalAssetId: assetId,
+            name: data.file.name,
+
+            model_name: data.model_name,
+            stem: data.stem,
+            clip_mode: data.clip_mode,
+            shifts: data.shifts,
+            overlap: data.overlap,
+            mp3_bitrate: data.mp3_bitrate,
+            float32: data.float32,
+            output_format: data.output_format,
+        });
+        console.log(result);
+        if (!result) return;
+        if (!result.success) {
+            try {
+                const errors = JSON.parse(result.error);
+                for (const error of errors) {
+                    for (const path of error.path) {
+                        form.setError(path, {
+                            type: path,
+                            message: error.message,
+                        });
+                    }
+                }
+                setCurrentStep(-1);
+            } catch (e) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Uh oh! Something went wrong.',
+                    description: result.error,
+                });
+                form.reset();
+                setCurrentStep(-1);
+                return;
+            }
+        }
+        if (result.success) {
+            toast({
+                title: 'File uploaded successfully.',
+                description: '🔥 We are cooking your track.',
+            });
+            form.reset();
         }
     };
 
@@ -274,8 +301,11 @@ export const SeparationForm = () => {
                             <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
                                 Submit your track
                             </h2>
-                            <Tabs defaultValue="local">
-                                <TabsList className="mb-4">
+                            <Tabs
+                                defaultValue="local"
+                                className="flex flex-1 flex-col"
+                            >
+                                <TabsList className="mb-4 self-start">
                                     <TabsTrigger value="local">
                                         Local file
                                     </TabsTrigger>
@@ -286,35 +316,21 @@ export const SeparationForm = () => {
                                         YouTube
                                     </TabsTrigger>
                                 </TabsList>
-                                <TabsContent value="local">
+                                <TabsContent
+                                    value="local"
+                                    className="data-[state=active]:flex data-[state=active]:flex-1 data-[state=active]:flex-col"
+                                >
                                     <FormField
-                                        name="audio"
+                                        name="file"
                                         render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>
-                                                    Drop your file here or
-                                                    browse
-                                                </FormLabel>
-                                                <FormDescription>
-                                                    Supports:{' '}
-                                                    {assetConfig.allowedFileTypes
-                                                        .map(
-                                                            (type) =>
-                                                                type
-                                                                    .toUpperCase()
-                                                                    .slice(6), // hack to remove 'audio/' prefix
-                                                        )
-                                                        .join(', ')}
-                                                </FormDescription>
+                                            <FormItem className="flex flex-1 flex-col items-center space-y-4">
                                                 <FormControl>
-                                                    <Input
-                                                        className="max-w-lg"
-                                                        name="audio"
-                                                        type="file"
+                                                    <Dropzone
+                                                        classNameWrapper="w-full flex-1 max-h-64"
+                                                        className="h-full w-full"
+                                                        name={field.name}
                                                         required
-                                                        accept={assetConfig.allowedFileTypes.join(
-                                                            ',',
-                                                        )}
+                                                        ref={field.ref}
                                                         disabled={
                                                             form.formState
                                                                 .isSubmitting
@@ -323,19 +339,58 @@ export const SeparationForm = () => {
                                                             form.formState
                                                                 .isSubmitting
                                                         }
-                                                        onChange={
-                                                            handleFileChange
+                                                        accept={assetConfig.allowedMimeTypes.join(
+                                                            ', ',
+                                                        )}
+                                                        dropMessage={
+                                                            field.value
+                                                                ? field.value[0]
+                                                                      ?.name
+                                                                : "Drop like it's hot 🔥"
                                                         }
+                                                        handleOnDrop={(
+                                                            acceptedFiles: FileList | null,
+                                                        ) => {
+                                                            field.onChange(
+                                                                acceptedFiles,
+                                                            );
+                                                            setFile(
+                                                                acceptedFiles?.[0] ||
+                                                                    null,
+                                                            );
+                                                        }}
                                                     />
                                                 </FormControl>
+                                                <FormDescription>
+                                                    Supports:{' '}
+                                                    {` ${allowedFileTypes.join(
+                                                        ', ',
+                                                    )}`}
+                                                </FormDescription>
                                                 <FormMessage />
+                                                {file && (
+                                                    <audio
+                                                        controls
+                                                        src={URL.createObjectURL(
+                                                            file,
+                                                        )}
+                                                    />
+                                                )}
                                             </FormItem>
                                         )}
                                     />
                                 </TabsContent>
                                 {/* TODO: implement */}
-                                <TabsContent value="remote">remote</TabsContent>
-                                <TabsContent value="youtube">
+                                <TabsContent
+                                    value="remote"
+                                    className="data-[state=active]:flex data-[state=active]:flex-1 data-[state=active]:flex-col"
+                                >
+                                    remote
+                                </TabsContent>
+                                <TabsContent
+                                    value="youtube"
+                                    className="data-[state=active]:flex data-[state=active]:flex-1 data-[state=active]:flex-col"
+                                >
                                     youtube
                                 </TabsContent>
                             </Tabs>
@@ -622,26 +677,93 @@ export const SeparationForm = () => {
             </Form>
 
             {/* Navigation */}
-            <div className="flex justify-between pt-48">
-                <Button
-                    type="button"
-                    onClick={prev}
-                    disabled={currentStep === 0}
-                    variant="outline"
-                    size="icon"
-                >
-                    <ChevronLeft className="h-6 w-6" />
-                </Button>
-                <Button
-                    type="button"
-                    onClick={next}
-                    disabled={currentStep === steps.length - 1}
-                    variant="outline"
-                    size="icon"
-                >
-                    <ChevronRight className="h-6 w-6" />
-                </Button>
+            <div className="flex justify-between space-x-2 pb-4">
+                {!form.formState.isSubmitSuccessful && (
+                    <>
+                        <Button
+                            type="button"
+                            onClick={prev}
+                            disabled={
+                                currentStep === 0 || form.formState.isSubmitting
+                            }
+                            variant="outline"
+                            size="icon"
+                        >
+                            <ChevronLeft className="h-6 w-6" />
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={next}
+                            disabled={
+                                currentStep === steps.length - 1 ||
+                                form.formState.isSubmitting
+                            }
+                            variant="outline"
+                            size="icon"
+                        >
+                            {form.formState.isSubmitting ? (
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : (
+                                <ChevronRight className="h-6 w-6" />
+                            )}
+                        </Button>
+                    </>
+                )}
+                {form.formState.isSubmitSuccessful && (
+                    <>
+                        <a
+                            href="/studio/new"
+                            className={buttonVariants({
+                                variant: 'outline',
+                            })}
+                        >
+                            Separate new track
+                        </a>
+                        <Link
+                            href="/studio"
+                            className={buttonVariants({
+                                variant: 'outline',
+                            })}
+                        >
+                            View tracks
+                        </Link>
+                    </>
+                )}
             </div>
         </>
     );
 };
+
+const allowedFileTypes = assetConfig.allowedMimeTypes.map(
+    (type) => type.toUpperCase().slice(6), // hack to remove 'audio/' prefix
+);
+
+const SeparationFormSchema = z.object({
+    file: z
+        .any()
+        .refine(
+            (files) => {
+                return files?.[0]?.size <= assetConfig.maxFileSize;
+            },
+            `Max file size is ${assetConfig.maxFileSize / 1024 / 1024} MB.`,
+        )
+        .refine(
+            (files) => assetConfig.allowedMimeTypes.includes(files?.[0]?.type),
+            `Only ${allowedFileTypes.join(', ')} files are allowed.`,
+        )
+        .transform((files) => files?.[0]),
+    model_name: z
+        .enum([...models.map((model) => model.name)] as [string, ...string[]])
+        .default('htdemucs'),
+    stem: z
+        .enum(['vocals', 'bass', 'drums', 'guitar', 'piano', 'other'])
+        .optional(),
+    clip_mode: z.enum(['rescale', 'clamp']).default('rescale'),
+    shifts: z.number().int().min(1).max(10).default(1),
+    overlap: z.number().default(0.25),
+    output_format: z.enum(['mp3', 'wav', 'flac']).default('mp3'),
+    mp3_bitrate: z.number().int().default(320),
+    float32: z.boolean().default(false),
+});
+
+type SeparationFormSchemaType = z.infer<typeof SeparationFormSchema>;

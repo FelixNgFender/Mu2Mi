@@ -24,7 +24,7 @@
 // import { ServerClient } from 'postmark';
 import { env } from '@/config/env';
 import { logger } from '@/lib/logger';
-import 'server-cli-only';
+import 'server-only';
 
 // const transporter = new ServerClient(env.POSTMARK_API_KEY);
 

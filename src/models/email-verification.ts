@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { emailVerificationTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import 'server-cli-only';
+import 'server-only';
 
 type NewEmailVerificationCode = typeof emailVerificationTable.$inferInsert;
 

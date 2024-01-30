@@ -1,6 +1,6 @@
 import { HttpErrorCodes, httpStatus } from '@/lib/http';
 import { logger } from '@/lib/logger';
-import 'server-cli-only';
+import 'server-only';
 
 export class AppError extends Error {
     public readonly name:

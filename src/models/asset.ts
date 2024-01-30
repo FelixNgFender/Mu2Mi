@@ -1,14 +1,14 @@
 import { db } from '@/db';
-import { asset as assetTable } from '@/db/schema';
-import { and, eq } from 'drizzle-orm';
-import 'server-cli-only';
+import { assetTable } from '@/db/schema';
+import { eq } from 'drizzle-orm';
+import 'server-only';
 
 type NewAsset = typeof assetTable.$inferInsert;
 
 class AssetModel {
-    async findByIdAndUserId(id: number, userId: string) {
-        return await db.query.asset.findFirst({
-            where: and(eq(assetTable.id, id), eq(assetTable.userId, userId)),
+    async findOne(id: string) {
+        return await db.query.assetTable.findFirst({
+            where: eq(assetTable.id, id),
         });
     }
 

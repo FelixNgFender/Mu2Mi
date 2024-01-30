@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { LogIn, LogOut, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 
-import { SignOutButton } from './sign-out-button';
+import { signOut } from './actions';
 
 interface ModeToggleProps {
     variant?:
@@ -42,6 +42,7 @@ export const Account = async ({
                 <span className="sr-only">Sign in</span>
             </Link>
         );
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -58,7 +59,12 @@ export const Account = async ({
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                    <SignOutButton />
+                    <form action={signOut} className="flex flex-1">
+                        <button type="submit" className="flex flex-1">
+                            <LogOut className="mr-2 h-5 w-5" />
+                            Sign out
+                        </button>
+                    </form>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

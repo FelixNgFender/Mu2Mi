@@ -1,7 +1,7 @@
-import { TrackSeparationModelInputSchema } from '@/app/studio/(separation)/new/_schemas/changeme';
 import { env } from '@/config/env';
+import { models } from '@/types/replicate';
 import Replicate from 'replicate';
-import 'server-cli-only';
+import 'server-only';
 import { number } from 'zod';
 // input: {
 //     stem: "drums",
@@ -51,12 +51,6 @@ import { z } from 'zod';
 //     "version": "abf8fe28e407afa6d8e41e86a759caccc0af8e49c3c68016006b62cb0968441e"
 //   }
 
-const TrackSeparationSchema = TrackSeparationModelInputSchema.extend({
-    taskId: z.number().int(),
-});
-
-type TrackSeparationSchemaType = z.infer<typeof TrackSeparationSchema>;
-
 export class ReplicateClient {
     replicate: Replicate;
 
@@ -76,7 +70,7 @@ export class ReplicateClient {
         webhook.searchParams.set('secret', env.WEBHOOK_SECRET);
         // TODO: Make webhook handlers idempotent. Identical webhooks can be sent
         // more than once, so you’ll need handle potentially duplicate information.
-
+        console.log('data before going into replicate', data);
         return this.replicate.predictions.create({
             version: env.TRACK_SEPARATION_MODEL_VERSION,
             input: data,
@@ -89,3 +83,26 @@ export class ReplicateClient {
 export const replicateClient = new ReplicateClient({
     auth: env.REPLICATE_API_TOKEN,
 });
+
+const TrackSeparationModelInputSchema = z.object({
+    audio: z.string().url(),
+    model_name: z
+        .enum([...models.map((model) => model.name)] as [string, ...string[]])
+        .default('htdemucs'),
+    stem: z
+        .enum(['vocals', 'bass', 'drums', 'guitar', 'piano', 'other'])
+        .optional(),
+    clip_mode: z.enum(['rescale', 'clamp']).default('rescale'),
+    shifts: z.number().int().min(1).max(10).default(1),
+    overlap: z.number().default(0.25),
+    mp3_bitrate: z.number().int().default(320),
+    float32: z.boolean().default(false),
+    output_format: z.enum(['mp3', 'wav', 'flac']).default('mp3'),
+});
+
+const TrackSeparationSchema = TrackSeparationModelInputSchema.extend({
+    // same as track id type
+    taskId: z.string().min(12).max(12),
+});
+
+type TrackSeparationSchemaType = z.infer<typeof TrackSeparationSchema>;

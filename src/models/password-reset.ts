@@ -2,7 +2,7 @@ import { db } from '@/db';
 import { passwordResetTable } from '@/db/schema';
 import { AppError } from '@/lib/error';
 import { eq } from 'drizzle-orm';
-import 'server-cli-only';
+import 'server-only';
 
 type NewPasswordResetToken = typeof passwordResetTable.$inferInsert;
 

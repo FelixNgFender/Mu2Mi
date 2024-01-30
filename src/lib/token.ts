@@ -4,7 +4,7 @@ import { passwordResetModel } from '@/models/password-reset';
 import { generateId } from 'lucia';
 import { TimeSpan, createDate } from 'oslo';
 import { alphabet, generateRandomString } from 'oslo/crypto';
-import 'server-cli-only';
+import 'server-only';
 
 export const generateEmailVerificationCode = async (
     userId: string,

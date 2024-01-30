@@ -1,5 +1,5 @@
 import { env } from '@/config/env';
-import 'server-cli-only';
+import 'server-only';
 import winston, { createLogger } from 'winston';
 
 const { transports, format } = winston;

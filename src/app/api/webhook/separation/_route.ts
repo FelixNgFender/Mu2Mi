@@ -33,3 +33,10 @@ export const POST = async (req: Request) => {
         return HttpResponse.badRequest(error.message);
     }
 };
+
+const replicateWebhookSchemaServer = z.object({
+    id: z.string().length(7).or(z.string().length(10)),
+    secret: z.string().refine((data) => data === env.WEBHOOK_SECRET, {
+        message: 'Invalid secret',
+    }),
+});

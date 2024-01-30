@@ -5,7 +5,7 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import { Client as MinioClient } from 'minio';
 import postgres from 'postgres';
 import { type RedisClientType, createClient } from 'redis';
-import 'server-cli-only';
+import 'server-only';
 
 import * as schema from './schema';
 
