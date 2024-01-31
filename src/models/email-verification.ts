@@ -5,14 +5,14 @@ import 'server-only';
 
 type NewEmailVerificationCode = typeof emailVerificationTable.$inferInsert;
 
-class EmailVerificationModel {
+export const emailVerificationModel = {
     async createOne(token: NewEmailVerificationCode) {
         return await db
             .insert(emailVerificationTable)
             .values(token)
             .returning()
             .then((codes) => codes[0]);
-    }
+    },
 
     async validateAndDelete(userId: string) {
         return await db.transaction(async (tx) => {
@@ -27,13 +27,11 @@ class EmailVerificationModel {
                 return databaseCode;
             }
         });
-    }
+    },
 
     async deleteAllByUserId(userId: string) {
         return await db
             .delete(emailVerificationTable)
             .where(eq(emailVerificationTable.userId, userId));
-    }
-}
-
-export const emailVerificationModel = new EmailVerificationModel();
+    },
+};

@@ -6,12 +6,12 @@ import 'server-only';
 
 type NewPasswordResetToken = typeof passwordResetTable.$inferInsert;
 
-class PasswordResetModel {
+export const passwordResetModel = {
     async findManyByUserId(userId: string) {
         return await db.query.passwordResetTable.findMany({
             where: eq(passwordResetTable.userId, userId),
         });
-    }
+    },
 
     async createOne(token: NewPasswordResetToken) {
         return await db
@@ -19,13 +19,13 @@ class PasswordResetModel {
             .values(token)
             .returning()
             .then((tokens) => tokens[0]);
-    }
+    },
 
     async deleteAllByUserId(userId: string) {
         return await db
             .delete(passwordResetTable)
             .where(eq(passwordResetTable.userId, userId));
-    }
+    },
 
     async validateAndDelete(token: string) {
         return await db.transaction(async (tx) => {
@@ -39,7 +39,5 @@ class PasswordResetModel {
             }
             return storedToken;
         });
-    }
-}
-
-export const passwordResetModel = new PasswordResetModel();
+    },
+};

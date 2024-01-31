@@ -5,12 +5,12 @@ import 'server-only';
 
 type NewAsset = typeof assetTable.$inferInsert;
 
-class AssetModel {
+export const assetModel = {
     async findOne(id: string) {
         return await db.query.assetTable.findFirst({
             where: eq(assetTable.id, id),
         });
-    }
+    },
 
     async createOne(asset: NewAsset) {
         return await db
@@ -18,7 +18,5 @@ class AssetModel {
             .values(asset)
             .returning()
             .then((assets) => assets[0]);
-    }
-}
-
-export const assetModel = new AssetModel();
+    },
+};

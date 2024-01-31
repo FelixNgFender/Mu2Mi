@@ -5,14 +5,14 @@ import 'server-only';
 
 export type NewOAuthAccount = typeof oauthAccountTable.$inferInsert;
 
-class OAuthAccountModel {
+export const oAuthAccountModel = {
     async createOne(oAuthAccount: NewOAuthAccount) {
         return await db
             .insert(oauthAccountTable)
             .values(oAuthAccount)
             .returning()
             .then((oAuthAccounts) => oAuthAccounts[0]);
-    }
+    },
 
     async findOneByProviderIdAndProviderUserId(
         providerId: 'github' | 'google' | 'facebook',
@@ -24,7 +24,5 @@ class OAuthAccountModel {
                 eq(oauthAccountTable.providerUserId, providerUserId),
             ),
         });
-    }
-}
-
-export const oAuthAccountModel = new OAuthAccountModel();
+    },
+};
