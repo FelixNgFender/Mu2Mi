@@ -14,9 +14,6 @@ const envSchema = z.object({
     APP_PORT: isNumber,
     HOST: isString,
 
-    // Next.js
-    NEXT_MANUAL_SIG_HANDLE: isBoolean,
-
     // General
     APP_LOGGING: isBoolean,
     LOG_LEVEL: z.enum([
