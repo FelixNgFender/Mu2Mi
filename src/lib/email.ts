@@ -2,7 +2,7 @@
 // import { env } from '$env/dynamic/private';
 // import { transporter } from './emailSetup';
 // export const sendEmailVerificationLink = async (email: string, token: string) => {
-// 	const url = `http://localhost:${env.PORT}/email-verification/${token}`;
+// 	const url = `http://localhost:${env.APP_PORT}/email-verification/${token}`;
 // 	await transporter.sendMail({
 // 		from: env.EMAIL_VERIFY,
 // 		to: email,
@@ -12,7 +12,7 @@
 // 	});
 // };
 // export const sendPasswordResetLink = async (email: string, token: string) => {
-// 	const url = `http://localhost:${env.PORT}/password-reset/${token}`;
+// 	const url = `http://localhost:${env.APP_PORT}/password-reset/${token}`;
 // 	await transporter.sendMail({
 // 		from: env.EMAIL_VERIFY,
 // 		to: email,

@@ -11,7 +11,7 @@ const envSchema = z.object({
 
     // Express
     PROTOCOL: z.enum(['http', 'https']),
-    PORT: isNumber,
+    APP_PORT: isNumber,
     HOST: isString,
 
     // Next.js
@@ -72,7 +72,7 @@ try {
     env = {
         ...parsedEnv,
         get ORIGIN() {
-            return `${parsedEnv.PROTOCOL}://${parsedEnv.HOST}:${parsedEnv.PORT}`;
+            return `${parsedEnv.PROTOCOL}://${parsedEnv.HOST}:${parsedEnv.APP_PORT}`;
         },
     };
 } catch (err) {
