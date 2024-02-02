@@ -68,6 +68,9 @@ export const POST = async (req: Request) => {
                         env.S3_BUCKET_NAME,
                         objectName,
                         Buffer.from(await blob.arrayBuffer()),
+                        {
+                            'Content-Type': mimeType || 'binary/octet-stream',
+                        },
                     );
                     const newAsset = await assetModel.createOne({
                         id: generatePublicId(),
