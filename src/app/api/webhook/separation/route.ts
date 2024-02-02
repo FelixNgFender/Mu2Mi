@@ -8,7 +8,7 @@ import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import { Buffer } from 'buffer';
 import crypto from 'crypto';
-import { fileTypeFromBuffer } from 'file-type';
+import { fileTypeFromBlob, fileTypeFromBuffer } from 'file-type';
 
 export const POST = async (req: Request) => {
     const searchParams = new URL(req.url).searchParams;
@@ -57,15 +57,17 @@ export const POST = async (req: Request) => {
         if (status === 'succeeded') {
             for (const [stem, url] of Object.entries(output)) {
                 if (url) {
-                    const buffer = Buffer.from(
-                        await fetch(url).then((res) => res.arrayBuffer()),
-                    );
-                    const mimeType = (await fileTypeFromBuffer(buffer))?.mime;
-                    const objectName = crypto.randomBytes(32).toString('hex');
+                    const blob = await fetch(url).then((res) => res.blob());
+                    const fileType = await fileTypeFromBlob(blob);
+                    const fileExtension = fileType?.ext;
+                    const mimeType = fileType?.mime;
+                    const objectName = `${crypto
+                        .randomBytes(32)
+                        .toString('hex')}.${fileExtension}`;
                     await fileStorageClient.putObject(
                         env.S3_BUCKET_NAME,
                         objectName,
-                        buffer,
+                        Buffer.from(await blob.arrayBuffer()),
                     );
                     const newAsset = await assetModel.createOne({
                         id: generatePublicId(),
