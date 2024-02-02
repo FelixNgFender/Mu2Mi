@@ -179,11 +179,6 @@ export const SeparationForm = () => {
         });
         const assetId = await handleFileUpload(data.file);
         if (!assetId) {
-            toast({
-                variant: 'destructive',
-                title: 'Uh oh! Something went wrong.',
-                description: 'File failed to upload. Please try again.',
-            });
             form.reset();
             setCurrentStep(-1);
             return;

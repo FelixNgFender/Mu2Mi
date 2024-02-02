@@ -29,9 +29,10 @@ export const getPresignedUrl = async (
             error: httpStatus.clientError.unprocessableEntity.humanMessage,
         };
     }
-    const { type, size, checksum } = data;
+    const { type, extension, size, checksum } = data;
     const result = signedUrlBodySchema.safeParse({
         type,
+        extension,
         size,
         checksum,
     });
@@ -44,9 +45,9 @@ export const getPresignedUrl = async (
     }
 
     try {
-        const objectName = `${crypto.randomBytes(32).toString('hex')}.${
-            data.extension
-        }`;
+        const objectName = `${crypto
+            .randomBytes(32)
+            .toString('hex')}.${extension}`;
         const url = await fileStorageClient.presignedPutObject(
             env.S3_BUCKET_NAME,
             objectName,
