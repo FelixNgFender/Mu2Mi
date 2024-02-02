@@ -17,6 +17,11 @@ import {
 } from 'drizzle-orm/pg-core';
 import { customType } from 'drizzle-orm/pg-core';
 
+const updateAndCreatedAt = {
+    updatedAt: timestamp('updated_at').notNull(),
+    createdAt: timestamp('created_at').notNull(),
+};
+
 export const userTable = pgTable('user', {
     id: text('id').primaryKey(),
     email: text('email').unique().notNull(),
@@ -25,8 +30,7 @@ export const userTable = pgTable('user', {
     usernameLower: text('username_lower').unique().notNull(),
     hashedPassword: text('hashed_password'),
     // other user attributes
-    createdAt: timestamp('created_at').defaultNow(),
-    updatedAt: timestamp('updated_at').defaultNow(),
+    ...updateAndCreatedAt,
 });
 
 export interface DatabaseUser {
@@ -166,8 +170,7 @@ export const assetTable = pgTable(
             }),
         name: text('name').unique().notNull(), // FK to S3 object name, cannot guarantee that users will actually upload files with their presigned URLs
         mimeType: mimeType('mime_type'),
-        createdAt: timestamp('created_at').defaultNow(),
-        updatedAt: timestamp('updated_at').defaultNow(),
+        ...updateAndCreatedAt,
     },
     (table) => {
         return {
@@ -253,8 +256,7 @@ export const trackTable = pgTable(
         ),
         name: text('name').notNull(),
         status: trackStatusEnum('status').notNull(),
-        createdAt: timestamp('created_at').defaultNow(),
-        updatedAt: timestamp('updated_at').defaultNow(),
+        ...updateAndCreatedAt,
     },
     (table) => {
         return {

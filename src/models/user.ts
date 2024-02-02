@@ -3,7 +3,10 @@ import { oauthAccountTable, userTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import 'server-only';
 
-export type NewUser = typeof userTable.$inferInsert;
+export type NewUser = Omit<
+    typeof userTable.$inferInsert,
+    'createdAt' | 'updatedAt'
+>;
 
 export const userModel = {
     async findOne(id: string) {
@@ -15,7 +18,11 @@ export const userModel = {
     async createOne(user: NewUser) {
         return await db
             .insert(userTable)
-            .values(user)
+            .values({
+                ...user,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            })
             .returning()
             .then((users) => users[0]);
     },
@@ -35,7 +42,11 @@ export const userModel = {
         providerUserId: string,
     ) {
         await db.transaction(async (tx) => {
-            await tx.insert(userTable).values(user);
+            await tx.insert(userTable).values({
+                ...user,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            });
             await tx.insert(oauthAccountTable).values({
                 providerId,
                 providerUserId,
@@ -47,7 +58,7 @@ export const userModel = {
     async updateOne(id: string, user: Partial<NewUser>) {
         return await db
             .update(userTable)
-            .set(user)
+            .set({ ...user, updatedAt: new Date() })
             .where(eq(userTable.id, id))
             .returning()
             .then((users) => users[0]);

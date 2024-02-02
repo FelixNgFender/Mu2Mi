@@ -1,5 +1,5 @@
 {
-    "id": "b2aa8581-fd46-4508-bd6d-3a2e99fdb23b",
+    "id": "e4b65ece-ec98-4982-b6c5-73901b035162",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "5",
     "dialect": "pg",
@@ -32,19 +32,17 @@
                     "primaryKey": false,
                     "notNull": false
                 },
-                "created_at": {
-                    "name": "created_at",
-                    "type": "timestamp",
-                    "primaryKey": false,
-                    "notNull": false,
-                    "default": "now()"
-                },
                 "updated_at": {
                     "name": "updated_at",
                     "type": "timestamp",
                     "primaryKey": false,
-                    "notNull": false,
-                    "default": "now()"
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
                 }
             },
             "indexes": {
@@ -353,19 +351,17 @@
                     "primaryKey": false,
                     "notNull": true
                 },
-                "created_at": {
-                    "name": "created_at",
-                    "type": "timestamp",
-                    "primaryKey": false,
-                    "notNull": false,
-                    "default": "now()"
-                },
                 "updated_at": {
                     "name": "updated_at",
                     "type": "timestamp",
                     "primaryKey": false,
-                    "notNull": false,
-                    "default": "now()"
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
                 }
             },
             "indexes": {
@@ -502,19 +498,17 @@
                     "primaryKey": false,
                     "notNull": false
                 },
-                "created_at": {
-                    "name": "created_at",
-                    "type": "timestamp",
-                    "primaryKey": false,
-                    "notNull": false,
-                    "default": "now()"
-                },
                 "updated_at": {
                     "name": "updated_at",
                     "type": "timestamp",
                     "primaryKey": false,
-                    "notNull": false,
-                    "default": "now()"
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": true
                 }
             },
             "indexes": {},

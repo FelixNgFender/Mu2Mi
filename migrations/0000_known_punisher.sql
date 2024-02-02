@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS "asset" (
 	"user_id" text NOT NULL,
 	"name" text NOT NULL,
 	"mime_type" "mime_type",
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
+	"updated_at" timestamp NOT NULL,
+	"created_at" timestamp NOT NULL,
 	CONSTRAINT "asset_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
@@ -66,8 +66,8 @@ CREATE TABLE IF NOT EXISTS "track" (
 	"midi_asset_id" varchar(15),
 	"name" text NOT NULL,
 	"status" "replicate_task_status" NOT NULL,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"updated_at" timestamp NOT NULL,
+	"created_at" timestamp NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user" (
@@ -77,8 +77,8 @@ CREATE TABLE IF NOT EXISTS "user" (
 	"username" text NOT NULL,
 	"username_lower" text NOT NULL,
 	"hashed_password" text,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now(),
+	"updated_at" timestamp NOT NULL,
+	"created_at" timestamp NOT NULL,
 	CONSTRAINT "user_email_unique" UNIQUE("email"),
 	CONSTRAINT "user_username_unique" UNIQUE("username"),
 	CONSTRAINT "user_username_lower_unique" UNIQUE("username_lower")

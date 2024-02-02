@@ -3,7 +3,10 @@ import { trackTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import 'server-only';
 
-export type NewTrack = typeof trackTable.$inferInsert;
+export type NewTrack = Omit<
+    typeof trackTable.$inferInsert,
+    'createdAt' | 'updatedAt'
+>;
 
 export const trackModel = {
     async findOne(id: string) {
@@ -15,7 +18,7 @@ export const trackModel = {
     async updateOne(id: string, track: Partial<NewTrack>) {
         return await db
             .update(trackTable)
-            .set(track)
+            .set({ ...track, updatedAt: new Date() })
             .where(eq(trackTable.id, id))
             .returning()
             .then((tracks) => tracks[0]);
@@ -24,7 +27,7 @@ export const trackModel = {
     async createOne(track: NewTrack) {
         return await db
             .insert(trackTable)
-            .values(track)
+            .values({ ...track, createdAt: new Date(), updatedAt: new Date() })
             .returning()
             .then((tracks) => tracks[0]);
     },
