@@ -16,6 +16,8 @@ export const POST = async (req: Request) => {
         Object.fromEntries(searchParams),
     );
 
+    console.log('incoming webhook from Replicate: ', req);
+
     if (!parsedParams.success) {
         return HttpResponse.badRequest(parsedParams.error.format());
     }
@@ -24,6 +26,10 @@ export const POST = async (req: Request) => {
         const { taskId, userId } = parsedParams.data;
         const body = await req.json();
         const { status, output, error } = body as replicateWebhookBody;
+        console.log('webhook body: ', body);
+        console.log('webhook status: ', status);
+        console.log('webhook output: ', output);
+        console.log('webhook error: ', error);
         if (error) {
             throw new AppError('ReplicateError', error, true);
         }
