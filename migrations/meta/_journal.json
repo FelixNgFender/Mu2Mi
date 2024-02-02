@@ -29,6 +29,13 @@
             "when": 1706897331242,
             "tag": "0003_married_sumo",
             "breakpoints": true
+        },
+        {
+            "idx": 4,
+            "version": "5",
+            "when": 1706898342841,
+            "tag": "0004_lean_red_ghost",
+            "breakpoints": true
         }
     ]
 }

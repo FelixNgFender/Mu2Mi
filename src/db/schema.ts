@@ -142,6 +142,7 @@ export const passwordResetTable = pgTable(
 
 export const mimeType = pgEnum('mime_type', [
     'audio/mp3',
+    'audio/mpeg',
     'audio/wav',
     'audio/flac',
     'audio/mp4',
