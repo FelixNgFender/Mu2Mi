@@ -1,1 +1,0 @@
-ALTER TYPE "mime_type" ADD VALUE 'audio/mp3';

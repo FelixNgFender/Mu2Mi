@@ -1,5 +1,5 @@
 {
-    "id": "4b5ef931-d2d6-4cfd-aa14-969c1b3ca44a",
+    "id": "d06892cc-2803-4bda-b608-723c73a6e37e",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "5",
     "dialect": "pg",
@@ -10,7 +10,7 @@
             "columns": {
                 "id": {
                     "name": "id",
-                    "type": "varchar(12)",
+                    "type": "varchar(15)",
                     "primaryKey": true,
                     "notNull": true
                 },
@@ -30,7 +30,7 @@
                     "name": "mime_type",
                     "type": "mime_type",
                     "primaryKey": false,
-                    "notNull": true
+                    "notNull": false
                 },
                 "created_at": {
                     "name": "created_at",
@@ -283,7 +283,7 @@
             "columns": {
                 "id": {
                     "name": "id",
-                    "type": "varchar(12)",
+                    "type": "varchar(15)",
                     "primaryKey": true,
                     "notNull": true
                 },
@@ -295,49 +295,49 @@
                 },
                 "original_asset_id": {
                     "name": "original_asset_id",
-                    "type": "varchar(12)",
+                    "type": "varchar(15)",
                     "primaryKey": false,
                     "notNull": false
                 },
                 "vocals_asset_id": {
                     "name": "vocals_asset_id",
-                    "type": "varchar(12)",
+                    "type": "varchar(15)",
                     "primaryKey": false,
                     "notNull": false
                 },
                 "accompaniment_asset_id": {
                     "name": "accompaniment_asset_id",
-                    "type": "varchar(12)",
+                    "type": "varchar(15)",
                     "primaryKey": false,
                     "notNull": false
                 },
                 "bass_asset_id": {
                     "name": "bass_asset_id",
-                    "type": "varchar(12)",
+                    "type": "varchar(15)",
                     "primaryKey": false,
                     "notNull": false
                 },
                 "drums_asset_id": {
                     "name": "drums_asset_id",
-                    "type": "varchar(12)",
+                    "type": "varchar(15)",
                     "primaryKey": false,
                     "notNull": false
                 },
                 "guitar_asset_id": {
                     "name": "guitar_asset_id",
-                    "type": "varchar(12)",
+                    "type": "varchar(15)",
                     "primaryKey": false,
                     "notNull": false
                 },
                 "piano_asset_id": {
                     "name": "piano_asset_id",
-                    "type": "varchar(12)",
+                    "type": "varchar(15)",
                     "primaryKey": false,
                     "notNull": false
                 },
                 "midi_asset_id": {
                     "name": "midi_asset_id",
-                    "type": "varchar(12)",
+                    "type": "varchar(15)",
                     "primaryKey": false,
                     "notNull": false
                 },
@@ -543,6 +543,7 @@
         "mime_type": {
             "name": "mime_type",
             "values": {
+                "audio/mp3": "audio/mp3",
                 "audio/mpeg": "audio/mpeg",
                 "audio/wav": "audio/wav",
                 "audio/flac": "audio/flac",
@@ -562,7 +563,7 @@
         "replicate_task_status": {
             "name": "replicate_task_status",
             "values": {
-                "starting": "starting",
+                "pending": "pending",
                 "processing": "processing",
                 "succeeded": "succeeded",
                 "failed": "failed",

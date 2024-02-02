@@ -1,5 +1,5 @@
 DO $$ BEGIN
- CREATE TYPE "mime_type" AS ENUM('audio/mpeg', 'audio/wav', 'audio/flac', 'audio/mp4', 'audio/mov', 'audio/wma');
+ CREATE TYPE "mime_type" AS ENUM('audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/flac', 'audio/mp4', 'audio/mov', 'audio/wma');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -11,16 +11,16 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "replicate_task_status" AS ENUM('starting', 'processing', 'succeeded', 'failed', 'canceled');
+ CREATE TYPE "replicate_task_status" AS ENUM('pending', 'processing', 'succeeded', 'failed', 'canceled');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "asset" (
-	"id" varchar(12) PRIMARY KEY NOT NULL,
+	"id" varchar(15) PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
 	"name" text NOT NULL,
-	"mime_type" "mime_type" NOT NULL,
+	"mime_type" "mime_type",
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	CONSTRAINT "asset_name_unique" UNIQUE("name")
@@ -54,16 +54,16 @@ CREATE TABLE IF NOT EXISTS "session" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "track" (
-	"id" varchar(12) PRIMARY KEY NOT NULL,
+	"id" varchar(15) PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
-	"original_asset_id" varchar(12),
-	"vocals_asset_id" varchar(12),
-	"accompaniment_asset_id" varchar(12),
-	"bass_asset_id" varchar(12),
-	"drums_asset_id" varchar(12),
-	"guitar_asset_id" varchar(12),
-	"piano_asset_id" varchar(12),
-	"midi_asset_id" varchar(12),
+	"original_asset_id" varchar(15),
+	"vocals_asset_id" varchar(15),
+	"accompaniment_asset_id" varchar(15),
+	"bass_asset_id" varchar(15),
+	"drums_asset_id" varchar(15),
+	"guitar_asset_id" varchar(15),
+	"piano_asset_id" varchar(15),
+	"midi_asset_id" varchar(15),
 	"name" text NOT NULL,
 	"status" "replicate_task_status" NOT NULL,
 	"created_at" timestamp DEFAULT now(),
