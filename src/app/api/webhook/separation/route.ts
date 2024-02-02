@@ -16,10 +16,8 @@ export const POST = async (req: Request) => {
         Object.fromEntries(searchParams),
     );
 
-    console.log('incoming webhook from Replicate: ', req);
-    console.log('parsedParams: ', parsedParams);
-
     if (!parsedParams.success) {
+        console.log('parsedParams errors: ', parsedParams.error.format());
         return HttpResponse.badRequest(parsedParams.error.format());
     }
 
