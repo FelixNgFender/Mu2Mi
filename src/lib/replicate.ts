@@ -59,8 +59,8 @@ export const trackSeparationInputSchema = z.object({
 });
 
 export const webhookMetadataSchema = z.object({
-    taskId: z.string().min(12).max(12), // = track id
-    userId: z.string().min(12).max(12),
+    taskId: z.string().min(15).max(15), // = track id
+    userId: z.string().min(15).max(15),
     secret: z.string().refine((data) => data === env.WEBHOOK_SECRET, {
         message: 'Invalid secret',
     }),

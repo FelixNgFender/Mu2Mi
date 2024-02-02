@@ -15,6 +15,13 @@
             "when": 1706860049235,
             "tag": "0001_certain_doctor_doom",
             "breakpoints": true
+        },
+        {
+            "idx": 2,
+            "version": "5",
+            "when": 1706894065676,
+            "tag": "0002_adorable_nighthawk",
+            "breakpoints": true
         }
     ]
 }

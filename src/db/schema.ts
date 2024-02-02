@@ -156,7 +156,7 @@ export const assetTable = pgTable(
         // TODO: https://github.com/drizzle-team/drizzle-orm/pull/1471
         // Wait for this to land and replace the below workaround for all tables
         id: varchar('id', {
-            length: 12,
+            length: 15,
         }).primaryKey(),
         userId: text('user_id')
             .notNull()
@@ -196,7 +196,7 @@ export const trackTable = pgTable(
     'track',
     {
         id: varchar('id', {
-            length: 12,
+            length: 15,
         }).primaryKey(),
         // no need to use UUID since track IDs are not sensitive
         // but useful technique, so keep it here for future reference
@@ -209,44 +209,44 @@ export const trackTable = pgTable(
             }),
         // TODO: investigate why foreign keys default to NOT NULL
         originalAssetId: varchar('original_asset_id', {
-            length: 12,
+            length: 15,
         }).references(() => assetTable.id, {
             onDelete: 'cascade',
         }),
-        vocalsAssetId: varchar('vocals_asset_id', { length: 12 }).references(
+        vocalsAssetId: varchar('vocals_asset_id', { length: 15 }).references(
             () => assetTable.id,
             {
                 onDelete: 'cascade',
             },
         ),
         accompanimentAssetId: varchar('accompaniment_asset_id', {
-            length: 12,
+            length: 15,
         }).references(() => assetTable.id, { onDelete: 'cascade' }),
-        bassAssetId: varchar('bass_asset_id', { length: 12 }).references(
+        bassAssetId: varchar('bass_asset_id', { length: 15 }).references(
             () => assetTable.id,
             {
                 onDelete: 'cascade',
             },
         ),
-        drumsAssetId: varchar('drums_asset_id', { length: 12 }).references(
+        drumsAssetId: varchar('drums_asset_id', { length: 15 }).references(
             () => assetTable.id,
             {
                 onDelete: 'cascade',
             },
         ),
-        guitarAssetId: varchar('guitar_asset_id', { length: 12 }).references(
+        guitarAssetId: varchar('guitar_asset_id', { length: 15 }).references(
             () => assetTable.id,
             {
                 onDelete: 'cascade',
             },
         ),
-        pianoAssetId: varchar('piano_asset_id', { length: 12 }).references(
+        pianoAssetId: varchar('piano_asset_id', { length: 15 }).references(
             () => assetTable.id,
             {
                 onDelete: 'cascade',
             },
         ),
-        midiAssetId: varchar('midi_asset_id', { length: 12 }).references(
+        midiAssetId: varchar('midi_asset_id', { length: 15 }).references(
             () => assetTable.id,
             {
                 onDelete: 'cascade',
