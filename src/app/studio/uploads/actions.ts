@@ -11,7 +11,6 @@ import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { ActionResult } from '@/types/server-action';
 import crypto from 'crypto';
-import mime from 'mime-types';
 import { z } from 'zod';
 
 export const getPresignedUrl = async (
@@ -45,10 +44,9 @@ export const getPresignedUrl = async (
     }
 
     try {
-        const fileExtension = mime.extension(type);
-        const objectName = `${crypto
-            .randomBytes(32)
-            .toString('hex')}.${fileExtension}`;
+        const objectName = `${crypto.randomBytes(32).toString('hex')}.${
+            data.extension
+        }`;
         const url = await fileStorageClient.presignedPutObject(
             env.S3_BUCKET_NAME,
             objectName,
@@ -91,6 +89,7 @@ export const getPresignedUrl = async (
 const signedUrlBodySchema = z.object({
     type: z.enum(assetConfig.allowedMimeTypes),
     size: z.number().max(assetConfig.maxFileSize),
+    extension: z.string(),
     checksum: z.string(),
 });
 

@@ -141,6 +141,7 @@ export const SeparationForm = () => {
     const handleFileUpload = async (file: File) => {
         const result = await getPresignedUrl({
             type: file.type as (typeof assetConfig.allowedMimeTypes)[number],
+            extension: file.name.split('.').pop() || '',
             size: file.size,
             checksum: await computeSHA256(file),
         });
