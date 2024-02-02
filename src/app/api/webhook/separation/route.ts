@@ -38,23 +38,32 @@ export const POST = async (req: Request) => {
         if (!track) {
             throw new AppError('FatalError', 'Failed to find track', true);
         }
+
         if (track.status === 'succeeded') {
             return HttpResponse.success();
         }
 
-        if (status === 'starting') {
+        if (track.status === 'pending' && status === 'starting') {
             await trackModel.updateOne(taskId, {
                 status: 'processing',
             });
             return HttpResponse.success();
         }
-        if (status === 'failed' || status === 'canceled') {
+
+        if (
+            (track.status === 'pending' || track.status === 'processing') &&
+            (status === 'failed' || status === 'canceled')
+        ) {
             await trackModel.updateOne(taskId, {
                 status,
             });
             return HttpResponse.success();
         }
-        if (status === 'succeeded') {
+
+        if (
+            (track.status === 'pending' || track.status === 'processing') &&
+            status === 'succeeded'
+        ) {
             for (const [stem, url] of Object.entries(output)) {
                 if (url) {
                     const blob = await fetch(url).then((res) => res.blob());
