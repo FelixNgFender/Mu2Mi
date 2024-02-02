@@ -1,5 +1,5 @@
 {
-    "id": "d06892cc-2803-4bda-b608-723c73a6e37e",
+    "id": "b2aa8581-fd46-4508-bd6d-3a2e99fdb23b",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "5",
     "dialect": "pg",
@@ -563,7 +563,6 @@
         "replicate_task_status": {
             "name": "replicate_task_status",
             "values": {
-                "pending": "pending",
                 "processing": "processing",
                 "succeeded": "succeeded",
                 "failed": "failed",

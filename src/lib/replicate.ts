@@ -33,7 +33,7 @@ export class ReplicateClient {
             webhook: webhook.toString(),
             // start: immmediately on prediction start
             // completed: when the prediction reaches a terminal state (succeeded/canceled/failed)
-            webhook_events_filter: ['start', 'completed'],
+            webhook_events_filter: ['completed'],
         });
     }
 }

@@ -142,9 +142,8 @@ const data: Track[] = [
 
 export type Track = {
     id: string;
-    // pending until received start signal from webhook, change to processing
     // processing until received completed signal from webhook, change to success/failed/canceled
-    status: 'pending' | 'processing' | 'success' | 'failed' | 'canceled';
+    status: 'processing' | 'success' | 'failed' | 'canceled';
     name: string;
     bpm: number;
 };

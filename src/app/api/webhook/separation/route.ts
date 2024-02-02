@@ -43,15 +43,8 @@ export const POST = async (req: Request) => {
             return HttpResponse.success();
         }
 
-        if (track.status === 'pending' && status === 'starting') {
-            await trackModel.updateOne(taskId, {
-                status: 'processing',
-            });
-            return HttpResponse.success();
-        }
-
         if (
-            (track.status === 'pending' || track.status === 'processing') &&
+            track.status === 'processing' &&
             (status === 'failed' || status === 'canceled')
         ) {
             await trackModel.updateOne(taskId, {
@@ -60,10 +53,7 @@ export const POST = async (req: Request) => {
             return HttpResponse.success();
         }
 
-        if (
-            (track.status === 'pending' || track.status === 'processing') &&
-            status === 'succeeded'
-        ) {
+        if (track.status === 'processing' && status === 'succeeded') {
             for (const [stem, url] of Object.entries(output)) {
                 if (url) {
                     const blob = await fetch(url).then((res) => res.blob());

@@ -176,10 +176,8 @@ export const assetTable = pgTable(
     },
 );
 
-// our 'pending' -> received webhook of 'start' event -> our 'processing'
-// -> received webhook of 'completed' event -> our 'succeeded' or 'failed'
+// our 'processing' -> received webhook of 'completed' event -> our 'succeeded' or 'failed' or 'canceled'
 export const trackStatusEnum = pgEnum('replicate_task_status', [
-    'pending',
     'processing',
     'succeeded',
     'failed',

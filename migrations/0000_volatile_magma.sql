@@ -11,7 +11,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "replicate_task_status" AS ENUM('pending', 'processing', 'succeeded', 'failed', 'canceled');
+ CREATE TYPE "replicate_task_status" AS ENUM('processing', 'succeeded', 'failed', 'canceled');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

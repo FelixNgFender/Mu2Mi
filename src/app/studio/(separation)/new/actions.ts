@@ -46,7 +46,7 @@ export const separateTrack = async (
         const track = await trackModel.createOne({
             id: generatePublicId(),
             userId: user.id,
-            status: 'pending',
+            status: 'processing',
             ...data,
         });
 
