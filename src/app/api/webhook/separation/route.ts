@@ -32,6 +32,16 @@ export const POST = async (req: Request) => {
         if (error) {
             throw new AppError('ReplicateError', error, true);
         }
+
+        // Handle duplicate webhooks
+        const track = await trackModel.findOne(taskId);
+        if (!track) {
+            throw new AppError('FatalError', 'Failed to find track', true);
+        }
+        if (track.status === 'succeeded') {
+            return HttpResponse.success();
+        }
+
         if (status === 'starting') {
             await trackModel.updateOne(taskId, {
                 status: 'processing',
@@ -45,16 +55,6 @@ export const POST = async (req: Request) => {
             return HttpResponse.success();
         }
         if (status === 'succeeded') {
-            // Handle duplicate webhooks
-            const track = await trackModel.findOne(taskId);
-            if (!track) {
-                throw new AppError('FatalError', 'Failed to find track', true);
-            }
-
-            if (track.status === 'succeeded') {
-                return HttpResponse.success();
-            }
-
             for (const [stem, url] of Object.entries(output)) {
                 if (url) {
                     const buffer = Buffer.from(
@@ -94,6 +94,7 @@ export const POST = async (req: Request) => {
                 }
             }
         }
+        return HttpResponse.success();
     } catch (error) {
         errorHandler.handleError(error as Error);
         return HttpResponse.internalServerError();
