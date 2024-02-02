@@ -7,11 +7,11 @@ import { AppError } from '@/lib/error';
 import { errorHandler } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { replicateClient } from '@/lib/replicate';
+import { trackSeparationInputSchema } from '@/lib/replicate';
 import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import { NewTrack } from '@/models/track';
-import { models } from '@/types/replicate';
 import { ActionResult } from '@/types/server-action';
 import { z } from 'zod';
 
@@ -46,7 +46,7 @@ export const separateTrack = async (
         const track = await trackModel.createOne({
             id: generatePublicId(),
             userId: user.id,
-            status: 'starting',
+            status: 'pending',
             ...data,
         });
 
@@ -80,6 +80,7 @@ export const separateTrack = async (
         const prediction = await replicateClient.separateTrack({
             ...data,
             taskId: track.id,
+            userId: user.id,
             audio: url,
         });
         console.log('Replicate prediction', prediction);
@@ -99,19 +100,8 @@ export const separateTrack = async (
     }
 };
 
-const clientFormSchema = z.object({
-    model_name: z
-        .enum([...models.map((model) => model.name)] as [string, ...string[]])
-        .default('htdemucs'),
-    stem: z
-        .enum(['vocals', 'bass', 'drums', 'guitar', 'piano', 'other'])
-        .optional(),
-    clip_mode: z.enum(['rescale', 'clamp']).default('rescale'),
-    shifts: z.number().int().min(1).max(10).default(1),
-    overlap: z.number().default(0.25),
-    output_format: z.enum(['mp3', 'wav', 'flac']).default('mp3'),
-    mp3_bitrate: z.number().int().default(320),
-    float32: z.boolean().default(false),
+const clientFormSchema = trackSeparationInputSchema.omit({
+    audio: true,
 });
 
 type ClientFormSchemaType = z.infer<typeof clientFormSchema>;

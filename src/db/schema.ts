@@ -164,7 +164,7 @@ export const assetTable = pgTable(
                 onDelete: 'cascade',
             }),
         name: text('name').unique().notNull(), // FK to S3 object name, cannot guarantee that users will actually upload files with their presigned URLs
-        mimeType: mimeType('mime_type').notNull(),
+        mimeType: mimeType('mime_type'),
         createdAt: timestamp('created_at').defaultNow(),
         updatedAt: timestamp('updated_at').defaultNow(),
     },
@@ -175,10 +175,10 @@ export const assetTable = pgTable(
     },
 );
 
-// our 'starting' -> received webhook of 'started' event -> our 'processing'
+// our 'pending' -> received webhook of 'start' event -> our 'processing'
 // -> received webhook of 'completed' event -> our 'succeeded' or 'failed'
-export const replicateTaskStatusEnum = pgEnum('replicate_task_status', [
-    'starting',
+export const trackStatusEnum = pgEnum('replicate_task_status', [
+    'pending',
     'processing',
     'succeeded',
     'failed',
@@ -253,7 +253,7 @@ export const trackTable = pgTable(
             },
         ),
         name: text('name').notNull(),
-        status: replicateTaskStatusEnum('status').notNull(),
+        status: trackStatusEnum('status').notNull(),
         createdAt: timestamp('created_at').defaultNow(),
         updatedAt: timestamp('updated_at').defaultNow(),
     },
