@@ -1,0 +1,579 @@
+{
+    "id": "794c188d-f82b-45d3-bd3d-3760eacebcb6",
+    "prevId": "4b5ef931-d2d6-4cfd-aa14-969c1b3ca44a",
+    "version": "5",
+    "dialect": "pg",
+    "tables": {
+        "asset": {
+            "name": "asset",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar(12)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "name": {
+                    "name": "name",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "mime_type": {
+                    "name": "mime_type",
+                    "type": "mime_type",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "now()"
+                }
+            },
+            "indexes": {
+                "asset_user_id_idx": {
+                    "name": "asset_user_id_idx",
+                    "columns": ["user_id"],
+                    "isUnique": false
+                }
+            },
+            "foreignKeys": {
+                "asset_user_id_user_id_fk": {
+                    "name": "asset_user_id_user_id_fk",
+                    "tableFrom": "asset",
+                    "tableTo": "user",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "asset_name_unique": {
+                    "name": "asset_name_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["name"]
+                }
+            }
+        },
+        "email_verification_code": {
+            "name": "email_verification_code",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "serial",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "code": {
+                    "name": "code",
+                    "type": "varchar(6)",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email": {
+                    "name": "email",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expires_at": {
+                    "name": "expires_at",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "email_verification_user_id_idx": {
+                    "name": "email_verification_user_id_idx",
+                    "columns": ["user_id"],
+                    "isUnique": false
+                }
+            },
+            "foreignKeys": {
+                "email_verification_code_user_id_user_id_fk": {
+                    "name": "email_verification_code_user_id_user_id_fk",
+                    "tableFrom": "email_verification_code",
+                    "tableTo": "user",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "oauth_account": {
+            "name": "oauth_account",
+            "schema": "",
+            "columns": {
+                "provider_id": {
+                    "name": "provider_id",
+                    "type": "provider_id",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "provider_user_id": {
+                    "name": "provider_user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "oauth_account_provider_id_idx": {
+                    "name": "oauth_account_provider_id_idx",
+                    "columns": ["provider_id"],
+                    "isUnique": false
+                },
+                "oauth_account_provider_user_id_idx": {
+                    "name": "oauth_account_provider_user_id_idx",
+                    "columns": ["provider_user_id"],
+                    "isUnique": false
+                },
+                "oauth_account_user_id_idx": {
+                    "name": "oauth_account_user_id_idx",
+                    "columns": ["user_id"],
+                    "isUnique": false
+                }
+            },
+            "foreignKeys": {
+                "oauth_account_user_id_user_id_fk": {
+                    "name": "oauth_account_user_id_user_id_fk",
+                    "tableFrom": "oauth_account",
+                    "tableTo": "user",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {
+                "oauth_account_provider_id_provider_user_id_pk": {
+                    "name": "oauth_account_provider_id_provider_user_id_pk",
+                    "columns": ["provider_id", "provider_user_id"]
+                }
+            },
+            "uniqueConstraints": {}
+        },
+        "password_reset_token": {
+            "name": "password_reset_token",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expires_at": {
+                    "name": "expires_at",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "password_reset_user_id_idx": {
+                    "name": "password_reset_user_id_idx",
+                    "columns": ["user_id"],
+                    "isUnique": false
+                }
+            },
+            "foreignKeys": {
+                "password_reset_token_user_id_user_id_fk": {
+                    "name": "password_reset_token_user_id_user_id_fk",
+                    "tableFrom": "password_reset_token",
+                    "tableTo": "user",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "session": {
+            "name": "session",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "expires_at": {
+                    "name": "expires_at",
+                    "type": "timestamp with time zone",
+                    "primaryKey": false,
+                    "notNull": true
+                }
+            },
+            "indexes": {
+                "session_user_id_idx": {
+                    "name": "session_user_id_idx",
+                    "columns": ["user_id"],
+                    "isUnique": false
+                }
+            },
+            "foreignKeys": {
+                "session_user_id_user_id_fk": {
+                    "name": "session_user_id_user_id_fk",
+                    "tableFrom": "session",
+                    "tableTo": "user",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "track": {
+            "name": "track",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "varchar(12)",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "user_id": {
+                    "name": "user_id",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "original_asset_id": {
+                    "name": "original_asset_id",
+                    "type": "varchar(12)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "vocals_asset_id": {
+                    "name": "vocals_asset_id",
+                    "type": "varchar(12)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "accompaniment_asset_id": {
+                    "name": "accompaniment_asset_id",
+                    "type": "varchar(12)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "bass_asset_id": {
+                    "name": "bass_asset_id",
+                    "type": "varchar(12)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "drums_asset_id": {
+                    "name": "drums_asset_id",
+                    "type": "varchar(12)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "guitar_asset_id": {
+                    "name": "guitar_asset_id",
+                    "type": "varchar(12)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "piano_asset_id": {
+                    "name": "piano_asset_id",
+                    "type": "varchar(12)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "midi_asset_id": {
+                    "name": "midi_asset_id",
+                    "type": "varchar(12)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "name": {
+                    "name": "name",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "status": {
+                    "name": "status",
+                    "type": "replicate_task_status",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "now()"
+                }
+            },
+            "indexes": {
+                "track_user_id_idx": {
+                    "name": "track_user_id_idx",
+                    "columns": ["user_id"],
+                    "isUnique": false
+                }
+            },
+            "foreignKeys": {
+                "track_user_id_user_id_fk": {
+                    "name": "track_user_id_user_id_fk",
+                    "tableFrom": "track",
+                    "tableTo": "user",
+                    "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "track_original_asset_id_asset_id_fk": {
+                    "name": "track_original_asset_id_asset_id_fk",
+                    "tableFrom": "track",
+                    "tableTo": "asset",
+                    "columnsFrom": ["original_asset_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "track_vocals_asset_id_asset_id_fk": {
+                    "name": "track_vocals_asset_id_asset_id_fk",
+                    "tableFrom": "track",
+                    "tableTo": "asset",
+                    "columnsFrom": ["vocals_asset_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "track_accompaniment_asset_id_asset_id_fk": {
+                    "name": "track_accompaniment_asset_id_asset_id_fk",
+                    "tableFrom": "track",
+                    "tableTo": "asset",
+                    "columnsFrom": ["accompaniment_asset_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "track_bass_asset_id_asset_id_fk": {
+                    "name": "track_bass_asset_id_asset_id_fk",
+                    "tableFrom": "track",
+                    "tableTo": "asset",
+                    "columnsFrom": ["bass_asset_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "track_drums_asset_id_asset_id_fk": {
+                    "name": "track_drums_asset_id_asset_id_fk",
+                    "tableFrom": "track",
+                    "tableTo": "asset",
+                    "columnsFrom": ["drums_asset_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "track_guitar_asset_id_asset_id_fk": {
+                    "name": "track_guitar_asset_id_asset_id_fk",
+                    "tableFrom": "track",
+                    "tableTo": "asset",
+                    "columnsFrom": ["guitar_asset_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "track_piano_asset_id_asset_id_fk": {
+                    "name": "track_piano_asset_id_asset_id_fk",
+                    "tableFrom": "track",
+                    "tableTo": "asset",
+                    "columnsFrom": ["piano_asset_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "track_midi_asset_id_asset_id_fk": {
+                    "name": "track_midi_asset_id_asset_id_fk",
+                    "tableFrom": "track",
+                    "tableTo": "asset",
+                    "columnsFrom": ["midi_asset_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                }
+            },
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {}
+        },
+        "user": {
+            "name": "user",
+            "schema": "",
+            "columns": {
+                "id": {
+                    "name": "id",
+                    "type": "text",
+                    "primaryKey": true,
+                    "notNull": true
+                },
+                "email": {
+                    "name": "email",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "email_verified": {
+                    "name": "email_verified",
+                    "type": "boolean",
+                    "primaryKey": false,
+                    "notNull": true,
+                    "default": false
+                },
+                "username": {
+                    "name": "username",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "username_lower": {
+                    "name": "username_lower",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": true
+                },
+                "hashed_password": {
+                    "name": "hashed_password",
+                    "type": "text",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "created_at": {
+                    "name": "created_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "now()"
+                },
+                "updated_at": {
+                    "name": "updated_at",
+                    "type": "timestamp",
+                    "primaryKey": false,
+                    "notNull": false,
+                    "default": "now()"
+                }
+            },
+            "indexes": {},
+            "foreignKeys": {},
+            "compositePrimaryKeys": {},
+            "uniqueConstraints": {
+                "user_email_unique": {
+                    "name": "user_email_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["email"]
+                },
+                "user_username_unique": {
+                    "name": "user_username_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["username"]
+                },
+                "user_username_lower_unique": {
+                    "name": "user_username_lower_unique",
+                    "nullsNotDistinct": false,
+                    "columns": ["username_lower"]
+                }
+            }
+        }
+    },
+    "enums": {
+        "mime_type": {
+            "name": "mime_type",
+            "values": {
+                "audio/mpeg": "audio/mpeg",
+                "audio/wav": "audio/wav",
+                "audio/flac": "audio/flac",
+                "audio/mp4": "audio/mp4",
+                "audio/mov": "audio/mov",
+                "audio/wma": "audio/wma"
+            }
+        },
+        "provider_id": {
+            "name": "provider_id",
+            "values": {
+                "github": "github",
+                "google": "google",
+                "facebook": "facebook"
+            }
+        },
+        "replicate_task_status": {
+            "name": "replicate_task_status",
+            "values": {
+                "pending": "pending",
+                "processing": "processing",
+                "succeeded": "succeeded",
+                "failed": "failed",
+                "canceled": "canceled"
+            }
+        }
+    },
+    "schemas": {},
+    "_meta": {
+        "columns": {},
+        "schemas": {},
+        "tables": {}
+    }
+}
