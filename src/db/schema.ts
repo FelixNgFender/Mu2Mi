@@ -162,7 +162,7 @@ export const trackAssetType = pgEnum('track_asset_type', [
     'drums',
     'guitar',
     'piano',
-    'midi',
+    'metronome',
 ]);
 
 // TODO: Opportunity to optimize: use DB as soft cache before hitting S3
@@ -229,7 +229,8 @@ export const trackTable = pgTable(
             }),
         // TODO: investigate why foreign keys default to NOT NULL
         name: text('name').notNull(),
-        status: trackStatusEnum('status').notNull(),
+        trackSeparationStatus: trackStatusEnum('track_separation_status'),
+        smartMetronomeStatus: trackStatusEnum('smart_metronome_status'),
         ...updateAndCreatedAt,
     },
     (table) => {

@@ -50,7 +50,7 @@ export type Assets = {
         | 'drums'
         | 'guitar'
         | 'piano'
-        | 'midi'
+        | 'metronome'
         | null;
 }[];
 
@@ -148,14 +148,14 @@ export const trackTableColumns: ColumnDef<Track>[] = [
         ),
     },
     {
-        accessorKey: 'status',
+        accessorKey: 'trackSeparationStatus', // track separation takes much longer than smart metronome so use its status for now
         header: 'Status',
         cell: ({ row }) => (
             <div className="capitalize">
                 <span className="mr-2">
-                    {getStatusIndicator(row.getValue('status'))}
+                    {getStatusIndicator(row.getValue('trackSeparationStatus'))}
                 </span>
-                {row.getValue('status')}
+                {row.getValue('trackSeparationStatus')}
             </div>
         ),
     },

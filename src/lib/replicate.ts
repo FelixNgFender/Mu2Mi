@@ -36,10 +36,35 @@ export class ReplicateClient {
             webhook_events_filter: ['completed'],
         });
     }
+
+    async smartMetronome({
+        taskId,
+        userId,
+        ...data
+    }: SmartMetronomeSchemaType) {
+        const webhook = new URL(`${env.ORIGIN}/api/webhook/metronome`);
+        webhook.searchParams.set('taskId', taskId);
+        webhook.searchParams.set('userId', userId);
+        webhook.searchParams.set('secret', env.WEBHOOK_SECRET);
+        return this.replicate.predictions.create({
+            version: env.SMART_METRONOME_MODEL_VERSION,
+            input: data,
+            webhook: webhook.toString(),
+            webhook_events_filter: ['completed'],
+        });
+    }
 }
 
 export const replicateClient = new ReplicateClient({
     auth: env.REPLICATE_API_TOKEN,
+});
+
+export const webhookMetadataSchema = z.object({
+    taskId: z.string().min(15).max(15), // = track id
+    userId: z.string().min(15).max(15),
+    secret: z.string().refine((data) => data === env.WEBHOOK_SECRET, {
+        message: 'Invalid secret',
+    }),
 });
 
 export const trackSeparationInputSchema = z.object({
@@ -58,14 +83,6 @@ export const trackSeparationInputSchema = z.object({
     output_format: z.enum(['mp3', 'wav', 'flac']).default('mp3'),
 });
 
-export const webhookMetadataSchema = z.object({
-    taskId: z.string().min(15).max(15), // = track id
-    userId: z.string().min(15).max(15),
-    secret: z.string().refine((data) => data === env.WEBHOOK_SECRET, {
-        message: 'Invalid secret',
-    }),
-});
-
 const trackSeparationSchema = trackSeparationInputSchema
     .merge(webhookMetadataSchema)
     .omit({
@@ -73,3 +90,18 @@ const trackSeparationSchema = trackSeparationInputSchema
     });
 
 type TrackSeparationSchemaType = z.infer<typeof trackSeparationSchema>;
+
+const smartMetronomeInputSchema = z.object({
+    audio: z.string().url(),
+    click_track: z.boolean().default(true),
+    combine_click_track: z.boolean().default(true),
+    detect_downbeat: z.boolean().default(false),
+});
+
+const smartMetronomeSchema = smartMetronomeInputSchema
+    .merge(webhookMetadataSchema)
+    .omit({
+        secret: true,
+    });
+
+type SmartMetronomeSchemaType = z.infer<typeof smartMetronomeSchema>;

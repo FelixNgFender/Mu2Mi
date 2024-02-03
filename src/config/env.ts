@@ -54,6 +54,7 @@ const envSchema = z.object({
     REPLICATE_API_TOKEN: isString,
     WEBHOOK_SECRET: isString,
     TRACK_SEPARATION_MODEL_VERSION: isString,
+    SMART_METRONOME_MODEL_VERSION: isString,
 });
 
 /**

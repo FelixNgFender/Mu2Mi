@@ -39,3 +39,28 @@ export const models = [
             'Quantized version of the previous models. Smaller download and storage but quality can be slightly worse.',
     },
 ] as const;
+
+interface ReplicateWebhookBody {
+    status: 'starting' | 'succeeded' | 'failed' | 'canceled';
+    error: string | null;
+    output: any;
+}
+
+export interface TrackSeparationWebhookBody extends ReplicateWebhookBody {
+    output: {
+        bass: string | null;
+        drums: string | null;
+        other: string | null;
+        piano: string | null;
+        guitar: string | null;
+        vocals: string | null;
+    };
+}
+
+export interface SmartMetronomeWebhookBody extends ReplicateWebhookBody {
+    output: {
+        beats: string | null;
+        click: string | null;
+        combined: string | null;
+    };
+}

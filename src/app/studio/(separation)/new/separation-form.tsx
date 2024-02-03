@@ -34,7 +34,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { separateTrack } from './actions';
+import { detectBeat, separateTrack } from './actions';
 
 const steps = [
     {
@@ -224,11 +224,24 @@ export const SeparationForm = () => {
             }
         }
         if (result.success) {
-            toast({
-                title: 'File uploaded successfully.',
-                description: '🔥 We are cooking your track.',
-            });
-            form.reset();
+            const nextResult = await detectBeat({ ...result.data });
+            if (!nextResult) return;
+            if (!nextResult.success) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Uh oh! Something went wrong.',
+                    description: nextResult.error,
+                });
+                form.reset();
+                setCurrentStep(-1);
+            }
+            if (nextResult.success) {
+                toast({
+                    title: 'File uploaded successfully.',
+                    description: '🔥 We are cooking your track.',
+                });
+                form.reset();
+            }
         }
     };
 

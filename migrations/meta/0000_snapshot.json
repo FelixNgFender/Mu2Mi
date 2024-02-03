@@ -1,5 +1,5 @@
 {
-    "id": "0c15b061-d3bd-4c0a-ad94-718bc118d9fa",
+    "id": "80dd7515-66b0-4ddc-9f67-4076e9d47c1e",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "5",
     "dialect": "pg",
@@ -323,11 +323,17 @@
                     "primaryKey": false,
                     "notNull": true
                 },
-                "status": {
-                    "name": "status",
+                "track_separation_status": {
+                    "name": "track_separation_status",
                     "type": "replicate_task_status",
                     "primaryKey": false,
-                    "notNull": true
+                    "notNull": false
+                },
+                "smart_metronome_status": {
+                    "name": "smart_metronome_status",
+                    "type": "replicate_task_status",
+                    "primaryKey": false,
+                    "notNull": false
                 },
                 "updated_at": {
                     "name": "updated_at",
@@ -470,7 +476,7 @@
                 "drums": "drums",
                 "guitar": "guitar",
                 "piano": "piano",
-                "midi": "midi"
+                "metronome": "metronome"
             }
         },
         "replicate_task_status": {

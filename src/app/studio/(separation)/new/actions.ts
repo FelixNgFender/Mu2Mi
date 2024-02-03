@@ -14,7 +14,7 @@ import { trackModel } from '@/models/track';
 import { NewTrack } from '@/models/track';
 import { ActionResult } from '@/types/server-action';
 import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
+import { string, z } from 'zod';
 
 export const separateTrack = async (
     data: ClientDataSchemaType,
@@ -47,7 +47,7 @@ export const separateTrack = async (
         const track = await trackModel.createOne({
             id: generatePublicId(),
             userId: user.id,
-            status: 'processing',
+            trackSeparationStatus: 'processing',
             name: data.name,
         });
 
@@ -91,8 +91,68 @@ export const separateTrack = async (
         return {
             success: true,
             data: {
-                predictionId: prediction.id,
+                trackId: track.id,
+                audio: url,
             },
+        };
+    } catch (err) {
+        errorHandler.handleError(err as Error);
+        return {
+            success: false,
+            error: httpStatus.serverError.internalServerError.humanMessage,
+        };
+    }
+};
+
+/**
+ * This runs after `separateTrack` so we can assume that the track and asset exist.
+ * Assume audio URL is still valid.
+ */
+export const detectBeat = async ({
+    trackId,
+    audio,
+}: {
+    trackId: string;
+    audio: string;
+}): Promise<ActionResult> => {
+    const { user } = await getUserSession();
+    if (!user) {
+        return {
+            success: false,
+            error: httpStatus.clientError.unauthorized.humanMessage,
+        };
+    }
+    if (!user.emailVerified) {
+        return {
+            success: false,
+            error: httpStatus.clientError.unprocessableEntity.humanMessage,
+        };
+    }
+
+    if (!trackId || !audio) {
+        return {
+            success: false,
+            error: httpStatus.clientError.badRequest.humanMessage,
+        };
+    }
+
+    try {
+        await trackModel.updateOne(trackId, {
+            smartMetronomeStatus: 'processing',
+        });
+
+        const prediction = await replicateClient.smartMetronome({
+            taskId: trackId,
+            userId: user.id,
+            audio,
+            click_track: true,
+            combine_click_track: false,
+            detect_downbeat: false,
+        });
+        console.log('Replicate prediction', prediction);
+        revalidatePath('/studio'); // refresh track table on studio page
+        return {
+            success: true,
         };
     } catch (err) {
         errorHandler.handleError(err as Error);

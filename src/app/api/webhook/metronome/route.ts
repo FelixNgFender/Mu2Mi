@@ -6,7 +6,7 @@ import { HttpResponse } from '@/lib/response';
 import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
-import { TrackSeparationWebhookBody } from '@/types/replicate';
+import { SmartMetronomeWebhookBody } from '@/types/replicate';
 import { Buffer } from 'buffer';
 import crypto from 'crypto';
 import { fileTypeFromBlob } from 'file-type';
@@ -25,13 +25,13 @@ export const POST = async (req: Request) => {
     try {
         const { taskId, userId } = parsedParams.data;
         const body = await req.json();
-        const { status, output, error } = body as TrackSeparationWebhookBody;
-
+        const { status, output, error } = body as SmartMetronomeWebhookBody;
+        console.log('webhook body: ', body);
+        console.log('webhook status: ', status);
+        console.log('webhook output: ', output);
+        console.log('webhook error: ', error);
         if (error) {
-            await trackModel.updateOne(taskId, {
-                trackSeparationStatus: 'failed',
-            });
-            return HttpResponse.success();
+            throw new AppError('ReplicateError', error, true);
         }
 
         // Handle duplicate webhooks
@@ -41,28 +41,30 @@ export const POST = async (req: Request) => {
         }
 
         if (
-            track.trackSeparationStatus === 'succeeded' ||
+            track.smartMetronomeStatus === 'succeeded' ||
             status === 'starting'
         ) {
             return HttpResponse.success();
         }
 
         if (
-            track.trackSeparationStatus === 'processing' &&
+            track.smartMetronomeStatus === 'processing' &&
             (status === 'failed' || status === 'canceled')
         ) {
             await trackModel.updateOne(taskId, {
-                trackSeparationStatus: status,
+                smartMetronomeStatus: status,
             });
             return HttpResponse.success();
         }
 
         if (
-            track.trackSeparationStatus === 'processing' &&
+            track.smartMetronomeStatus === 'processing' &&
             status === 'succeeded'
         ) {
             const promises = Object.entries(output).map(async ([stem, url]) => {
                 if (url) {
+                    if (stem !== 'click') return;
+
                     const blob = await fetch(url).then((res) => res.blob());
                     const fileType = await fileTypeFromBlob(blob);
                     const fileExtension = fileType?.ext;
@@ -84,8 +86,7 @@ export const POST = async (req: Request) => {
                         name: objectName,
                         mimeType: mimeType as any,
                         trackId: taskId,
-                        type:
-                            stem === 'other' ? 'accompaniment' : (stem as any),
+                        type: 'metronome',
                     });
                     if (!newAsset) {
                         throw new AppError(
@@ -98,7 +99,7 @@ export const POST = async (req: Request) => {
             });
             await Promise.all(promises);
             await trackModel.updateOne(taskId, {
-                trackSeparationStatus: status,
+                smartMetronomeStatus: status,
             });
         }
         return HttpResponse.success();
