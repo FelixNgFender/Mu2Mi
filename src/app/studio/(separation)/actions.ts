@@ -44,7 +44,12 @@ export const downloadTrack = async (trackId: string): Promise<ActionResult> => {
 
 export const deleteTrack = async (trackId: string): Promise<ActionResult> => {
     try {
-        await trackModel.deleteOne(trackId);
+        const assets = await assetModel.findManyByUserId(trackId);
+        await fileStorageClient.removeObjects(
+            env.S3_BUCKET_NAME,
+            assets.map((asset) => asset.name),
+        );
+        await trackModel.deleteOne(trackId); // cascades to asset table
         revalidatePath('/studio');
         return {
             success: true,
