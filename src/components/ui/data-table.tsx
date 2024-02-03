@@ -1,7 +1,6 @@
 'use client';
 
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -29,16 +28,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import {
-    ArrowUpDown,
-    CheckCircle2,
-    ChevronDown,
-    Download,
-    Loader2,
-    MoreHorizontal,
-    Trash2,
-    XCircle,
-} from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import * as React from 'react';
 
 interface DataTableProps<TData, TValue> {

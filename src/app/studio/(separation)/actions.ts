@@ -78,3 +78,26 @@ export const deleteTrack = async (trackId: string): Promise<ActionResult> => {
         };
     }
 };
+
+export const getTracks = async (): Promise<ActionResult> => {
+    const { user } = await getUserSession();
+    if (!user) {
+        return {
+            success: false,
+            error: httpStatus.clientError.unauthorized.humanMessage,
+        };
+    }
+    try {
+        const tracks = await trackModel.findManyByUserId(user.id);
+        return {
+            success: true,
+            data: tracks,
+        };
+    } catch (error) {
+        errorHandler.handleError(error as Error);
+        return {
+            success: false,
+            error: httpStatus.serverError.internalServerError.humanMessage,
+        };
+    }
+};
