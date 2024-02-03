@@ -1,12 +1,20 @@
-import { SeparationHeader } from './separation-header';
-import { TrackTable } from './track-table';
+import { DataTable } from '@/components/ui/data-table';
+import { getUserSession } from '@/lib/auth';
+import { trackModel } from '@/models/track';
 
-// TODO: Implement
+import { SeparationHeader } from './separation-header';
+import { trackTableColumns } from './track-table-columns';
+
 const SeparationPage = async () => {
+    const { user } = await getUserSession();
+    if (!user) {
+        return null;
+    }
+    const data = await trackModel.findManyByUserId(user.id);
     return (
         <>
             <SeparationHeader />
-            <TrackTable />
+            <DataTable columns={trackTableColumns} data={data} />
         </>
     );
 };

@@ -1,5 +1,5 @@
 {
-    "id": "e4b65ece-ec98-4982-b6c5-73901b035162",
+    "id": "0c15b061-d3bd-4c0a-ad94-718bc118d9fa",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "5",
     "dialect": "pg",
@@ -19,6 +19,18 @@
                     "type": "text",
                     "primaryKey": false,
                     "notNull": true
+                },
+                "track_id": {
+                    "name": "track_id",
+                    "type": "varchar(15)",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "track_type": {
+                    "name": "track_type",
+                    "type": "track_asset_type",
+                    "primaryKey": false,
+                    "notNull": false
                 },
                 "name": {
                     "name": "name",
@@ -50,6 +62,11 @@
                     "name": "asset_user_id_idx",
                     "columns": ["user_id"],
                     "isUnique": false
+                },
+                "asset_track_id_idx": {
+                    "name": "asset_track_id_idx",
+                    "columns": ["track_id"],
+                    "isUnique": false
                 }
             },
             "foreignKeys": {
@@ -58,6 +75,15 @@
                     "tableFrom": "asset",
                     "tableTo": "user",
                     "columnsFrom": ["user_id"],
+                    "columnsTo": ["id"],
+                    "onDelete": "cascade",
+                    "onUpdate": "no action"
+                },
+                "asset_track_id_track_id_fk": {
+                    "name": "asset_track_id_track_id_fk",
+                    "tableFrom": "asset",
+                    "tableTo": "track",
+                    "columnsFrom": ["track_id"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
                     "onUpdate": "no action"
@@ -291,54 +317,6 @@
                     "primaryKey": false,
                     "notNull": true
                 },
-                "original_asset_id": {
-                    "name": "original_asset_id",
-                    "type": "varchar(15)",
-                    "primaryKey": false,
-                    "notNull": false
-                },
-                "vocals_asset_id": {
-                    "name": "vocals_asset_id",
-                    "type": "varchar(15)",
-                    "primaryKey": false,
-                    "notNull": false
-                },
-                "accompaniment_asset_id": {
-                    "name": "accompaniment_asset_id",
-                    "type": "varchar(15)",
-                    "primaryKey": false,
-                    "notNull": false
-                },
-                "bass_asset_id": {
-                    "name": "bass_asset_id",
-                    "type": "varchar(15)",
-                    "primaryKey": false,
-                    "notNull": false
-                },
-                "drums_asset_id": {
-                    "name": "drums_asset_id",
-                    "type": "varchar(15)",
-                    "primaryKey": false,
-                    "notNull": false
-                },
-                "guitar_asset_id": {
-                    "name": "guitar_asset_id",
-                    "type": "varchar(15)",
-                    "primaryKey": false,
-                    "notNull": false
-                },
-                "piano_asset_id": {
-                    "name": "piano_asset_id",
-                    "type": "varchar(15)",
-                    "primaryKey": false,
-                    "notNull": false
-                },
-                "midi_asset_id": {
-                    "name": "midi_asset_id",
-                    "type": "varchar(15)",
-                    "primaryKey": false,
-                    "notNull": false
-                },
                 "name": {
                     "name": "name",
                     "type": "text",
@@ -377,78 +355,6 @@
                     "tableFrom": "track",
                     "tableTo": "user",
                     "columnsFrom": ["user_id"],
-                    "columnsTo": ["id"],
-                    "onDelete": "cascade",
-                    "onUpdate": "no action"
-                },
-                "track_original_asset_id_asset_id_fk": {
-                    "name": "track_original_asset_id_asset_id_fk",
-                    "tableFrom": "track",
-                    "tableTo": "asset",
-                    "columnsFrom": ["original_asset_id"],
-                    "columnsTo": ["id"],
-                    "onDelete": "cascade",
-                    "onUpdate": "no action"
-                },
-                "track_vocals_asset_id_asset_id_fk": {
-                    "name": "track_vocals_asset_id_asset_id_fk",
-                    "tableFrom": "track",
-                    "tableTo": "asset",
-                    "columnsFrom": ["vocals_asset_id"],
-                    "columnsTo": ["id"],
-                    "onDelete": "cascade",
-                    "onUpdate": "no action"
-                },
-                "track_accompaniment_asset_id_asset_id_fk": {
-                    "name": "track_accompaniment_asset_id_asset_id_fk",
-                    "tableFrom": "track",
-                    "tableTo": "asset",
-                    "columnsFrom": ["accompaniment_asset_id"],
-                    "columnsTo": ["id"],
-                    "onDelete": "cascade",
-                    "onUpdate": "no action"
-                },
-                "track_bass_asset_id_asset_id_fk": {
-                    "name": "track_bass_asset_id_asset_id_fk",
-                    "tableFrom": "track",
-                    "tableTo": "asset",
-                    "columnsFrom": ["bass_asset_id"],
-                    "columnsTo": ["id"],
-                    "onDelete": "cascade",
-                    "onUpdate": "no action"
-                },
-                "track_drums_asset_id_asset_id_fk": {
-                    "name": "track_drums_asset_id_asset_id_fk",
-                    "tableFrom": "track",
-                    "tableTo": "asset",
-                    "columnsFrom": ["drums_asset_id"],
-                    "columnsTo": ["id"],
-                    "onDelete": "cascade",
-                    "onUpdate": "no action"
-                },
-                "track_guitar_asset_id_asset_id_fk": {
-                    "name": "track_guitar_asset_id_asset_id_fk",
-                    "tableFrom": "track",
-                    "tableTo": "asset",
-                    "columnsFrom": ["guitar_asset_id"],
-                    "columnsTo": ["id"],
-                    "onDelete": "cascade",
-                    "onUpdate": "no action"
-                },
-                "track_piano_asset_id_asset_id_fk": {
-                    "name": "track_piano_asset_id_asset_id_fk",
-                    "tableFrom": "track",
-                    "tableTo": "asset",
-                    "columnsFrom": ["piano_asset_id"],
-                    "columnsTo": ["id"],
-                    "onDelete": "cascade",
-                    "onUpdate": "no action"
-                },
-                "track_midi_asset_id_asset_id_fk": {
-                    "name": "track_midi_asset_id_asset_id_fk",
-                    "tableFrom": "track",
-                    "tableTo": "asset",
-                    "columnsFrom": ["midi_asset_id"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
                     "onUpdate": "no action"
@@ -552,6 +458,19 @@
                 "github": "github",
                 "google": "google",
                 "facebook": "facebook"
+            }
+        },
+        "track_asset_type": {
+            "name": "track_asset_type",
+            "values": {
+                "original": "original",
+                "vocals": "vocals",
+                "accompaniment": "accompaniment",
+                "bass": "bass",
+                "drums": "drums",
+                "guitar": "guitar",
+                "piano": "piano",
+                "midi": "midi"
             }
         },
         "replicate_task_status": {

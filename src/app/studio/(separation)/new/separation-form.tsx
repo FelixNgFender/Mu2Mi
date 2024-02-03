@@ -186,7 +186,6 @@ export const SeparationForm = () => {
 
         // asset has been uploaded to db and file storage, now separate track
         const result = await separateTrack({
-            originalAssetId: assetId,
             name: data.file.name,
 
             model_name: data.model_name,

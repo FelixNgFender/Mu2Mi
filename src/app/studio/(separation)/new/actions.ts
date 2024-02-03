@@ -47,10 +47,10 @@ export const separateTrack = async (
             id: generatePublicId(),
             userId: user.id,
             status: 'processing',
-            ...data,
+            name: data.name,
         });
 
-        if (!track || !track.originalAssetId) {
+        if (!track) {
             throw new AppError(
                 'HttpError',
                 'Failed to create track',
@@ -59,7 +59,7 @@ export const separateTrack = async (
             );
         }
 
-        const asset = await assetModel.findOne(track.originalAssetId);
+        const asset = await assetModel.findOneByTrackId(track.id);
 
         if (!asset) {
             throw new AppError(
@@ -105,5 +105,4 @@ const clientFormSchema = trackSeparationInputSchema.omit({
 });
 
 type ClientFormSchemaType = z.infer<typeof clientFormSchema>;
-type ClientDataSchemaType = Pick<NewTrack, 'originalAssetId' | 'name'> &
-    ClientFormSchemaType;
+type ClientDataSchemaType = Pick<NewTrack, 'name'> & ClientFormSchemaType;

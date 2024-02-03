@@ -39,7 +39,7 @@ export const POST = async (req: Request) => {
             throw new AppError('FatalError', 'Failed to find track', true);
         }
 
-        if (track.status === 'succeeded') {
+        if (track.status === 'succeeded' || status === 'starting') {
             return HttpResponse.success();
         }
 
@@ -54,7 +54,7 @@ export const POST = async (req: Request) => {
         }
 
         if (track.status === 'processing' && status === 'succeeded') {
-            for (const [stem, url] of Object.entries(output)) {
+            const promises = Object.entries(output).map(async ([stem, url]) => {
                 if (url) {
                     const blob = await fetch(url).then((res) => res.blob());
                     const fileType = await fileTypeFromBlob(blob);
@@ -76,6 +76,9 @@ export const POST = async (req: Request) => {
                         userId: userId,
                         name: objectName,
                         mimeType: mimeType as any,
+                        trackId: taskId,
+                        type:
+                            stem === 'other' ? 'accompaniment' : (stem as any),
                     });
                     if (!newAsset) {
                         throw new AppError(
@@ -84,19 +87,9 @@ export const POST = async (req: Request) => {
                             true,
                         );
                     }
-                    if (stem === 'other') {
-                        await trackModel.updateOne(taskId, {
-                            status: 'succeeded',
-                            accompanimentAssetId: newAsset.id,
-                        });
-                    } else {
-                        await trackModel.updateOne(taskId, {
-                            status: 'succeeded',
-                            [`${stem}AssetId`]: newAsset.id,
-                        });
-                    }
                 }
-            }
+            });
+            await Promise.all(promises);
         }
         return HttpResponse.success();
     } catch (error) {

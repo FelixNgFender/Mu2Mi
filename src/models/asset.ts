@@ -12,6 +12,18 @@ export const assetModel = {
         });
     },
 
+    async findOneByTrackId(trackId: string) {
+        return await db.query.assetTable.findFirst({
+            where: eq(assetTable.trackId, trackId),
+        });
+    },
+
+    async findManyByUserId(userId: string) {
+        return await db.query.assetTable.findMany({
+            where: eq(assetTable.userId, userId),
+        });
+    },
+
     async createOne(asset: NewAsset) {
         return await db
             .insert(assetTable)

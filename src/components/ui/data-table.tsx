@@ -1,14 +1,11 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
@@ -32,240 +29,27 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react';
+import {
+    ArrowUpDown,
+    CheckCircle2,
+    ChevronDown,
+    Download,
+    Loader2,
+    MoreHorizontal,
+    Trash2,
+    XCircle,
+} from 'lucide-react';
 import * as React from 'react';
 
-const data: Track[] = [
-    {
-        id: 'm5gr84i9',
-        bpm: 316,
-        status: 'success',
-        name: 'ken99@yahoo.com',
-    },
-    {
-        id: '3u1reuv4',
-        bpm: 242,
-        status: 'success',
-        name: 'Abe45@gmail.com',
-    },
-    {
-        id: 'derv1ws0',
-        bpm: 837,
-        status: 'processing',
-        name: 'Monserrat44@gmail.com',
-    },
-    {
-        id: '5kma53ae',
-        bpm: 874,
-        status: 'success',
-        name: 'Silas22@gmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-    {
-        id: 'bhqecj4p',
-        bpm: 721,
-        status: 'failed',
-        name: 'carmella@hotmail.com',
-    },
-];
+interface DataTableProps<TData, TValue> {
+    columns: ColumnDef<TData, TValue>[];
+    data: TData[];
+}
 
-export type Track = {
-    id: string;
-    // processing until received completed signal from webhook, change to success/failed/canceled
-    status: 'processing' | 'success' | 'failed' | 'canceled';
-    name: string;
-    bpm: number;
-};
-
-export const columns: ColumnDef<Track>[] = [
-    {
-        id: 'select',
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && 'indeterminate')
-                }
-                onCheckedChange={(value) =>
-                    table.toggleAllPageRowsSelected(!!value)
-                }
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }) => (
-            <div className="capitalize">{row.getValue('status')}</div>
-        ),
-    },
-    {
-        accessorKey: 'name',
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() =>
-                        column.toggleSorting(column.getIsSorted() === 'asc')
-                    }
-                >
-                    Track Name
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            );
-        },
-        cell: ({ row }) => (
-            <div className="lowercase">{row.getValue('name')}</div>
-        ),
-    },
-    {
-        accessorKey: 'key',
-        header: () => <div className="text-right">Key</div>,
-        cell: ({ row }) => {
-            const bpm = parseFloat(row.getValue('bpm'));
-
-            // Format the bpm as a dollar bpm
-            const formatted = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-            }).format(bpm);
-
-            return <div className="text-right font-medium">{formatted}</div>;
-        },
-    },
-    {
-        accessorKey: 'bpm',
-        header: () => <div className="text-right">BPM</div>,
-        cell: ({ row }) => {
-            const bpm = parseFloat(row.getValue('bpm'));
-
-            // Format the bpm as a dollar bpm
-            const formatted = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-            }).format(bpm);
-
-            return <div className="text-right font-medium">{formatted}</div>;
-        },
-    },
-    {
-        id: 'actions',
-        enableHiding: false,
-        cell: ({ row }) => {
-            const payment = row.original;
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() =>
-                                navigator.clipboard.writeText(payment.id)
-                            }
-                        >
-                            Copy payment ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>View customer</DropdownMenuItem>
-                        <DropdownMenuItem>
-                            View payment details
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            );
-        },
-    },
-];
-
-// TODO: Implement
-export function TrackTable() {
+export function DataTable<TData, TValue>({
+    columns,
+    data,
+}: DataTableProps<TData, TValue>) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
         React.useState<ColumnFiltersState>([]);

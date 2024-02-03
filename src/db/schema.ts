@@ -154,6 +154,17 @@ export const mimeType = pgEnum('mime_type', [
     'audio/wma',
 ]);
 
+export const trackAssetType = pgEnum('track_asset_type', [
+    'original',
+    'vocals',
+    'accompaniment',
+    'bass',
+    'drums',
+    'guitar',
+    'piano',
+    'midi',
+]);
+
 // TODO: Opportunity to optimize: use DB as soft cache before hitting S3
 export const assetTable = pgTable(
     'asset',
@@ -168,6 +179,12 @@ export const assetTable = pgTable(
             .references(() => userTable.id, {
                 onDelete: 'cascade',
             }),
+        trackId: varchar('track_id', {
+            length: 15,
+        }).references(() => trackTable.id, {
+            onDelete: 'cascade',
+        }),
+        type: trackAssetType('track_type'),
         name: text('name').unique().notNull(), // FK to S3 object name, cannot guarantee that users will actually upload files with their presigned URLs
         mimeType: mimeType('mime_type'),
         ...updateAndCreatedAt,
@@ -175,6 +192,7 @@ export const assetTable = pgTable(
     (table) => {
         return {
             userIdIdx: index('asset_user_id_idx').on(table.userId),
+            trackIdIdx: index('asset_track_id_idx').on(table.trackId),
         };
     },
 );
@@ -210,50 +228,6 @@ export const trackTable = pgTable(
                 onDelete: 'cascade',
             }),
         // TODO: investigate why foreign keys default to NOT NULL
-        originalAssetId: varchar('original_asset_id', {
-            length: 15,
-        }).references(() => assetTable.id, {
-            onDelete: 'cascade',
-        }),
-        vocalsAssetId: varchar('vocals_asset_id', { length: 15 }).references(
-            () => assetTable.id,
-            {
-                onDelete: 'cascade',
-            },
-        ),
-        accompanimentAssetId: varchar('accompaniment_asset_id', {
-            length: 15,
-        }).references(() => assetTable.id, { onDelete: 'cascade' }),
-        bassAssetId: varchar('bass_asset_id', { length: 15 }).references(
-            () => assetTable.id,
-            {
-                onDelete: 'cascade',
-            },
-        ),
-        drumsAssetId: varchar('drums_asset_id', { length: 15 }).references(
-            () => assetTable.id,
-            {
-                onDelete: 'cascade',
-            },
-        ),
-        guitarAssetId: varchar('guitar_asset_id', { length: 15 }).references(
-            () => assetTable.id,
-            {
-                onDelete: 'cascade',
-            },
-        ),
-        pianoAssetId: varchar('piano_asset_id', { length: 15 }).references(
-            () => assetTable.id,
-            {
-                onDelete: 'cascade',
-            },
-        ),
-        midiAssetId: varchar('midi_asset_id', { length: 15 }).references(
-            () => assetTable.id,
-            {
-                onDelete: 'cascade',
-            },
-        ),
         name: text('name').notNull(),
         status: trackStatusEnum('status').notNull(),
         ...updateAndCreatedAt,

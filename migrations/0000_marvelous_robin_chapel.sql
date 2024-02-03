@@ -11,6 +11,12 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ CREATE TYPE "track_asset_type" AS ENUM('original', 'vocals', 'accompaniment', 'bass', 'drums', 'guitar', 'piano', 'midi');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  CREATE TYPE "replicate_task_status" AS ENUM('processing', 'succeeded', 'failed', 'canceled');
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -19,6 +25,8 @@ END $$;
 CREATE TABLE IF NOT EXISTS "asset" (
 	"id" varchar(15) PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
+	"track_id" varchar(15),
+	"track_type" "track_asset_type",
 	"name" text NOT NULL,
 	"mime_type" "mime_type",
 	"updated_at" timestamp NOT NULL,
@@ -56,14 +64,6 @@ CREATE TABLE IF NOT EXISTS "session" (
 CREATE TABLE IF NOT EXISTS "track" (
 	"id" varchar(15) PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
-	"original_asset_id" varchar(15),
-	"vocals_asset_id" varchar(15),
-	"accompaniment_asset_id" varchar(15),
-	"bass_asset_id" varchar(15),
-	"drums_asset_id" varchar(15),
-	"guitar_asset_id" varchar(15),
-	"piano_asset_id" varchar(15),
-	"midi_asset_id" varchar(15),
 	"name" text NOT NULL,
 	"status" "replicate_task_status" NOT NULL,
 	"updated_at" timestamp NOT NULL,
@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 );
 --> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "asset_user_id_idx" ON "asset" ("user_id");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "asset_track_id_idx" ON "asset" ("track_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "email_verification_user_id_idx" ON "email_verification_code" ("user_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "oauth_account_provider_id_idx" ON "oauth_account" ("provider_id");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "oauth_account_provider_user_id_idx" ON "oauth_account" ("provider_user_id");--> statement-breakpoint
@@ -94,6 +95,12 @@ CREATE INDEX IF NOT EXISTS "session_user_id_idx" ON "session" ("user_id");--> st
 CREATE INDEX IF NOT EXISTS "track_user_id_idx" ON "track" ("user_id");--> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "asset" ADD CONSTRAINT "asset_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "asset" ADD CONSTRAINT "asset_track_id_track_id_fk" FOREIGN KEY ("track_id") REFERENCES "track"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -124,54 +131,6 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "track" ADD CONSTRAINT "track_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "track" ADD CONSTRAINT "track_original_asset_id_asset_id_fk" FOREIGN KEY ("original_asset_id") REFERENCES "asset"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "track" ADD CONSTRAINT "track_vocals_asset_id_asset_id_fk" FOREIGN KEY ("vocals_asset_id") REFERENCES "asset"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "track" ADD CONSTRAINT "track_accompaniment_asset_id_asset_id_fk" FOREIGN KEY ("accompaniment_asset_id") REFERENCES "asset"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "track" ADD CONSTRAINT "track_bass_asset_id_asset_id_fk" FOREIGN KEY ("bass_asset_id") REFERENCES "asset"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "track" ADD CONSTRAINT "track_drums_asset_id_asset_id_fk" FOREIGN KEY ("drums_asset_id") REFERENCES "asset"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "track" ADD CONSTRAINT "track_guitar_asset_id_asset_id_fk" FOREIGN KEY ("guitar_asset_id") REFERENCES "asset"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "track" ADD CONSTRAINT "track_piano_asset_id_asset_id_fk" FOREIGN KEY ("piano_asset_id") REFERENCES "asset"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "track" ADD CONSTRAINT "track_midi_asset_id_asset_id_fk" FOREIGN KEY ("midi_asset_id") REFERENCES "asset"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
