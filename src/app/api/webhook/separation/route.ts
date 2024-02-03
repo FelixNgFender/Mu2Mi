@@ -90,6 +90,9 @@ export const POST = async (req: Request) => {
                 }
             });
             await Promise.all(promises);
+            await trackModel.updateOne(taskId, {
+                status,
+            });
         }
         return HttpResponse.success();
     } catch (error) {

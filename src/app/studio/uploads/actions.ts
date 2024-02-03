@@ -61,6 +61,7 @@ export const getPresignedUrl = async (
             // better solution would be set up a trigger on the S3 bucket to create the asset
             name: objectName,
             mimeType: type,
+            type: 'original',
         });
 
         if (!newAsset)
