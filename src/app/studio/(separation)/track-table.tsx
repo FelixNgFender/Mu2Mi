@@ -23,7 +23,7 @@ export const TrackTable = () => {
             }
             return result.data;
         },
-        refetchInterval: 5000,
+        refetchInterval: 3000,
     });
 
     if (isPending) {
