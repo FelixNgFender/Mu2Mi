@@ -12,10 +12,13 @@ export const assetModel = {
         });
     },
 
-    async findOneByTrackId(trackId: string) {
-        return await db.query.assetTable.findFirst({
-            where: eq(assetTable.trackId, trackId),
-        });
+    async updateOne(id: string, asset: Partial<NewAsset>) {
+        return await db
+            .update(assetTable)
+            .set({ ...asset, updatedAt: new Date() })
+            .where(eq(assetTable.id, id))
+            .returning()
+            .then((assets) => assets[0]);
     },
 
     async findManyByUserId(userId: string) {

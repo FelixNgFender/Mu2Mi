@@ -59,12 +59,14 @@ export const separateTrack = async (
             );
         }
 
-        const asset = await assetModel.findOneByTrackId(track.id);
+        const asset = await assetModel.updateOne(data.assetId, {
+            trackId: track.id,
+        });
 
         if (!asset) {
             throw new AppError(
                 'HttpError',
-                'Failed to find asset',
+                'Failed to update asset',
                 true,
                 httpStatus.serverError.internalServerError.code,
             );
@@ -105,4 +107,7 @@ const clientFormSchema = trackSeparationInputSchema.omit({
 });
 
 type ClientFormSchemaType = z.infer<typeof clientFormSchema>;
-type ClientDataSchemaType = Pick<NewTrack, 'name'> & ClientFormSchemaType;
+type ClientDataSchemaType = Pick<NewTrack, 'name'> &
+    ClientFormSchemaType & {
+        assetId: string;
+    };
