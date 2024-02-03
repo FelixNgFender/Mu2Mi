@@ -13,6 +13,7 @@ import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import { NewTrack } from '@/models/track';
 import { ActionResult } from '@/types/server-action';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 export const separateTrack = async (
@@ -86,7 +87,7 @@ export const separateTrack = async (
             audio: url,
         });
         console.log('Replicate prediction', prediction);
-
+        revalidatePath('/studio'); // refresh track table on studio page
         return {
             success: true,
             data: {
