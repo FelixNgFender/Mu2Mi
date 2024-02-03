@@ -2,7 +2,9 @@
 
 import { env } from '@/config/env';
 import { fileStorageClient } from '@/db';
+import { getUserSession } from '@/lib/auth';
 import { AppError, errorHandler } from '@/lib/error';
+import { httpStatus } from '@/lib/http';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import { ActionResult } from '@/types/server-action';
@@ -11,8 +13,15 @@ import { revalidatePath } from 'next/cache';
 import { Assets } from './track-table-columns';
 
 export const downloadTrack = async (trackId: string): Promise<ActionResult> => {
+    const { user } = await getUserSession();
+    if (!user) {
+        return {
+            success: false,
+            error: httpStatus.clientError.unauthorized.humanMessage,
+        };
+    }
     try {
-        const trackAssets = await assetModel.findManyByUserId(trackId);
+        const trackAssets = await assetModel.findManyByUserId(user.id);
         const promises = trackAssets.map(async (asset) => {
             const url = await fileStorageClient
                 .presignedGetObject(
@@ -37,12 +46,19 @@ export const downloadTrack = async (trackId: string): Promise<ActionResult> => {
         errorHandler.handleError(err as Error);
         return {
             success: false,
-            error: 'Failed to download track',
+            error: httpStatus.serverError.internalServerError.humanMessage,
         };
     }
 };
 
 export const deleteTrack = async (trackId: string): Promise<ActionResult> => {
+    const { user } = await getUserSession();
+    if (!user) {
+        return {
+            success: false,
+            error: httpStatus.clientError.unauthorized.humanMessage,
+        };
+    }
     try {
         const assets = await assetModel.findManyByUserId(trackId);
         await fileStorageClient.removeObjects(
@@ -58,7 +74,7 @@ export const deleteTrack = async (trackId: string): Promise<ActionResult> => {
         errorHandler.handleError(err as Error);
         return {
             success: false,
-            error: 'Failed to delete track',
+            error: httpStatus.serverError.internalServerError.humanMessage,
         };
     }
 };
