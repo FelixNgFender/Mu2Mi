@@ -21,9 +21,9 @@ export const assetModel = {
             .then((assets) => assets[0]);
     },
 
-    async findManyByUserId(userId: string) {
+    async findManyByTrackId(trackId: string) {
         return await db.query.assetTable.findMany({
-            where: eq(assetTable.userId, userId),
+            where: eq(assetTable.trackId, trackId),
         });
     },
 

@@ -21,7 +21,7 @@ export const downloadTrack = async (trackId: string): Promise<ActionResult> => {
         };
     }
     try {
-        const trackAssets = await assetModel.findManyByUserId(user.id);
+        const trackAssets = await assetModel.findManyByTrackId(trackId);
         const promises = trackAssets.map(async (asset) => {
             const url = await fileStorageClient
                 .presignedGetObject(
@@ -60,7 +60,7 @@ export const deleteTrack = async (trackId: string): Promise<ActionResult> => {
         };
     }
     try {
-        const assets = await assetModel.findManyByUserId(trackId);
+        const assets = await assetModel.findManyByTrackId(trackId);
         await fileStorageClient.removeObjects(
             env.S3_BUCKET_NAME,
             assets.map((asset) => asset.name),
