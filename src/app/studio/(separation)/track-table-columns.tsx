@@ -135,17 +135,21 @@ export const trackTableColumns: ColumnDef<Track>[] = [
                 </Button>
             );
         },
-        cell: ({ row }) => (
-            <Link
-                href={`/studio/track/${row.original.id}`}
-                className={cn(
-                    buttonVariants({ variant: 'link' }),
-                    'text-foreground',
-                )}
-            >
-                {row.original.name}
-            </Link>
-        ),
+        cell: ({ row }) =>
+            row.getValue('trackSeparationStatus') === 'succeeded' &&
+            row.getValue('smartMetronomeStatus') === 'succeeded' ? (
+                <Link
+                    href={`/studio/track/${row.original.id}`}
+                    className={cn(
+                        buttonVariants({ variant: 'link' }),
+                        'text-foreground',
+                    )}
+                >
+                    {row.original.name}
+                </Link>
+            ) : (
+                <span>{row.original.name}</span>
+            ),
     },
     {
         accessorKey: 'trackSeparationStatus',
