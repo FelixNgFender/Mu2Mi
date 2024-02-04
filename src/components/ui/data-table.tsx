@@ -1,12 +1,12 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+// import {
+//     DropdownMenu,
+//     DropdownMenuCheckboxItem,
+//     DropdownMenuContent,
+//     DropdownMenuTrigger,
+// } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
     Table,
@@ -19,8 +19,7 @@ import {
 import {
     ColumnDef,
     ColumnFiltersState,
-    SortingState,
-    VisibilityState,
+    SortingState, // VisibilityState,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
@@ -28,7 +27,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import { ChevronDown } from 'lucide-react';
+// import { ChevronDown } from 'lucide-react';
 import * as React from 'react';
 
 interface DataTableProps<TData, TValue> {
@@ -45,7 +44,7 @@ export function DataTable<TData, TValue>({
         React.useState<ColumnFiltersState>([]);
     // const [columnVisibility, setColumnVisibility] =
     //     React.useState<VisibilityState>({});
-    const [rowSelection, setRowSelection] = React.useState({});
+    // const [rowSelection, setRowSelection] = React.useState({});
 
     const table = useReactTable({
         data,
@@ -57,12 +56,12 @@ export function DataTable<TData, TValue>({
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         // onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
+        // onRowSelectionChange: setRowSelection,
         state: {
             sorting,
             columnFilters,
             // columnVisibility,
-            rowSelection,
+            // rowSelection,
         },
     });
 
@@ -163,10 +162,10 @@ export function DataTable<TData, TValue>({
                 </Table>
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
-                <div className="flex-1 text-sm text-muted-foreground">
+                {/* <div className="flex-1 text-sm text-muted-foreground">
                     {table.getFilteredSelectedRowModel().rows.length} of{' '}
                     {table.getFilteredRowModel().rows.length} row(s) selected.
-                </div>
+                </div> */}
                 <div className="space-x-2">
                     <Button
                         variant="outline"
