@@ -1,12 +1,12 @@
 import { getUserSession } from '@/lib/auth';
-import { Track, trackModel } from '@/models/track';
+import { trackModel } from '@/models/track';
 import {
     HydrationBoundary,
     QueryClient,
     dehydrate,
 } from '@tanstack/react-query';
 
-import { getTracks } from './actions';
+import { getTracks } from '../actions';
 import { SeparationHeader } from './separation-header';
 import { TrackTable } from './track-table';
 

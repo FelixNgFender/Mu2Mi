@@ -61,6 +61,7 @@
         "sharp": "^0.33.2",
         "tailwind-merge": "^2.2.0",
         "tailwindcss-animate": "^1.0.7",
+        "waveform-playlist": "^4.3.3",
         "winston": "^3.11.0",
         "zod": "^3.22.4"
     },

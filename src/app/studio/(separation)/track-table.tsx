@@ -5,7 +5,7 @@ import { DataTable } from '@/components/ui/data-table';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
 
-import { getTracks } from './actions';
+import { getTracks } from '../actions';
 import { trackTableColumns } from './track-table-columns';
 
 export const TrackTable = () => {

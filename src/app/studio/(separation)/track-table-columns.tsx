@@ -1,5 +1,6 @@
 'use client';
 
+import { deleteTrack, downloadTrack } from '@/app/studio/actions';
 import { Button, buttonVariants } from '@/components/ui/button';
 // import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -10,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { Track } from '@/models/track';
+import { Asset } from '@/types/asset';
 import { ColumnDef } from '@tanstack/react-table';
 import JSZip from 'jszip';
 import {
@@ -22,8 +24,6 @@ import {
     XCircle,
 } from 'lucide-react';
 import Link from 'next/link';
-
-import { deleteTrack, downloadTrack } from './actions';
 
 const getStatusIndicator = (
     status: 'processing' | 'succeeded' | 'failed' | 'canceled',
@@ -40,27 +40,13 @@ const getStatusIndicator = (
     }
 };
 
-export type Assets = {
-    url: string;
-    type:
-        | 'original'
-        | 'vocals'
-        | 'accompaniment'
-        | 'bass'
-        | 'drums'
-        | 'guitar'
-        | 'piano'
-        | 'metronome'
-        | null;
-}[];
-
 const handleDownload = async (trackId: string) => {
     try {
         const result = await downloadTrack(trackId);
         if (result && result.success) {
             console.log(result.data);
             const zip = new JSZip();
-            const assets = result.data as Assets;
+            const assets = result.data as Asset[];
             const promises = assets.map((asset) =>
                 fetch(asset.url)
                     .then((response) => response.blob())
