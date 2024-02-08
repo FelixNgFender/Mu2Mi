@@ -31,32 +31,11 @@ const TrackPage = ({ params }: TrackPageProps) => {
         },
     });
 
-    const assets = useQueries({
-        queries: assetLinks
-            ? assetLinks.map((asset) => {
-                  return {
-                      queryKey: ['track-assets', asset.id],
-                      queryFn: async () => {
-                          //   const response = await fetch(asset.url);
-                          //   if (!response.ok) {
-                          //       throw new Error(
-                          //           `Failed to download asset: ${asset.url} - ${response.status} ${response.statusText}`,
-                          //       );
-                          //   }
-                          return {
-                              src: asset.url,
-                              name: asset.type || 'track' + Date.now(),
-                          };
-                      },
-                  };
-              })
-            : [],
-    });
-
     useEffect(() => {
-        if (assets.some((a) => a.isError || a.isPending || !a.data)) {
+        if (!assetLinks) {
             return;
         }
+
         const loadPlaylist = async () => {
             const playlist = WaveformPlaylist({
                 samplesPerPixel: 3000,
@@ -75,30 +54,37 @@ const TrackPage = ({ params }: TrackPageProps) => {
                 },
                 zoomLevels: [500, 1000, 3000, 5000],
             });
-            console.log(assets.map((a) => a.data));
+            console.log(
+                assetLinks.map((asset) => {
+                    return {
+                        src: asset.url,
+                        name: asset.type || 'track' + Date.now(),
+                    };
+                }),
+            );
             await playlist.load(
-                assets.map((a) => {
-                    a.data;
+                assetLinks.map((asset) => {
+                    return {
+                        src: asset.url,
+                        name: asset.type || 'track' + Date.now(),
+                    };
                 }),
             );
         };
 
         loadPlaylist();
-    }, [assets]);
+    }, [assetLinks]);
 
-    if (isPending || assets.some((a) => a.isPending)) {
+    if (isPending) {
         return <div>Loading...</div>;
     }
 
-    if (isError || assets.some((a) => a.isError)) {
+    if (isError) {
         return (
             <Alert variant="destructive">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Error</AlertTitle>
-                <AlertDescription>
-                    {error?.message ||
-                        assets.find((a) => a.isError)?.error?.message}
-                </AlertDescription>
+                <AlertDescription>{error.message}</AlertDescription>
             </Alert>
         );
     }
