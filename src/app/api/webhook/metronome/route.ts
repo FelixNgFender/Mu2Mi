@@ -31,7 +31,10 @@ export const POST = async (req: Request) => {
         console.log('webhook output: ', output);
         console.log('webhook error: ', error);
         if (error) {
-            throw new AppError('ReplicateError', error, true);
+            await trackModel.updateOne(taskId, {
+                smartMetronomeStatus: 'failed',
+            });
+            return HttpResponse.success();
         }
 
         // Handle duplicate webhooks
