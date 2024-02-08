@@ -39,9 +39,9 @@ const TrackPage = ({ params }: TrackPageProps) => {
                       queryFn: async () => {
                           const response = await fetch(asset.url);
                           console.log(asset.url);
-                          const buffer = await response.arrayBuffer();
+                          const blob = await response.blob();
                           return {
-                              src: buffer,
+                              src: URL.createObjectURL(blob),
                               name: asset.type || 'track' + Date.now(),
                           };
                       },
