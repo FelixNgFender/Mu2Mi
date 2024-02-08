@@ -38,10 +38,13 @@ const TrackPage = ({ params }: TrackPageProps) => {
                       queryKey: ['track-assets', asset.id],
                       queryFn: async () => {
                           const response = await fetch(asset.url);
-                          console.log(asset.url);
-                          const blob = await response.blob();
+                          if (!response.ok) {
+                              throw new Error(
+                                  `Failed to download asset: ${asset.url} - ${response.status} ${response.statusText}`,
+                              );
+                          }
                           return {
-                              src: URL.createObjectURL(blob),
+                              src: asset.url,
                               name: asset.type || 'track' + Date.now(),
                           };
                       },
@@ -51,13 +54,11 @@ const TrackPage = ({ params }: TrackPageProps) => {
     });
 
     useEffect(() => {
+        if (assets.some((a) => a.isError) && assets.some((a) => !a.isPending)) {
+            return;
+        }
+
         const loadPlaylist = async () => {
-            if (
-                assets.some((a) => a.isError) &&
-                assets.some((a) => !a.isPending)
-            ) {
-                return;
-            }
             const playlist = WaveformPlaylist({
                 samplesPerPixel: 3000,
                 mono: true,
