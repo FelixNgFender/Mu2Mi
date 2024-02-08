@@ -21,7 +21,7 @@ const TrackPage = ({ params }: TrackPageProps) => {
         data: assetLinks,
         error,
     } = useQuery({
-        queryKey: ['track-assets-links'],
+        queryKey: ['track-assets', params.id],
         queryFn: async () => {
             const result = await downloadTrack(params.id);
             if (result && !result.success) {
@@ -81,11 +81,13 @@ const TrackPage = ({ params }: TrackPageProps) => {
 
     if (isError) {
         return (
-            <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error.message}</AlertDescription>
-            </Alert>
+            <section className="container relative flex h-full max-w-screen-lg flex-col space-y-4 py-4">
+                <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error.message}</AlertDescription>
+                </Alert>
+            </section>
         );
     }
 
