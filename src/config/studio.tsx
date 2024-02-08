@@ -1,8 +1,8 @@
 import { MainNavItem, SidebarNavItem } from '@/types/nav';
 import {
+    BrainCircuit,
     Disc3,
     KeyboardMusic,
-    Mic2,
     PencilLine,
     Speaker,
     Split,
@@ -58,25 +58,27 @@ export const studioConfig: StudioConfig = {
                     icon: ({ className }) => <Split className={className} />,
                 },
                 {
-                    title: 'Voice Studio',
-                    href: `${baseStudioPath}/voice`,
-                    items: [],
-                    icon: ({ className }) => <Mic2 className={className} />,
-                },
-                {
-                    title: 'Mastering',
-                    href: `${baseStudioPath}/mastering`,
-                    items: [],
-                    icon: ({ className }) => <Speaker className={className} />,
-                },
-                {
-                    title: 'Lyrics Writer',
-                    href: `${baseStudioPath}/lyrics`,
+                    title: 'Music Transcription',
+                    href: `${baseStudioPath}/transcription`,
                     items: [],
                     icon: ({ className }) => (
                         <PencilLine className={className} />
                     ),
                 },
+                {
+                    title: 'Music Generation',
+                    href: `${baseStudioPath}/generation`,
+                    items: [],
+                    icon: ({ className }) => (
+                        <BrainCircuit className={className} />
+                    ),
+                },
+                // {
+                //     title: 'Mixing & Mastering',
+                //     href: `${baseStudioPath}/mixmaster`,
+                //     items: [],
+                //     icon: ({ className }) => <Speaker className={className} />,
+                // },
             ],
         },
         {

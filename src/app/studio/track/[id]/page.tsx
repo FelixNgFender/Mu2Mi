@@ -3,10 +3,21 @@
 import { downloadTrack } from '@/app/studio/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { toast, useToast } from '@/components/ui/use-toast';
 import { Asset } from '@/types/asset';
 import { useQuery } from '@tanstack/react-query';
 import EventEmitter from 'events';
-import { AlertTriangle } from 'lucide-react';
+import {
+    AlertTriangle,
+    Download,
+    FastForward,
+    Pause,
+    Play,
+    Rewind,
+    Square,
+    ZoomIn,
+    ZoomOut,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import WaveformPlaylist from 'waveform-playlist';
 
@@ -37,6 +48,7 @@ const TrackPage = ({ params }: TrackPageProps) => {
 
     const playlistRef = useRef<HTMLDivElement>(null);
     const [ee] = useState(new EventEmitter());
+    const { toast } = useToast();
 
     useEffect(() => {
         if (!assetLinks || !playlistRef.current) {
@@ -81,24 +93,31 @@ const TrackPage = ({ params }: TrackPageProps) => {
                 }
             });
 
-            await playlist.load(
-                assetLinks.map((asset) => {
-                    return {
-                        src: asset.url,
-                        name:
-                            (asset.type &&
-                                asset.type.charAt(0).toUpperCase() +
-                                    asset.type.slice(1)) ||
-                            'track' + Date.now(),
-                    };
-                }),
-            );
+            // await playlist.load(
+            //     assetLinks.map((asset) => {
+            //         return {
+            //             src: asset.url,
+            //             name:
+            //                 (asset.type &&
+            //                     asset.type.charAt(0).toUpperCase() +
+            //                         asset.type.slice(1)) ||
+            //                 'track' + Date.now(),
+            //         };
+            //     }),
+            // );
 
-            await playlist.initExporter();
+            // await playlist.initExporter();
         };
-
-        loadPlaylist();
-    }, [assetLinks, ee]);
+        try {
+            loadPlaylist();
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: 'Uh oh! Something went wrong.',
+                description: (error as Error).message || '',
+            });
+        }
+    }, [assetLinks, ee, toast]);
 
     if (isPending) {
         return null;
@@ -106,67 +125,107 @@ const TrackPage = ({ params }: TrackPageProps) => {
 
     if (isError) {
         return (
-            <section className="container relative flex h-full max-w-screen-lg flex-col space-y-4 py-4">
-                <Alert variant="destructive">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error.message}</AlertDescription>
-                </Alert>
-            </section>
+            <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error.message}</AlertDescription>
+            </Alert>
         );
     }
     // TODO: investigate why rendering twice when navigating around with Links
     return (
         <>
-            <div className="flex space-x-4">
+            <div className="mx-auto flex space-x-4" role="group">
+                <div className='flex space-x-1'>
+                    <Button
+                        type="button"
+                        title="Play"
+                        variant="secondary"
+                        size="icon"
+                        onClick={() => {
+                            ee.emit('play');
+                        }}
+                    >
+                        <Play className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        title="Pause"
+                        variant="secondary"
+                        size="icon"
+                        onClick={() => {
+                            ee.emit('pause');
+                        }}
+                    >
+                        <Pause className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        title="Stop"
+                        variant="secondary"
+                        size="icon"
+                        onClick={() => {
+                            ee.emit('stop');
+                        }}
+                    >
+                        <Square className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        title="Rewind"
+                        variant="secondary"
+                        size="icon"
+                        onClick={() => {
+                            ee.emit('rewind');
+                        }}
+                    >
+                        <Rewind className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        title="Fast forward"
+                        variant="secondary"
+                        size="icon"
+                        onClick={() => ee.emit('fastforward')}
+                    >
+                        <FastForward className="h-4 w-4" />
+                    </Button>
+                </div>
+                <div className='flex space-x-1'>
+                    <Button
+                        type="button"
+                        title="Zoom in"
+                        variant="secondary"
+                        size="icon"
+                        onClick={() => ee.emit('zoomin')}
+                    >
+                        <ZoomIn className="h-4 w-4" />
+                    </Button>
+                    <Button
+                        type="button"
+                        title="Zoom out"
+                        variant="secondary"
+                        size="icon"
+                        onClick={() => {
+                            ee.emit('zoomout');
+                        }}
+                    >
+                        <ZoomOut className="h-4 w-4" />
+                    </Button>
+                </div>
                 <Button
-                    onClick={() => {
-                        ee.emit('play');
-                    }}
-                >
-                    Play
-                </Button>
-                <Button
-                    onClick={() => {
-                        ee.emit('pause');
-                    }}
-                >
-                    Pause
-                </Button>
-                <Button
-                    onClick={() => {
-                        ee.emit('stop');
-                    }}
-                >
-                    Stop
-                </Button>
-                <Button
-                    onClick={() => {
-                        ee.emit('rewind');
-                    }}
-                >
-                    Rewind
-                </Button>
-                <Button onClick={() => ee.emit('fastforward')}>
-                    Fast forward
-                </Button>
-                <Button onClick={() => ee.emit('zoomin')}>Zoom in</Button>
-                <Button
-                    onClick={() => {
-                        ee.emit('zoomout');
-                    }}
-                >
-                    Zoom out
-                </Button>
-                <Button
+                    type="button"
+                    title="Download rendered audio"
+                    variant="secondary"
+                    size="icon"
                     onClick={() => {
                         ee.emit('startaudiorendering', 'wav');
                     }}
                 >
-                    Download
+                    <Download className="h-4 w-4" />
                 </Button>
             </div>
-            <div className="h-full w-full" ref={playlistRef} />
+            <div className="flex-1" ref={playlistRef} />
         </>
     );
 };
