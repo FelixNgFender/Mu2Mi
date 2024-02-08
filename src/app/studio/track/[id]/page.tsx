@@ -37,12 +37,12 @@ const TrackPage = ({ params }: TrackPageProps) => {
                   return {
                       queryKey: ['track-assets', asset.id],
                       queryFn: async () => {
-                          const response = await fetch(asset.url);
-                          if (!response.ok) {
-                              throw new Error(
-                                  `Failed to download asset: ${asset.url} - ${response.status} ${response.statusText}`,
-                              );
-                          }
+                          //   const response = await fetch(asset.url);
+                          //   if (!response.ok) {
+                          //       throw new Error(
+                          //           `Failed to download asset: ${asset.url} - ${response.status} ${response.statusText}`,
+                          //       );
+                          //   }
                           return {
                               src: asset.url,
                               name: asset.type || 'track' + Date.now(),
@@ -54,10 +54,9 @@ const TrackPage = ({ params }: TrackPageProps) => {
     });
 
     useEffect(() => {
-        if (assets.some((a) => a.isError) && assets.some((a) => !a.isPending)) {
+        if (assets.some((a) => a.isError || a.isPending || !a.data)) {
             return;
         }
-
         const loadPlaylist = async () => {
             const playlist = WaveformPlaylist({
                 samplesPerPixel: 3000,
@@ -76,8 +75,12 @@ const TrackPage = ({ params }: TrackPageProps) => {
                 },
                 zoomLevels: [500, 1000, 3000, 5000],
             });
-            console.log(assets.map((a) => a.data?.src));
-            await playlist.load(assets.map((a) => a.data?.src));
+            console.log(assets.map((a) => a.data));
+            await playlist.load(
+                assets.map((a) => {
+                    a.data;
+                }),
+            );
         };
 
         loadPlaylist();
