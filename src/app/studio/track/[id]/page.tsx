@@ -2,13 +2,14 @@
 
 import { downloadTrack } from '@/app/studio/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { toast, useToast } from '@/components/ui/use-toast';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Asset } from '@/types/asset';
 import { useQuery } from '@tanstack/react-query';
 import EventEmitter from 'events';
 import {
     AlertTriangle,
+    ChevronLeftCircle,
     Download,
     FastForward,
     Pause,
@@ -18,7 +19,8 @@ import {
     ZoomIn,
     ZoomOut,
 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useCallback, useState } from 'react';
 import WaveformPlaylist from 'waveform-playlist';
 
 import './playlist.css';
@@ -46,78 +48,64 @@ const TrackPage = ({ params }: TrackPageProps) => {
         },
     });
 
-    const playlistRef = useRef<HTMLDivElement>(null);
     const [ee] = useState(new EventEmitter());
-    const { toast } = useToast();
 
-    useEffect(() => {
-        if (!assetLinks || !playlistRef.current) {
-            return;
-        }
-
-        const loadPlaylist = async () => {
-            const playlist = WaveformPlaylist(
-                {
-                    container: playlistRef.current,
-                    samplesPerPixel: 2048,
-                    mono: true,
-                    exclSolo: true,
-                    timescale: true,
-                    controls: {
-                        show: true,
-                        width: 256,
+    const playlist = useCallback(
+        (node: HTMLDivElement | null) => {
+            if (node !== null && assetLinks) {
+                const playlist = WaveformPlaylist(
+                    {
+                        container: node,
+                        samplesPerPixel: 2048,
+                        mono: true,
+                        exclSolo: true,
+                        timescale: true,
+                        controls: {
+                            show: true,
+                            width: 200,
+                        },
+                        colors: {
+                            waveOutlineColor: 'black',
+                        },
+                        waveHeight: 128,
+                        barWidth: 1,
+                        barGap: 0,
+                        state: 'cursor', // (cursor | select | fadein | fadeout | shift)
+                        zoomLevels: [512, 1024, 2048, 4096],
+                        isAutomaticScroll: true,
                     },
-                    colors: {
-                        waveOutlineColor: 'black',
-                    },
-                    waveHeight: 128,
-                    barWidth: 1,
-                    barGap: 0,
-                    state: 'cursor', // (cursor | select | fadein | fadeout | shift)
-                    zoomLevels: [512, 1024, 2048, 4096],
-                    isAutomaticScroll: true,
-                },
-                ee,
-            );
+                    ee,
+                );
+                ee.on('audiorenderingfinished', function (type, data) {
+                    if (type === 'wav') {
+                        const url = URL.createObjectURL(data);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = `mu2mi-mixdown-${Date.now()}.wav`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                    }
+                });
 
-            ee.on('audiorenderingfinished', function (type, data) {
-                if (type === 'wav') {
-                    const url = URL.createObjectURL(data);
-                    const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = `mu2mi-mixdown-${Date.now()}.wav`;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                }
-            });
-
-            // await playlist.load(
-            //     assetLinks.map((asset) => {
-            //         return {
-            //             src: asset.url,
-            //             name:
-            //                 (asset.type &&
-            //                     asset.type.charAt(0).toUpperCase() +
-            //                         asset.type.slice(1)) ||
-            //                 'track' + Date.now(),
-            //         };
-            //     }),
-            // );
-
-            // await playlist.initExporter();
-        };
-        try {
-            loadPlaylist();
-        } catch (error) {
-            toast({
-                variant: 'destructive',
-                title: 'Uh oh! Something went wrong.',
-                description: (error as Error).message || '',
-            });
-        }
-    }, [assetLinks, ee, toast]);
+                playlist.load(
+                    assetLinks.map((asset) => {
+                        return {
+                            src: asset.url,
+                            name:
+                                (asset.type &&
+                                    asset.type.charAt(0).toUpperCase() +
+                                        asset.type.slice(1)) ||
+                                'track' + Date.now(),
+                        };
+                    }),
+                );
+                playlist.initExporter();
+            }
+        },
+        [assetLinks, ee],
+    );
 
     if (isPending) {
         return null;
@@ -132,11 +120,23 @@ const TrackPage = ({ params }: TrackPageProps) => {
             </Alert>
         );
     }
-    // TODO: investigate why rendering twice when navigating around with Links
+
     return (
         <>
-            <div className="mx-auto flex space-x-4" role="group">
-                <div className='flex space-x-1'>
+            <div className="flex justify-between space-x-2" role="group">
+                <Link
+                    href="/studio"
+                    className={cn(
+                        buttonVariants({ variant: 'link' }),
+                        'self-start',
+                    )}
+                >
+                    <span>
+                        <ChevronLeftCircle className="mr-2 h-4 w-4" />
+                    </span>
+                    <span>Back to tracks</span>
+                </Link>
+                <div className="flex space-x-1">
                     <Button
                         type="button"
                         title="Play"
@@ -147,6 +147,7 @@ const TrackPage = ({ params }: TrackPageProps) => {
                         }}
                     >
                         <Play className="h-4 w-4" />
+                        <span className="sr-only">Play</span>
                     </Button>
                     <Button
                         type="button"
@@ -158,6 +159,7 @@ const TrackPage = ({ params }: TrackPageProps) => {
                         }}
                     >
                         <Pause className="h-4 w-4" />
+                        <span className="sr-only">Pause</span>
                     </Button>
                     <Button
                         type="button"
@@ -169,6 +171,7 @@ const TrackPage = ({ params }: TrackPageProps) => {
                         }}
                     >
                         <Square className="h-4 w-4" />
+                        <span className="sr-only">Stop</span>
                     </Button>
                     <Button
                         type="button"
@@ -180,6 +183,7 @@ const TrackPage = ({ params }: TrackPageProps) => {
                         }}
                     >
                         <Rewind className="h-4 w-4" />
+                        <span className="sr-only">Rewind</span>
                     </Button>
                     <Button
                         type="button"
@@ -189,9 +193,8 @@ const TrackPage = ({ params }: TrackPageProps) => {
                         onClick={() => ee.emit('fastforward')}
                     >
                         <FastForward className="h-4 w-4" />
+                        <span className="sr-only">Fast forward</span>
                     </Button>
-                </div>
-                <div className='flex space-x-1'>
                     <Button
                         type="button"
                         title="Zoom in"
@@ -200,6 +203,7 @@ const TrackPage = ({ params }: TrackPageProps) => {
                         onClick={() => ee.emit('zoomin')}
                     >
                         <ZoomIn className="h-4 w-4" />
+                        <span className="sr-only">Zoom in</span>
                     </Button>
                     <Button
                         type="button"
@@ -211,21 +215,21 @@ const TrackPage = ({ params }: TrackPageProps) => {
                         }}
                     >
                         <ZoomOut className="h-4 w-4" />
+                        <span className="sr-only">Zoom out</span>
                     </Button>
                 </div>
                 <Button
                     type="button"
-                    title="Download rendered audio"
-                    variant="secondary"
-                    size="icon"
+                    title="Download audio"
                     onClick={() => {
                         ee.emit('startaudiorendering', 'wav');
                     }}
                 >
-                    <Download className="h-4 w-4" />
+                    <Download className=" mr-2 h-4 w-4" />
+                    Download audio
                 </Button>
             </div>
-            <div className="flex-1" ref={playlistRef} />
+            <div className="flex-1" ref={playlist} />
         </>
     );
 };
