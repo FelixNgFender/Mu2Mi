@@ -34,7 +34,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { detectBeat, separateTrack } from './actions';
+import { separateTrackAndDetectBeat } from './actions';
 
 const steps = [
     {
@@ -54,6 +54,7 @@ const steps = [
             'mp3_bitrate',
             'float32',
             'output_format',
+            'smart_metronome',
         ],
     },
     { id: 'Step 3', name: 'Upload file' },
@@ -79,6 +80,7 @@ export const SeparationForm = () => {
             mp3_bitrate: 320,
             float32: false,
             output_format: 'mp3',
+            smart_metronome: false,
         },
     });
 
@@ -184,10 +186,10 @@ export const SeparationForm = () => {
             return;
         }
 
-        // asset has been uploaded to db and file storage, now separate track
-        const result = await separateTrack({
+        const result = await separateTrackAndDetectBeat({
             name: data.file.name,
             assetId: assetId,
+            smartMetronome: data.smart_metronome,
 
             model_name: data.model_name,
             stem: data.stem,
@@ -198,7 +200,7 @@ export const SeparationForm = () => {
             float32: data.float32,
             output_format: data.output_format,
         });
-        console.log(result);
+
         if (!result) return;
         if (!result.success) {
             try {
@@ -224,24 +226,11 @@ export const SeparationForm = () => {
             }
         }
         if (result.success) {
-            const nextResult = await detectBeat({ ...result.data });
-            if (!nextResult) return;
-            if (!nextResult.success) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Uh oh! Something went wrong.',
-                    description: nextResult.error,
-                });
-                form.reset();
-                setCurrentStep(-1);
-            }
-            if (nextResult.success) {
-                toast({
-                    title: 'File uploaded successfully.',
-                    description: '🔥 We are cooking your track.',
-                });
-                form.reset();
-            }
+            toast({
+                title: 'File uploaded successfully.',
+                description: '🔥 We are cooking your track.',
+            });
+            form.reset();
         }
     };
 
@@ -669,6 +658,29 @@ export const SeparationForm = () => {
                                     </FormItem>
                                 )}
                             />
+                            <FormField
+                                control={form.control}
+                                name="smart_metronome"
+                                render={({ field }) => (
+                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel>
+                                                Generate smart metronome track
+                                            </FormLabel>
+                                            <FormDescription>
+                                                A smart click track that adapts
+                                                to the tempo of your track.
+                                            </FormDescription>
+                                        </div>
+                                    </FormItem>
+                                )}
+                            />
                         </motion.div>
                     )}
 
@@ -773,6 +785,7 @@ const SeparationFormSchema = z.object({
     output_format: z.enum(['mp3', 'wav', 'flac']).default('mp3'),
     mp3_bitrate: z.number().int().default(320),
     float32: z.boolean().default(false),
+    smart_metronome: z.boolean().default(false),
 });
 
 type SeparationFormSchemaType = z.infer<typeof SeparationFormSchema>;
