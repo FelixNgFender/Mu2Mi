@@ -1,8 +1,13 @@
 import { env } from '@/config/env';
-import { models } from '@/types/replicate';
+import {
+    MidiTranscriptionSchemaType,
+    MusicgenSchemaType,
+    RiffusionSchemaType,
+    SmartMetronomeSchemaType,
+    TrackSeparationSchemaType,
+} from '@/types/replicate';
 import Replicate from 'replicate';
 import 'server-only';
-import { z } from 'zod';
 
 export class ReplicateClient {
     replicate: Replicate;
@@ -53,55 +58,51 @@ export class ReplicateClient {
             webhook_events_filter: ['completed'],
         });
     }
+
+    async midiTranscription({
+        taskId,
+        userId,
+        ...data
+    }: MidiTranscriptionSchemaType) {
+        const webhook = new URL(`${env.ORIGIN}/api/webhook/midi`);
+        webhook.searchParams.set('taskId', taskId);
+        webhook.searchParams.set('userId', userId);
+        webhook.searchParams.set('secret', env.WEBHOOK_SECRET);
+        return this.replicate.predictions.create({
+            version: env.MIDI_TRANSCRIPTION_MODEL_VERSION,
+            input: data,
+            webhook: webhook.toString(),
+            webhook_events_filter: ['completed'],
+        });
+    }
+
+    async musicgen({ taskId, userId, ...data }: MusicgenSchemaType) {
+        const webhook = new URL(`${env.ORIGIN}/api/webhook/musicgen`);
+        webhook.searchParams.set('taskId', taskId);
+        webhook.searchParams.set('userId', userId);
+        webhook.searchParams.set('secret', env.WEBHOOK_SECRET);
+        return this.replicate.predictions.create({
+            version: env.MUSICGEN_MODEL_VERSION,
+            input: data,
+            webhook: webhook.toString(),
+            webhook_events_filter: ['completed'],
+        });
+    }
+
+    async riffusion({ taskId, userId, ...data }: RiffusionSchemaType) {
+        const webhook = new URL(`${env.ORIGIN}/api/webhook/riffusion`);
+        webhook.searchParams.set('taskId', taskId);
+        webhook.searchParams.set('userId', userId);
+        webhook.searchParams.set('secret', env.WEBHOOK_SECRET);
+        return this.replicate.predictions.create({
+            version: env.RIFFUSION_MODEL_VERSION,
+            input: data,
+            webhook: webhook.toString(),
+            webhook_events_filter: ['completed'],
+        });
+    }
 }
 
 export const replicateClient = new ReplicateClient({
     auth: env.REPLICATE_API_TOKEN,
 });
-
-export const webhookMetadataSchema = z.object({
-    taskId: z.string().min(15).max(15), // = track id
-    userId: z.string().min(15).max(15),
-    secret: z.string().refine((data) => data === env.WEBHOOK_SECRET, {
-        message: 'Invalid secret',
-    }),
-});
-
-export const trackSeparationInputSchema = z.object({
-    audio: z.string().url(),
-    model_name: z
-        .enum([...models.map((model) => model.name)] as [string, ...string[]])
-        .default('htdemucs'),
-    stem: z
-        .enum(['vocals', 'bass', 'drums', 'guitar', 'piano', 'other'])
-        .optional(),
-    clip_mode: z.enum(['rescale', 'clamp']).default('rescale'),
-    shifts: z.number().int().min(1).max(10).default(1),
-    overlap: z.number().default(0.25),
-    mp3_bitrate: z.number().int().default(320),
-    float32: z.boolean().default(false),
-    output_format: z.enum(['mp3', 'wav', 'flac']).default('mp3'),
-});
-
-const trackSeparationSchema = trackSeparationInputSchema
-    .merge(webhookMetadataSchema)
-    .omit({
-        secret: true,
-    });
-
-type TrackSeparationSchemaType = z.infer<typeof trackSeparationSchema>;
-
-const smartMetronomeInputSchema = z.object({
-    audio: z.string().url(),
-    click_track: z.boolean().default(true),
-    combine_click_track: z.boolean().default(true),
-    detect_downbeat: z.boolean().default(false),
-});
-
-const smartMetronomeSchema = smartMetronomeInputSchema
-    .merge(webhookMetadataSchema)
-    .omit({
-        secret: true,
-    });
-
-type SmartMetronomeSchemaType = z.infer<typeof smartMetronomeSchema>;

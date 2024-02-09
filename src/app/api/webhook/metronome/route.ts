@@ -1,11 +1,11 @@
 import { env } from '@/config/env';
 import { fileStorageClient } from '@/db';
 import { AppError, errorHandler } from '@/lib/error';
-import { webhookMetadataSchema } from '@/lib/replicate';
 import { HttpResponse } from '@/lib/response';
 import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
+import { webhookMetadataSchema } from '@/types/replicate';
 import { SmartMetronomeWebhookBody } from '@/types/replicate';
 import { Buffer } from 'buffer';
 import crypto from 'crypto';
@@ -26,10 +26,7 @@ export const POST = async (req: Request) => {
         const { taskId, userId } = parsedParams.data;
         const body = await req.json();
         const { status, output, error } = body as SmartMetronomeWebhookBody;
-        console.log('webhook body: ', body);
-        console.log('webhook status: ', status);
-        console.log('webhook output: ', output);
-        console.log('webhook error: ', error);
+
         if (error) {
             await trackModel.updateOne(taskId, {
                 smartMetronomeStatus: 'failed',

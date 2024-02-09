@@ -55,6 +55,9 @@ const envSchema = z.object({
     WEBHOOK_SECRET: isString,
     TRACK_SEPARATION_MODEL_VERSION: isString,
     SMART_METRONOME_MODEL_VERSION: isString,
+    MIDI_TRANSCRIPTION_MODEL_VERSION: isString,
+    MUSICGEN_MODEL_VERSION: isString,
+    RIFFUSION_MODEL_VERSION: isString,
 });
 
 /**

@@ -7,14 +7,14 @@ import { AppError } from '@/lib/error';
 import { errorHandler } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { replicateClient } from '@/lib/replicate';
-import { trackSeparationInputSchema } from '@/lib/replicate';
 import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import { NewTrack } from '@/models/track';
+import { trackSeparationInputSchema } from '@/types/replicate';
 import { ActionResult } from '@/types/server-action';
 import { revalidatePath } from 'next/cache';
-import { string, z } from 'zod';
+import { z } from 'zod';
 
 export const separateTrackAndDetectBeat = async (
     data: ClientDataSchemaType,

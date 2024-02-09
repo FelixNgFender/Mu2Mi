@@ -7,7 +7,6 @@ import { AppError, errorHandler } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
-import { Asset } from '@/types/asset';
 import { ActionResult } from '@/types/server-action';
 import { revalidatePath } from 'next/cache';
 
@@ -36,7 +35,7 @@ export const downloadTrack = async (trackId: string): Promise<ActionResult> => {
                 });
             return { id: asset.id, url, type: asset.type };
         });
-        const assets: Asset[] = await Promise.all(promises);
+        const assets = await Promise.all(promises);
         return {
             success: true,
             data: assets,

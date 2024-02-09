@@ -1,7 +1,7 @@
 import { env } from '@/config/env';
 import { fileStorageClient } from '@/db';
 import { AppError, errorHandler } from '@/lib/error';
-import { webhookMetadataSchema } from '@/lib/replicate';
+import { webhookMetadataSchema } from '@/types/replicate';
 import { HttpResponse } from '@/lib/response';
 import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';

@@ -1,5 +1,5 @@
 {
-    "id": "2ff3bd51-29df-46a1-9388-0a61c10b0423",
+    "id": "a862f9fd-c890-49bf-a4a2-ddba9ce4deac",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "5",
     "dialect": "pg",
@@ -335,6 +335,24 @@
                     "primaryKey": false,
                     "notNull": false
                 },
+                "midi_transcription_status": {
+                    "name": "midi_transcription_status",
+                    "type": "replicate_task_status",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "musicgen_status": {
+                    "name": "musicgen_status",
+                    "type": "replicate_task_status",
+                    "primaryKey": false,
+                    "notNull": false
+                },
+                "riffusion_status": {
+                    "name": "riffusion_status",
+                    "type": "replicate_task_status",
+                    "primaryKey": false,
+                    "notNull": false
+                },
                 "updated_at": {
                     "name": "updated_at",
                     "type": "timestamp",
@@ -455,7 +473,9 @@
                 "audio/flac": "audio/flac",
                 "audio/mp4": "audio/mp4",
                 "audio/mov": "audio/mov",
-                "audio/wma": "audio/wma"
+                "audio/wma": "audio/wma",
+                "audio/midi": "audio/midi",
+                "audio/x-midi": "audio/x-midi"
             }
         },
         "provider_id": {
@@ -476,7 +496,10 @@
                 "drums": "drums",
                 "guitar": "guitar",
                 "piano": "piano",
-                "metronome": "metronome"
+                "metronome": "metronome",
+                "midi": "midi",
+                "musicgen": "musicgen",
+                "riffusion": "riffusion"
             }
         },
         "replicate_task_status": {

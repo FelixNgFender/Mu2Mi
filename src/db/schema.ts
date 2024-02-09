@@ -1,21 +1,16 @@
 // This file should not contain any runtime logic besides defining the schema.
 // See https://orm.drizzle.team/docs/migrations#quick-start
-import { sql } from 'drizzle-orm';
 import {
-    bigint,
     boolean,
     index,
-    integer,
     pgEnum,
     pgTable,
     primaryKey,
     serial,
     text,
     timestamp,
-    uuid,
     varchar,
 } from 'drizzle-orm/pg-core';
-import { customType } from 'drizzle-orm/pg-core';
 
 const updateAndCreatedAt = {
     updatedAt: timestamp('updated_at').notNull(),
@@ -152,6 +147,8 @@ export const mimeType = pgEnum('mime_type', [
     'audio/mp4',
     'audio/mov',
     'audio/wma',
+    'audio/midi',
+    'audio/x-midi',
 ]);
 
 export const trackAssetType = pgEnum('track_asset_type', [
@@ -163,6 +160,9 @@ export const trackAssetType = pgEnum('track_asset_type', [
     'guitar',
     'piano',
     'metronome',
+    'midi',
+    'musicgen',
+    'riffusion',
 ]);
 
 // TODO: Opportunity to optimize: use DB as soft cache before hitting S3
@@ -231,6 +231,9 @@ export const trackTable = pgTable(
         name: text('name').notNull(),
         trackSeparationStatus: trackStatusEnum('track_separation_status'),
         smartMetronomeStatus: trackStatusEnum('smart_metronome_status'),
+        midiTranscriptionStatus: trackStatusEnum('midi_transcription_status'),
+        musicgenStatus: trackStatusEnum('musicgen_status'),
+        riffusionStatus: trackStatusEnum('riffusion_status'),
         ...updateAndCreatedAt,
     },
     (table) => {
