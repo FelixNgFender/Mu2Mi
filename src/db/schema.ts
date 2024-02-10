@@ -227,7 +227,6 @@ export const trackTable = pgTable(
             .references(() => userTable.id, {
                 onDelete: 'cascade',
             }),
-        // TODO: investigate why foreign keys default to NOT NULL
         name: text('name').notNull(),
         trackSeparationStatus: trackStatusEnum('track_separation_status'),
         smartMetronomeStatus: trackStatusEnum('smart_metronome_status'),
