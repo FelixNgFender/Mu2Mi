@@ -55,10 +55,6 @@ const handleDownload = async (trackId: string) => {
                             asset.type || 'track' + Date.now()
                         }.${blob.type.split('/')[1]}`;
                         zip.file(filename, blob);
-                    })
-                    .catch((error) => {
-                        // TODO: Handle errors with error boundary
-                        console.error(error);
                     }),
             );
             await Promise.all(promises);
@@ -71,14 +67,18 @@ const handleDownload = async (trackId: string) => {
             URL.revokeObjectURL(url);
         }
     } catch (error) {
-        // TODO: Handle errors with error boundary
-        console.error(error);
+        // keep this in production to track user-reported errors
+        console.error('Failed to download track', error);
     }
 };
 
 const handleDelete = async (trackId: string) => {
-    // TODO: Handle errors with error boundary
-    await deleteTrack(trackId);
+    try {
+        await deleteTrack(trackId);
+    } catch (error) {
+        // keep this in production to track user-reported errors
+        console.error('Failed to delete track', error);
+    }
 };
 
 export const trackTableColumns: ColumnDef<Track>[] = [
@@ -121,21 +121,17 @@ export const trackTableColumns: ColumnDef<Track>[] = [
                 </Button>
             );
         },
-        cell: ({ row }) =>
-            row.getValue('trackSeparationStatus') === 'succeeded' &&
-            row.getValue('smartMetronomeStatus') === 'succeeded' ? (
-                <Link
-                    href={`/studio/track/${row.original.id}`}
-                    className={cn(
-                        buttonVariants({ variant: 'link' }),
-                        'text-foreground',
-                    )}
-                >
-                    {row.original.name}
-                </Link>
-            ) : (
-                <span>{row.original.name}</span>
-            ),
+        cell: ({ row }) => (
+            <Link
+                href={`/studio/track/${row.original.id}`}
+                className={cn(
+                    buttonVariants({ variant: 'link' }),
+                    'text-foreground',
+                )}
+            >
+                {row.original.name}
+            </Link>
+        ),
     },
     {
         accessorKey: 'trackSeparationStatus',
