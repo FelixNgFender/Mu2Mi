@@ -40,5 +40,11 @@ export const TrackTable = () => {
         );
     }
 
-    return <DataTable columns={trackTableColumns} data={tracks} />;
+    return (
+        <DataTable
+            columns={trackTableColumns}
+            // @ts-expect-error - data prop is not required
+            data={tracks.filter((track) => track.trackSeparationStatus)}
+        />
+    );
 };
