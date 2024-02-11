@@ -1,82 +1,73 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { buttonVariants } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { studioConfig } from '@/config/studio';
 import { cn } from '@/lib/utils';
+import { SidebarNavItem } from '@/types/nav';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-interface StudioSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface StudioSidebarNavProps {
+    items: SidebarNavItem[];
+}
 
-export const StudioSidebar = async ({ className }: StudioSidebarProps) => {
-    const links = studioConfig.sidebarNav.find((nav) => nav.title === 'Create')
-        ?.items;
-    const recentTracks = studioConfig.sidebarNav.find(
-        (nav) => nav.title === 'Recent Tracks',
-    )?.items;
+export const StudioSidebar = async ({ items }: StudioSidebarNavProps) => {
     const pathname = usePathname();
-    return (
-        <div className={cn('pb-12', className)}>
-            <div className="space-y-4 py-4">
-                <div className="px-3 py-2">
-                    <h2 className="text-md mb-2 px-4 font-semibold tracking-tight lg:text-lg">
-                        Create
-                    </h2>
-                    <div className="space-y-1">
-                        {links?.map(({ title, href, icon }) => (
-                            <Link
-                                key={href}
-                                href={href || '/'}
-                                className={cn(
-                                    buttonVariants({
-                                        variant:
-                                            pathname === href
-                                                ? 'default'
-                                                : 'ghost',
-                                    }),
-                                    'w-full justify-start text-xs lg:text-sm',
-                                )}
-                            >
-                                {icon &&
-                                    icon({
-                                        className:
-                                            'mr-2 h-4 w-4 hidden lg:block',
-                                    })}
-                                {title}
-                            </Link>
-                        ))}
-                    </div>
+    return items.length ? (
+        <div className="space-y-8 px-3 py-4">
+            {items.map((item, index) => (
+                <div key={index}>
+                    <h4 className="text-md mb-2 px-4 font-semibold tracking-tight lg:text-lg">
+                        {item.title}
+                    </h4>
+                    {item?.items?.length && (
+                        <StudioSidebarNavItems
+                            items={item.items}
+                            pathname={pathname}
+                        />
+                    )}
                 </div>
-                <div className="py-2">
-                    <h2 className="text-md relative px-7 font-semibold tracking-tight lg:text-lg">
-                        Recent Tracks
-                    </h2>
-                    <ScrollArea className="h-96 px-1">
-                        <div className="space-y-1 p-2">
-                            {recentTracks?.map((recentTrack, i) => (
-                                <Button
-                                    key={`${recentTrack.title}-${i}`}
-                                    variant={
-                                        pathname === recentTrack.href
-                                            ? 'default'
-                                            : 'ghost'
-                                    }
-                                    className="w-full justify-start text-xs font-normal lg:text-sm"
-                                >
-                                    {recentTrack.icon &&
-                                        recentTrack.icon({
-                                            className:
-                                                'mr-2 h-4 w-4 hidden lg:block',
-                                        })}
-                                    {recentTrack.title}
-                                </Button>
-                            ))}
-                        </div>
-                    </ScrollArea>
-                </div>
-            </div>
+            ))}
         </div>
-    );
+    ) : null;
+};
+
+interface StudioSidebarNavItemsProps {
+    items: SidebarNavItem[];
+    pathname: string | null;
+}
+
+export const StudioSidebarNavItems = ({
+    items,
+    pathname,
+}: StudioSidebarNavItemsProps) => {
+    return items?.length ? (
+        <div className="grid grid-flow-row auto-rows-max space-y-1">
+            {items.map(
+                (item, index) =>
+                    item.href && (
+                        <Link
+                            key={index}
+                            href={item.href}
+                            className={cn(
+                                buttonVariants({
+                                    variant: item.external
+                                        ? 'link'
+                                        : pathname === item.href
+                                          ? 'default'
+                                          : 'ghost',
+                                }),
+                                'w-full justify-start text-xs lg:text-sm',
+                            )}
+                            target={item.external ? '_blank' : ''}
+                            rel={item.external ? 'noreferrer' : ''}
+                        >
+                            <div className="mr-2 hidden h-4 w-4 items-center justify-center lg:flex">
+                                {item.icon}
+                            </div>
+                            {item.title}
+                        </Link>
+                    ),
+            )}
+        </div>
+    ) : null;
 };

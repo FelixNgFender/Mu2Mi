@@ -3,6 +3,8 @@ import {
     ResizablePanel,
     ResizablePanelGroup,
 } from '@/components/ui/resizable';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { studioConfig } from '@/config/studio';
 import { getUserSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
@@ -28,7 +30,11 @@ const StudioLayout = async ({ children }: StudioLayoutProps) => {
                 maxSize={50}
                 className="hidden md:block"
             >
-                <StudioSidebar />
+                <aside>
+                    <ScrollArea className="h-full">
+                        <StudioSidebar items={studioConfig.sidebarNav} />
+                    </ScrollArea>
+                </aside>
             </ResizablePanel>
             <ResizableHandle className="hidden opacity-30 hover:opacity-100 md:flex" />
             <ResizablePanel defaultSize={80}>{children}</ResizablePanel>

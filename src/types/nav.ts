@@ -1,9 +1,8 @@
 export interface NavItem {
     title: string;
     href?: string;
-    disabled?: boolean;
     external?: boolean;
-    icon?: ({ className }: { className: string }) => JSX.Element;
+    icon?: JSX.Element;
     label?: string;
 }
 

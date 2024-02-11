@@ -1,7 +1,5 @@
 'use client';
 
-// import { Icons } from '@/components/icons';
-// import { Badge } from '@/components/ui/badge';
 import { siteConfig } from '@/config/site';
 import { baseStudioPath } from '@/config/studio';
 import { cn } from '@/lib/utils';

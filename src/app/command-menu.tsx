@@ -88,10 +88,9 @@ export function CommandMenu({ ...props }: DialogProps) {
                                         );
                                     }}
                                 >
-                                    {navItem.icon &&
-                                        navItem.icon({
-                                            className: 'mr-2 h-4 w-4',
-                                        })}
+                                    <div className="mr-2 flex h-4 w-4 items-center justify-center">
+                                        {navItem.icon}
+                                    </div>
                                     {navItem.title}
                                 </CommandItem>
                             ))}
@@ -109,10 +108,7 @@ export function CommandMenu({ ...props }: DialogProps) {
                                     }}
                                 >
                                     <div className="mr-2 flex h-4 w-4 items-center justify-center">
-                                        {navItem.icon &&
-                                            navItem.icon({
-                                                className: 'h-3 w-3',
-                                            })}
+                                        {navItem.icon}
                                     </div>
                                     {navItem.title}
                                 </CommandItem>

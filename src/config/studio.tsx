@@ -1,36 +1,21 @@
+import { Icons } from '@/components/icons';
 import { MainNavItem, SidebarNavItem } from '@/types/nav';
 import {
     BrainCircuit,
     Disc3,
+    FileAudio,
+    FileMusic,
     KeyboardMusic,
-    PencilLine,
-    Speaker,
+    Mic2,
     Split,
 } from 'lucide-react';
+
+import { siteConfig } from './site';
 
 interface StudioConfig {
     mainNav: MainNavItem[];
     sidebarNav: SidebarNavItem[];
 }
-
-const tracks = [
-    'Magic',
-    'NIGHT DANCER',
-    'Kura Kura',
-    'KICK BACK',
-    'Kizuna no Kiseki',
-    '夜に駆ける',
-    'Stay With Me',
-    'Mixed Nuts',
-    'Inferno',
-    'Que Sera Sera',
-    'Show',
-    'Shinunoga E-Wa',
-    'LADY',
-    'だから僕は音楽を辞めた',
-    'ミズキリ',
-    '月色ホライズン',
-];
 
 export const baseStudioPath = '/studio';
 
@@ -39,11 +24,16 @@ export const studioConfig: StudioConfig = {
         {
             title: 'Studio',
             href: baseStudioPath,
-            icon: ({ className }) => <KeyboardMusic className={className} />,
+            icon: <KeyboardMusic />,
         },
         {
             title: 'GitHub',
-            href: 'https://github.com/FelixNgFender/Mu2Mi',
+            href: siteConfig.links.github,
+            external: true,
+        },
+        {
+            title: 'Twitter',
+            href: siteConfig.links.twitter,
             external: true,
         },
     ],
@@ -55,43 +45,62 @@ export const studioConfig: StudioConfig = {
                     title: 'Track Separation',
                     href: `${baseStudioPath}`,
                     items: [],
-                    icon: ({ className }) => <Split className={className} />,
+                    icon: <Split />,
                 },
                 {
-                    title: 'Music Transcription',
-                    href: `${baseStudioPath}/transcription`,
+                    title: 'MIDI Transcription',
+                    href: `${baseStudioPath}/midi`,
                     items: [],
-                    icon: ({ className }) => (
-                        <PencilLine className={className} />
-                    ),
+                    icon: <FileMusic />,
+                },
+                {
+                    title: 'Lyrics Transcription',
+                    href: `${baseStudioPath}/lyrics`,
+                    items: [],
+                    icon: <Mic2 />,
                 },
                 {
                     title: 'Music Generation',
                     href: `${baseStudioPath}/generation`,
                     items: [],
-                    icon: ({ className }) => (
-                        <BrainCircuit className={className} />
-                    ),
+                    icon: <BrainCircuit />,
                 },
-                // {
-                //     title: 'Mixing & Mastering',
-                //     href: `${baseStudioPath}/mixmaster`,
-                //     items: [],
-                //     icon: ({ className }) => <Speaker className={className} />,
-                // },
             ],
         },
         {
-            title: 'Recent Tracks',
+            title: 'Preview',
             items: [
-                ...tracks.map((track) => ({
-                    title: track,
-                    href: `/tracks/${track}`,
+                {
+                    title: 'Audio Preview',
+                    href: `${baseStudioPath}/track`,
                     items: [],
-                    icon: ({ className }: { className: string }) => (
-                        <Disc3 className={className} />
-                    ),
-                })),
+                    icon: <Disc3 />,
+                },
+                {
+                    title: 'MIDI Preview',
+                    href: `${baseStudioPath}/track/midi`,
+                    items: [],
+                    icon: <FileAudio />,
+                },
+            ],
+        },
+        {
+            title: 'Connect',
+            items: [
+                {
+                    title: 'GitHub',
+                    href: siteConfig.links.github,
+                    items: [],
+                    external: true,
+                    icon: <Icons.gitHub className="fill-current" />,
+                },
+                {
+                    title: 'Twitter',
+                    href: siteConfig.links.twitter,
+                    items: [],
+                    external: true,
+                    icon: <Icons.twitter className="fill-current" />,
+                },
             ],
         },
     ],
