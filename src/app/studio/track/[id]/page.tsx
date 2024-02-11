@@ -52,8 +52,10 @@ const TrackPage = ({ params }: TrackPageProps) => {
 
     const playlist = useCallback(
         (node: HTMLDivElement | null) => {
+            // @ts-expect-error - WaveformPlaylist is not typed
+            let playlistInstance;
             if (node !== null && assetLinks) {
-                const playlist = WaveformPlaylist(
+                playlistInstance = WaveformPlaylist(
                     {
                         container: node,
                         samplesPerPixel: 2048,
@@ -70,7 +72,7 @@ const TrackPage = ({ params }: TrackPageProps) => {
                         waveHeight: 128,
                         barWidth: 1,
                         barGap: 0,
-                        state: 'cursor', // (cursor | select | fadein | fadeout | shift)
+                        state: 'cursor',
                         zoomLevels: [512, 1024, 2048, 4096],
                         isAutomaticScroll: true,
                     },
@@ -89,7 +91,7 @@ const TrackPage = ({ params }: TrackPageProps) => {
                     }
                 });
 
-                playlist.load(
+                playlistInstance.load(
                     assetLinks.map((asset) => {
                         return {
                             src: asset.url,
@@ -101,8 +103,16 @@ const TrackPage = ({ params }: TrackPageProps) => {
                         };
                     }),
                 );
-                playlist.initExporter();
+                playlistInstance.initExporter();
             }
+
+            return () => {
+                // @ts-expect-error - WaveformPlaylist is not typed
+                if (playlistInstance) {
+                    // Stops playout if playlist is playing, removes all tracks from the playlist
+                    ee.emit('clear');
+                }
+            };
         },
         [assetLinks, ee],
     );
