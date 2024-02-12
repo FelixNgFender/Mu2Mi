@@ -7,19 +7,19 @@ import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
-const AudioPlayer = dynamic(() => import('../audio-player'), {
+const MidiPlayer = dynamic(() => import('../midi-player'), {
     ssr: false,
     // TODO: replace this
     loading: () => <p>Loading...</p>,
 });
 
-type TrackPageProps = {
+type MidiTrackPageProps = {
     params: {
         id: string;
     };
 };
 
-const TrackPage = ({ params }: TrackPageProps) => {
+const MidiTrackPage = ({ params }: MidiTrackPageProps) => {
     const {
         isPending,
         isError,
@@ -50,7 +50,11 @@ const TrackPage = ({ params }: TrackPageProps) => {
         );
     }
 
-    return <AudioPlayer assetLinks={assetLinks} />;
+    return (
+        <MidiPlayer
+            initialURL={assetLinks.find((a) => a.type === 'midi')?.url}
+        />
+    );
 };
 
-export default TrackPage;
+export default MidiTrackPage;

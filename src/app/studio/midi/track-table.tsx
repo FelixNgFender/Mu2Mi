@@ -1,39 +1,29 @@
 'use client';
 
-import { downloadTrack } from '@/app/studio/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Asset } from '@/types/asset';
+import { DataTable } from '@/components/ui/data-table';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
-import dynamic from 'next/dynamic';
 
-const AudioPlayer = dynamic(() => import('../audio-player'), {
-    ssr: false,
-    // TODO: replace this
-    loading: () => <p>Loading...</p>,
-});
+import { getTracks } from '../actions';
+import { trackTableColumns } from './track-table-columns';
 
-type TrackPageProps = {
-    params: {
-        id: string;
-    };
-};
-
-const TrackPage = ({ params }: TrackPageProps) => {
+export const TrackTable = () => {
     const {
         isPending,
         isError,
-        data: assetLinks,
+        data: tracks,
         error,
     } = useQuery({
-        queryKey: ['track-assets', params.id],
+        queryKey: ['polling-tracks'],
         queryFn: async () => {
-            const result = await downloadTrack(params.id);
+            const result = await getTracks();
             if (result && !result.success) {
                 throw new Error(result.error);
             }
-            return result.data as Asset[];
+            return result.data;
         },
+        refetchInterval: 3000,
     });
 
     if (isPending) {
@@ -50,7 +40,11 @@ const TrackPage = ({ params }: TrackPageProps) => {
         );
     }
 
-    return <AudioPlayer assetLinks={assetLinks} />;
+    return (
+        <DataTable
+            columns={trackTableColumns}
+            // @ts-expect-error - data prop is not required
+            data={tracks.filter((track) => track.midiTranscriptionStatus)}
+        />
+    );
 };
-
-export default TrackPage;

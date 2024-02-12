@@ -90,7 +90,7 @@ export const getPresignedUrl = async (
 
 const signedUrlBodySchema = z.object({
     type: z.enum(assetConfig.allowedMimeTypes),
-    size: z.number().max(assetConfig.maxFileSize),
+    size: z.number().max(assetConfig.maxFileSizeBytes),
     extension: z.string(),
     checksum: z.string(),
 });

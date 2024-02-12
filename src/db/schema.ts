@@ -147,6 +147,8 @@ export const mimeType = pgEnum('mime_type', [
     'audio/mp4',
     'audio/mov',
     'audio/wma',
+    'audio/ogg',
+    'audio/m4a',
     'audio/midi',
     'audio/x-midi',
 ]);

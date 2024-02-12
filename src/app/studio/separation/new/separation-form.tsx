@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { assetConfig } from '@/config/asset';
+import { trackSeparationAssetConfig } from '@/config/asset';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
@@ -68,7 +68,7 @@ export const SeparationForm = () => {
     const delta = currentStep - previousStep;
 
     const form = useForm<SeparationFormSchemaType>({
-        resolver: zodResolver(SeparationFormSchema),
+        resolver: zodResolver(separationFormSchema),
         defaultValues: {
             file: null,
             model_name: 'htdemucs',
@@ -123,13 +123,16 @@ export const SeparationForm = () => {
     const uploadFile = async (url: string, file: File) => {
         try {
             // Don't use Server Actions here because we can upload directly to S3
-            await fetch(url, {
+            const res = await fetch(url, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': file.type,
                 },
                 body: file,
             });
+            if (!res.ok) {
+                throw new Error('Failed to upload file');
+            }
         } catch (error) {
             toast({
                 variant: 'destructive',
@@ -141,7 +144,7 @@ export const SeparationForm = () => {
 
     const handleFileUpload = async (file: File) => {
         const result = await getPresignedUrl({
-            type: file.type as (typeof assetConfig.allowedMimeTypes)[number],
+            type: file.type as (typeof trackSeparationAssetConfig.allowedMimeTypes)[number],
             extension: file.name.split('.').pop() || '',
             size: file.size,
             checksum: await computeSHA256(file),
@@ -336,7 +339,7 @@ export const SeparationForm = () => {
                                                             form.formState
                                                                 .isSubmitting
                                                         }
-                                                        accept={assetConfig.allowedMimeTypes.join(
+                                                        accept={trackSeparationAssetConfig.allowedMimeTypes.join(
                                                             ', ',
                                                         )}
                                                         dropMessage={
@@ -754,8 +757,8 @@ export const SeparationForm = () => {
     );
 };
 
-const allowedFileTypes = assetConfig.allowedMimeTypes.map((type) =>
-    type.toUpperCase().replace('AUDIO/', ''),
+const allowedFileTypes = trackSeparationAssetConfig.allowedMimeTypes.map(
+    (type) => type.toUpperCase().replace('AUDIO/', ''),
 );
 
 const models = [
@@ -800,17 +803,25 @@ const models = [
     },
 ] as const;
 
-const SeparationFormSchema = z.object({
+const separationFormSchema = z.object({
     file: z
         .any()
         .refine(
             (files) => {
-                return files?.[0]?.size <= assetConfig.maxFileSize;
+                return (
+                    files?.[0]?.size <=
+                    trackSeparationAssetConfig.maxFileSizeBytes
+                );
             },
-            `Max file size is ${assetConfig.maxFileSize / 1024 / 1024} MB.`,
+            `Max file size is ${
+                trackSeparationAssetConfig.maxFileSizeBytes / 1024 / 1024
+            } MB.`,
         )
         .refine(
-            (files) => assetConfig.allowedMimeTypes.includes(files?.[0]?.type),
+            (files) =>
+                trackSeparationAssetConfig.allowedMimeTypes.includes(
+                    files?.[0]?.type,
+                ),
             `Only ${allowedFileTypes.join(', ')} files are allowed.`,
         )
         .transform((files) => files?.[0]),
@@ -829,4 +840,4 @@ const SeparationFormSchema = z.object({
     smart_metronome: z.boolean().default(false),
 });
 
-type SeparationFormSchemaType = z.infer<typeof SeparationFormSchema>;
+type SeparationFormSchemaType = z.infer<typeof separationFormSchema>;

@@ -1,10 +1,12 @@
 import { Icons } from '@/components/icons';
 import { MainNavItem, SidebarNavItem } from '@/types/nav';
 import {
+    Activity,
     BrainCircuit,
     Disc3,
     FileAudio,
     FileMusic,
+    Ghost,
     KeyboardMusic,
     Mic2,
     Split,
@@ -42,10 +44,39 @@ export const studioConfig: StudioConfig = {
             title: 'Create',
             items: [
                 {
-                    title: 'Track Separation',
+                    title: 'Music Generation',
                     href: `${baseStudioPath}`,
                     items: [],
+                    icon: <BrainCircuit />,
+                },
+                {
+                    title: 'Style Remix',
+                    href: `${baseStudioPath}/remix`,
+                    items: [],
+                    icon: <Disc3 />,
+                },
+                {
+                    title: 'Ghostwriter',
+                    href: `${baseStudioPath}/ghostwriter`,
+                    items: [],
+                    icon: <Ghost />,
+                },
+            ],
+        },
+        {
+            title: 'Analyze',
+            items: [
+                {
+                    title: 'Track Separation',
+                    href: `${baseStudioPath}/separation`,
+                    items: [],
                     icon: <Split />,
+                },
+                {
+                    title: 'Track Analysis',
+                    href: `${baseStudioPath}/analysis`,
+                    items: [],
+                    icon: <Activity />,
                 },
                 {
                     title: 'MIDI Transcription',
@@ -58,12 +89,6 @@ export const studioConfig: StudioConfig = {
                     href: `${baseStudioPath}/lyrics`,
                     items: [],
                     icon: <Mic2 />,
-                },
-                {
-                    title: 'Music Generation',
-                    href: `${baseStudioPath}/generation`,
-                    items: [],
-                    icon: <BrainCircuit />,
                 },
             ],
         },

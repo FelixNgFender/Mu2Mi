@@ -11,12 +11,12 @@ import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import { NewTrack } from '@/models/track';
-import { trackSeparationInputSchema } from '@/types/replicate';
+import { midiTranscriptionInputSchema } from '@/types/replicate';
 import { ActionResult } from '@/types/server-action';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
-export const separateTrackAndDetectBeat = async (
+export const transcribeMidi = async (
     data: ClientDataSchemaType,
 ): Promise<ActionResult> => {
     const { user } = await getUserSession();
@@ -43,14 +43,10 @@ export const separateTrackAndDetectBeat = async (
     }
 
     try {
-        console.log('data inserting into track table', data);
         const track = await trackModel.createOne({
             id: generatePublicId(),
             userId: user.id,
-            trackSeparationStatus: 'processing',
-            smartMetronomeStatus: data.smartMetronome
-                ? 'processing'
-                : undefined,
+            midiTranscriptionStatus: 'processing',
             name: data.name,
         });
 
@@ -82,24 +78,14 @@ export const separateTrackAndDetectBeat = async (
             env.S3_PRESIGNED_URL_EXPIRATION_S,
         );
 
-        await replicateClient.separateTrack({
+        await replicateClient.midiTranscription({
             ...data,
             taskId: track.id,
             userId: user.id,
-            audio: url,
+            audio_file: url,
         });
-        if (data.smartMetronome) {
-            await replicateClient.smartMetronome({
-                taskId: track.id,
-                userId: user.id,
-                audio: url,
-                click_track: true,
-                combine_click_track: false,
-                detect_downbeat: false,
-            });
-        }
 
-        revalidatePath('/studio'); // refresh track table on studio page
+        revalidatePath('/studio/midi'); // refresh track table on midi page
         return {
             success: true,
         };
@@ -112,13 +98,12 @@ export const separateTrackAndDetectBeat = async (
     }
 };
 
-const clientFormSchema = trackSeparationInputSchema.omit({
-    audio: true,
+const clientFormSchema = midiTranscriptionInputSchema.omit({
+    audio_file: true,
 });
 
 type ClientFormSchemaType = z.infer<typeof clientFormSchema>;
 type ClientDataSchemaType = Pick<NewTrack, 'name'> &
     ClientFormSchemaType & {
         assetId: string;
-        smartMetronome: boolean;
     };

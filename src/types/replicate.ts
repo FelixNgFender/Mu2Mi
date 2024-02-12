@@ -90,7 +90,7 @@ const smartMetronomeSchema = smartMetronomeInputSchema
 
 export type SmartMetronomeSchemaType = z.infer<typeof smartMetronomeSchema>;
 
-const midiTranscriptionInputSchema = z.object({
+export const midiTranscriptionInputSchema = z.object({
     audio_file: z.string().url(),
 });
 
@@ -104,7 +104,7 @@ export type MidiTranscriptionSchemaType = z.infer<
     typeof midiTranscriptionSchema
 >;
 
-const musicgenInputSchema = z.object({
+export const musicgenInputSchema = z.object({
     model_version: z
         .enum([
             'stereo-melody-large',
@@ -138,7 +138,7 @@ const musicgenSchema = musicgenInputSchema.merge(webhookMetadataSchema).omit({
 
 export type MusicgenSchemaType = z.infer<typeof musicgenSchema>;
 
-const riffusionInputSchema = z.object({
+export const riffusionInputSchema = z.object({
     prompt_a: z.string().default('funky synth solo'),
     denoising: z.number().min(0).max(1).default(0.75),
     prompt_b: z.string().optional(),
