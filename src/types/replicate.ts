@@ -206,3 +206,10 @@ export interface RiffusionWebhookBody extends ReplicateWebhookBody {
         spectrogram: string | null;
     };
 }
+
+export type ReplicateWebhookBodyTypes =
+    | TrackSeparationWebhookBody
+    | SmartMetronomeWebhookBody
+    | MidiTranscriptionWebhookBody
+    | MusicGenWebhookBody
+    | RiffusionWebhookBody;
