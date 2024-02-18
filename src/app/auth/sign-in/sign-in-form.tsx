@@ -11,6 +11,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -89,8 +90,8 @@ export const SignInForm = () => {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input
-                                    type="password"
+                                <PasswordInput
+                                    autoComplete="current-password"
                                     placeholder="••••••••"
                                     {...field}
                                     disabled={form.formState.isSubmitting}

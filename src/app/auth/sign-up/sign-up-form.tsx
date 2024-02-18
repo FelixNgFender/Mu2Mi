@@ -10,6 +10,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import { useToast } from '@/components/ui/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -86,8 +87,8 @@ export const SignUpForm = () => {
                         <FormItem>
                             <FormLabel>Password</FormLabel>
                             <FormControl>
-                                <Input
-                                    type="password"
+                                <PasswordInput
+                                    autoComplete="new-password"
                                     placeholder="••••••••"
                                     {...field}
                                     disabled={form.formState.isSubmitting}
@@ -104,8 +105,8 @@ export const SignUpForm = () => {
                         <FormItem>
                             <FormLabel>Confirm password</FormLabel>
                             <FormControl>
-                                <Input
-                                    type="password"
+                                <PasswordInput
+                                    autoComplete="new-password"
                                     placeholder="••••••••"
                                     {...field}
                                     disabled={form.formState.isSubmitting}
