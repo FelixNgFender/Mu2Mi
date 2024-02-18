@@ -1,5 +1,5 @@
 {
-    "id": "a862f9fd-c890-49bf-a4a2-ddba9ce4deac",
+    "id": "d370df14-338c-43d3-ba24-4ae75b7c4b8e",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "5",
     "dialect": "pg",
@@ -77,7 +77,7 @@
                     "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
-                    "onUpdate": "no action"
+                    "onUpdate": "cascade"
                 },
                 "asset_track_id_track_id_fk": {
                     "name": "asset_track_id_track_id_fk",
@@ -86,7 +86,7 @@
                     "columnsFrom": ["track_id"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
-                    "onUpdate": "no action"
+                    "onUpdate": "cascade"
                 }
             },
             "compositePrimaryKeys": {},
@@ -148,7 +148,7 @@
                     "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
-                    "onUpdate": "no action"
+                    "onUpdate": "cascade"
                 }
             },
             "compositePrimaryKeys": {},
@@ -202,7 +202,7 @@
                     "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
-                    "onUpdate": "no action"
+                    "onUpdate": "cascade"
                 }
             },
             "compositePrimaryKeys": {
@@ -251,7 +251,7 @@
                     "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
-                    "onUpdate": "no action"
+                    "onUpdate": "cascade"
                 }
             },
             "compositePrimaryKeys": {},
@@ -295,7 +295,7 @@
                     "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
-                    "onUpdate": "no action"
+                    "onUpdate": "cascade"
                 }
             },
             "compositePrimaryKeys": {},
@@ -381,7 +381,7 @@
                     "columnsFrom": ["user_id"],
                     "columnsTo": ["id"],
                     "onDelete": "cascade",
-                    "onUpdate": "no action"
+                    "onUpdate": "cascade"
                 }
             },
             "compositePrimaryKeys": {},
@@ -474,6 +474,8 @@
                 "audio/mp4": "audio/mp4",
                 "audio/mov": "audio/mov",
                 "audio/wma": "audio/wma",
+                "audio/ogg": "audio/ogg",
+                "audio/m4a": "audio/m4a",
                 "audio/midi": "audio/midi",
                 "audio/x-midi": "audio/x-midi"
             }

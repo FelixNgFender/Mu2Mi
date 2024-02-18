@@ -16,7 +16,7 @@ import { customAlphabet } from 'nanoid';
 const alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
 const publicIdLength = 15;
 
-const nanoid = customAlphabet(alphabet, length);
+const nanoid = customAlphabet(alphabet, publicIdLength);
 
 export const generatePublicId = () => {
     return nanoid();
