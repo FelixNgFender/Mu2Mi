@@ -79,15 +79,31 @@
     }
 }
 
-.bg-gradient {
-    background: var(--gradient);
-}
-
 @layer base {
     * {
         @apply border-border;
     }
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+.bg-gradient {
+    background: var(--gradient);
+}
+
+/*
+    https://github.com/tailwindlabs/tailwindcss/discussions/2394
+    https://github.com/tailwindlabs/tailwindcss/pull/5732
+*/
+@layer utilities {
+    /* Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
     }
 }
