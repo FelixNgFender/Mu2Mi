@@ -1,13 +1,11 @@
 import { db } from '@/db';
 import { assetTable } from '@/db/schema';
-import { generatePublicId } from '@/lib/utils';
 import { eq } from 'drizzle-orm';
 import 'server-only';
 
-type NewAsset = Omit<
-    typeof assetTable.$inferInsert,
-    'id' | 'createdAt' | 'updatedAt'
->;
+type NewAsset = Omit<typeof assetTable.$inferInsert, 'createdAt' | 'updatedAt'>;
+
+type UpdateAsset = Partial<Omit<typeof assetTable.$inferInsert, 'updatedAt'>>;
 
 export const assetModel = {
     async findOne(id: string) {
@@ -16,7 +14,7 @@ export const assetModel = {
         });
     },
 
-    async updateOne(id: string, asset: Partial<NewAsset>) {
+    async updateOne(id: string, asset: UpdateAsset) {
         return await db
             .update(assetTable)
             .set({ ...asset, updatedAt: new Date() })
@@ -36,7 +34,6 @@ export const assetModel = {
             .insert(assetTable)
             .values({
                 ...asset,
-                id: generatePublicId(),
                 createdAt: new Date(),
                 updatedAt: new Date(),
             })

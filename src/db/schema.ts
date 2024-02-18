@@ -11,6 +11,21 @@ import {
     timestamp,
     varchar,
 } from 'drizzle-orm/pg-core';
+import { customAlphabet } from 'nanoid';
+
+const alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
+const publicIdLength = 15;
+
+const nanoid = customAlphabet(alphabet, length);
+
+export const generatePublicId = () => {
+    return nanoid();
+};
+
+const cascadingUpdateAndDelete = {
+    onUpdate: 'cascade',
+    onDelete: 'cascade',
+} as const;
 
 const updateAndCreatedAt = {
     updatedAt: timestamp('updated_at').notNull(),
@@ -45,9 +60,7 @@ export const sessionTable = pgTable(
         id: text('id').primaryKey(),
         userId: text('user_id')
             .notNull()
-            .references(() => userTable.id, {
-                onDelete: 'cascade',
-            }),
+            .references(() => userTable.id, cascadingUpdateAndDelete),
         expiresAt: timestamp('expires_at', {
             withTimezone: true,
             mode: 'date',
@@ -73,9 +86,7 @@ export const oauthAccountTable = pgTable(
         providerUserId: text('provider_user_id').notNull(),
         userId: text('user_id')
             .notNull()
-            .references(() => userTable.id, {
-                onDelete: 'cascade',
-            }),
+            .references(() => userTable.id, cascadingUpdateAndDelete),
     },
     (table) => {
         return {
@@ -102,9 +113,7 @@ export const emailVerificationTable = pgTable(
         }).notNull(),
         userId: text('user_id')
             .notNull()
-            .references(() => userTable.id, {
-                onDelete: 'cascade',
-            }),
+            .references(() => userTable.id, cascadingUpdateAndDelete),
         email: text('email').notNull(),
         expiresAt: timestamp('expires_at', {
             withTimezone: true,
@@ -124,9 +133,7 @@ export const passwordResetTable = pgTable(
         id: text('id').primaryKey(), // Token to send inside the reset link
         userId: text('user_id')
             .notNull()
-            .references(() => userTable.id, {
-                onDelete: 'cascade',
-            }),
+            .references(() => userTable.id, cascadingUpdateAndDelete),
         expiresAt: timestamp('expires_at', {
             withTimezone: true,
             mode: 'date',
@@ -174,18 +181,16 @@ export const assetTable = pgTable(
         // TODO: https://github.com/drizzle-team/drizzle-orm/pull/1471
         // Wait for this to land and replace the below workaround for all tables
         id: varchar('id', {
-            length: 15,
-        }).primaryKey(),
+            length: publicIdLength,
+        })
+            .primaryKey()
+            .$defaultFn(generatePublicId),
         userId: text('user_id')
             .notNull()
-            .references(() => userTable.id, {
-                onDelete: 'cascade',
-            }),
+            .references(() => userTable.id, cascadingUpdateAndDelete),
         trackId: varchar('track_id', {
-            length: 15,
-        }).references(() => trackTable.id, {
-            onDelete: 'cascade',
-        }),
+            length: publicIdLength,
+        }).references(() => trackTable.id, cascadingUpdateAndDelete),
         type: trackAssetType('track_type'),
         name: text('name').unique().notNull(), // FK to S3 object name, cannot guarantee that users will actually upload files with their presigned URLs
         mimeType: mimeType('mime_type'),
@@ -218,17 +223,17 @@ export const trackTable = pgTable(
     'track',
     {
         id: varchar('id', {
-            length: 15,
-        }).primaryKey(),
+            length: publicIdLength,
+        })
+            .primaryKey()
+            .$defaultFn(generatePublicId),
         // no need to use UUID since track IDs are not sensitive
         // but useful technique, so keep it here for future reference
         // maybe look into nanoid, temporarily use nanoid for track ids
         // https://brockherion.dev/blog/posts/why-im-using-nanoids-for-my-database-keys/
         userId: text('user_id')
             .notNull()
-            .references(() => userTable.id, {
-                onDelete: 'cascade',
-            }),
+            .references(() => userTable.id, cascadingUpdateAndDelete),
         name: text('name').notNull(),
         trackSeparationStatus: trackStatusEnum('track_separation_status'),
         smartMetronomeStatus: trackStatusEnum('smart_metronome_status'),

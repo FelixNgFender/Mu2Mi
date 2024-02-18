@@ -1,6 +1,5 @@
 import { db } from '@/db';
 import { trackTable } from '@/db/schema';
-import { generatePublicId } from '@/lib/utils';
 import { eq } from 'drizzle-orm';
 import 'server-only';
 
@@ -8,7 +7,11 @@ export type Track = typeof trackTable.$inferSelect;
 
 export type NewTrack = Omit<
     typeof trackTable.$inferInsert,
-    'id' | 'createdAt' | 'updatedAt'
+    'createdAt' | 'updatedAt'
+>;
+
+export type UpdateTrack = Partial<
+    Omit<typeof trackTable.$inferInsert, 'updatedAt'>
 >;
 
 export const trackModel = {
@@ -29,7 +32,7 @@ export const trackModel = {
         return await db.delete(trackTable).where(eq(trackTable.id, id));
     },
 
-    async updateOne(id: string, track: Partial<NewTrack>) {
+    async updateOne(id: string, track: UpdateTrack) {
         return await db
             .update(trackTable)
             .set({ ...track, updatedAt: new Date() })
@@ -43,7 +46,6 @@ export const trackModel = {
             .insert(trackTable)
             .values({
                 ...track,
-                id: generatePublicId(),
                 createdAt: new Date(),
                 updatedAt: new Date(),
             })
