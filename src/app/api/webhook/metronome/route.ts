@@ -6,7 +6,7 @@ import { replicateWebhookHandler } from '../replicate';
 
 export const POST = async (req: Request) => {
     try {
-        await replicateWebhookHandler<SmartMetronomeWebhookBody>(
+        return await replicateWebhookHandler<SmartMetronomeWebhookBody>(
             req,
             'smartMetronomeStatus',
             'metronome',

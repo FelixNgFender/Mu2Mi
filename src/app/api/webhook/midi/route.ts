@@ -6,7 +6,7 @@ import { replicateWebhookHandler } from '../replicate';
 
 export const POST = async (req: Request) => {
     try {
-        await replicateWebhookHandler<MidiTranscriptionWebhookBody>(
+        return await replicateWebhookHandler<MidiTranscriptionWebhookBody>(
             req,
             'midiTranscriptionStatus',
             'midi',

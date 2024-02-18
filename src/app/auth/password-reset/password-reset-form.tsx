@@ -17,43 +17,44 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { requestPasswordReset } from './actions';
+import { PasswordResetFormType, passwordResetFormSchema } from './schemas';
 
 export const PasswordResetForm = () => {
     const { toast } = useToast();
     const router = useRouter();
-    const form = useForm<PasswordResetSchemaClientType>({
-        resolver: zodResolver(passwordResetSchemaClient),
+    const form = useForm<PasswordResetFormType>({
+        resolver: zodResolver(passwordResetFormSchema),
         defaultValues: {
             email: '',
         },
     });
 
-    const onSubmit = async (data: PasswordResetSchemaClientType) => {
+    type FieldName = keyof PasswordResetFormType;
+
+    const onSubmit: SubmitHandler<PasswordResetFormType> = async (data) => {
         const result = await requestPasswordReset(data);
-        if (!result) return;
-        if (!result.success) {
-            try {
-                const errors = JSON.parse(result.error);
-                for (const error of errors) {
-                    for (const path of error.path) {
-                        form.setError(path, {
-                            type: path,
-                            message: error.message,
-                        });
-                    }
-                }
-            } catch (e) {
-                form.setError('email', {
-                    type: 'email',
-                    message: result.error,
+        if (result.validationErrors) {
+            for (const [path, value] of Object.entries(
+                result.validationErrors,
+            )) {
+                form.setError(path as FieldName, {
+                    type: path,
+                    message: value.join(', '),
                 });
             }
         }
-        if (result.success) {
+        if (result.serverError) {
+            toast({
+                variant: 'destructive',
+                title: 'Uh oh! Something went wrong.',
+                description: result.serverError,
+            });
+            form.reset();
+        }
+        if (result.data && result.data.success) {
             toast({
                 title: 'Password reset link sent!',
                 description: 'Check your inbox for the link.',
@@ -123,12 +124,3 @@ export const PasswordResetForm = () => {
         </Form>
     );
 };
-
-/**
- * For **client-side** validation
- */
-const passwordResetSchemaClient = z.object({
-    email: z.string().email({ message: 'Invalid email address.' }),
-});
-
-type PasswordResetSchemaClientType = z.infer<typeof passwordResetSchemaClient>;

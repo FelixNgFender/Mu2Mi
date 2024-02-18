@@ -6,7 +6,7 @@ import { replicateWebhookHandler } from '../replicate';
 
 export const POST = async (req: Request) => {
     try {
-        await replicateWebhookHandler<MusicGenWebhookBody>(
+        return await replicateWebhookHandler<MusicGenWebhookBody>(
             req,
             'musicgenStatus',
             'musicgen',

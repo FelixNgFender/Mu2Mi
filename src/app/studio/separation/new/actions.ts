@@ -2,48 +2,30 @@
 
 import { env } from '@/config/env';
 import { fileStorageClient } from '@/db';
-import { getUserSession } from '@/lib/auth';
 import { AppError } from '@/lib/error';
-import { errorHandler } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { replicateClient } from '@/lib/replicate';
+import { authAction } from '@/lib/safe-action';
 import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
-import { NewTrack } from '@/models/track';
 import { trackSeparationInputSchema } from '@/types/replicate';
-import { ActionResult } from '@/types/server-action';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
-export const separateTrackAndDetectBeat = async (
-    data: ClientDataSchemaType,
-): Promise<ActionResult> => {
-    const { user } = await getUserSession();
-    if (!user) {
-        return {
-            success: false,
-            error: httpStatus.clientError.unauthorized.humanMessage,
-        };
-    }
-    if (!user.emailVerified) {
-        return {
-            success: false,
-            error: httpStatus.clientError.unprocessableEntity.humanMessage,
-        };
-    }
+const schema = trackSeparationInputSchema
+    .omit({
+        audio: true,
+    })
+    .extend({
+        name: z.string(),
+        assetId: z.string(),
+        smartMetronome: z.boolean(),
+    });
 
-    const result = clientFormSchema.safeParse(data);
-
-    if (!result.success) {
-        return {
-            success: false,
-            error: JSON.stringify(result.error.issues),
-        };
-    }
-
-    try {
-        console.log('data inserting into track table', data);
+export const separateTrackAndDetectBeat = authAction(
+    schema,
+    async (data, { user }) => {
         const track = await trackModel.createOne({
             id: generatePublicId(),
             userId: user.id,
@@ -103,22 +85,5 @@ export const separateTrackAndDetectBeat = async (
         return {
             success: true,
         };
-    } catch (err) {
-        errorHandler.handleError(err as Error);
-        return {
-            success: false,
-            error: httpStatus.serverError.internalServerError.humanMessage,
-        };
-    }
-};
-
-const clientFormSchema = trackSeparationInputSchema.omit({
-    audio: true,
-});
-
-type ClientFormSchemaType = z.infer<typeof clientFormSchema>;
-type ClientDataSchemaType = Pick<NewTrack, 'name'> &
-    ClientFormSchemaType & {
-        assetId: string;
-        smartMetronome: boolean;
-    };
+    },
+);

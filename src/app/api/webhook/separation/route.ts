@@ -6,7 +6,7 @@ import { replicateWebhookHandler } from '../replicate';
 
 export const POST = async (req: Request) => {
     try {
-        await replicateWebhookHandler<TrackSeparationWebhookBody>(
+        return await replicateWebhookHandler<TrackSeparationWebhookBody>(
             req,
             'trackSeparationStatus',
         );

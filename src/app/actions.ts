@@ -1,22 +1,15 @@
 'use server';
 
-import { auth, getUserSession } from '@/lib/auth';
-import { httpStatus } from '@/lib/http';
-import { ActionResult } from '@/types/server-action';
+import { auth } from '@/lib/auth';
+import { authAction } from '@/lib/safe-action';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { z } from 'zod';
 
-export const signOut = async (): Promise<ActionResult> => {
-    const { session } = await getUserSession();
-    if (!session) {
-        return {
-            success: false,
-            error: httpStatus.clientError.unauthorized.humanMessage,
-        };
-    }
+const schema = z.object({});
 
+export const signOut = authAction(schema, async ({}, { session }) => {
     await auth.invalidateSession(session.id);
-
     const sessionCookie = auth.createBlankSessionCookie();
     cookies().set(
         sessionCookie.name,
@@ -24,4 +17,4 @@ export const signOut = async (): Promise<ActionResult> => {
         sessionCookie.attributes,
     );
     return redirect('/auth/sign-in');
-};
+});

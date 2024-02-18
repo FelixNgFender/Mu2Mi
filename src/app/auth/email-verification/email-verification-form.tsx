@@ -8,39 +8,26 @@ import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import { resendCode, verifyCode } from './actions';
-
-const emailVerificationSchemaClient = z.object({
-    code: z
-        .string()
-        .min(6, {
-            message: 'Code must be 6 characters long',
-        })
-        .max(6, {
-            message: 'Code must be 6 characters long',
-        })
-        .regex(/^[0-9]+$/, {
-            message: 'Code must contain only numbers',
-        }),
-});
+import { verifyCodeFormSchema } from './schemas';
 
 export const EmailVerificationForm = () => {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState<string | undefined>(undefined);
+    const [_, setError] = useState<string | undefined>(undefined);
     const [code, setCode] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        const parsed = emailVerificationSchemaClient.safeParse({
+        const parsed = verifyCodeFormSchema.safeParse({
             code,
         });
+
         if (!parsed.success) {
             setError(parsed.error.issues[0]?.message);
             setIsSubmitting(false);
@@ -48,24 +35,25 @@ export const EmailVerificationForm = () => {
         }
         if (parsed.success) setError(undefined);
 
-        const result = await verifyCode(code);
+        const result = await verifyCode({ code });
+        // must check if action returns redirect
         if (!result) return;
-        if (!result.success) {
-            setError(result.error);
+        if (result.validationErrors) {
+            for (const [_, value] of Object.entries(result.validationErrors)) {
+                setError(value.join(', '));
+            }
             setIsSubmitting(false);
-            return;
         }
-    };
-
-    useEffect(() => {
-        if (error) {
+        if (result.serverError) {
             toast({
                 variant: 'destructive',
                 title: 'Uh oh! Something went wrong.',
-                description: error,
+                description: result.serverError,
             });
+            setIsSubmitting(false);
+            setCode('');
         }
-    }, [error, toast]);
+    };
 
     return (
         <form
@@ -96,29 +84,32 @@ export const ResendVerificationCodeButton = () => {
     const { toast } = useToast();
     const form = useForm();
     const onSubmit = async () => {
-        const result = await resendCode();
-        if (!result.success) {
+        const result = await resendCode({});
+        if (result.serverError) {
             toast({
                 variant: 'destructive',
                 title: 'Uh oh! Something went wrong.',
-                description: result.error,
+                description: result.serverError,
+            });
+            form.reset();
+        }
+        if (result.data && result.data.success) {
+            toast({
+                title: 'Email verification link sent!',
+                description: 'Check your inbox for the link.',
+                action: (
+                    <ToastAction altText="Open Gmail">
+                        <Link
+                            href="https://mail.google.com/mail/"
+                            target="_blank"
+                            rel="noreferrer"
+                        >
+                            <Icons.gmail className="h-4 w-4" />
+                        </Link>
+                    </ToastAction>
+                ),
             });
         }
-        toast({
-            title: 'Email verification link sent!',
-            description: 'Check your inbox for the link.',
-            action: (
-                <ToastAction altText="Open Gmail">
-                    <Link
-                        href="https://mail.google.com/mail/"
-                        target="_blank"
-                        rel="noreferrer"
-                    >
-                        <Icons.gmail className="h-4 w-4" />
-                    </Link>
-                </ToastAction>
-            ),
-        });
     };
     return (
         <Form {...form}>

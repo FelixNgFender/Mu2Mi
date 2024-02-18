@@ -14,3 +14,11 @@ const nanoid = customAlphabet(alphabet, length);
 export const generatePublicId = () => {
     return nanoid();
 };
+
+export const formatValidationErrors = (
+    errors: Partial<Record<string, string[]>>,
+): string => {
+    return Object.entries(errors)
+        .map(([key, value]) => `${key}: ${value?.join(', ') ?? ''}`)
+        .join(', ');
+};

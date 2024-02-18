@@ -12,37 +12,49 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { useToast } from '@/components/ui/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { signIn } from './actions';
+import { SignInFormType, signInFormSchema } from './schemas';
 
 export const SignInForm = () => {
-    const form = useForm<SignInSchemaClientType>({
-        resolver: zodResolver(signInSchemaClient),
+    const form = useForm<SignInFormType>({
+        resolver: zodResolver(signInFormSchema),
         defaultValues: {
             email: '',
             password: '',
             rememberMe: false,
         },
     });
+    const { toast } = useToast();
 
-    const onSubmit = async (data: SignInSchemaClientType) => {
+    type FieldName = keyof SignInFormType;
+
+    const onSubmit: SubmitHandler<SignInFormType> = async (data) => {
         const result = await signIn(data);
+        // must check if action returns redirect
         if (!result) return;
-        if (!result.success) {
-            const errors = JSON.parse(result.error);
-            for (const error of errors) {
-                for (const path of error.path) {
-                    form.setError(path, {
-                        type: path,
-                        message: error.message,
-                    });
-                }
+        if (result.validationErrors) {
+            for (const [path, value] of Object.entries(
+                result.validationErrors,
+            )) {
+                form.setError(path as FieldName, {
+                    type: path,
+                    message: value.join(', '),
+                });
             }
+        }
+        if (result.serverError) {
+            toast({
+                variant: 'destructive',
+                title: 'Uh oh! Something went wrong.',
+                description: result.serverError,
+            });
+            form.reset();
         }
     };
 
@@ -147,105 +159,3 @@ export const SignInForm = () => {
         </Form>
     );
 };
-
-/**
- * For **client-side** validation
- */
-const signInSchemaClient = z
-    .object({
-        email: z.string().email({ message: 'Invalid email address.' }),
-        password: z
-            .string()
-            .min(8, {
-                message: 'Password must be at least 8 characters long',
-            })
-            .max(64, {
-                message: 'Password must be at most 64 characters long',
-            }),
-        rememberMe: z.boolean(),
-    })
-    .superRefine(({ password }, ctx) => {
-        const containsUppercase = (ch: string) => /[A-Z]/.test(ch);
-        const containsLowercase = (ch: string) => /[a-z]/.test(ch);
-        const containsSpecialChar = (ch: string) =>
-            /[`!@#$%^&*()_\-+=\[\]{};':"\\|,.<>\/?~ ]/.test(ch);
-        let countOfUpperCase = 0,
-            countOfLowerCase = 0,
-            countOfNumbers = 0,
-            countOfSpecialChar = 0;
-
-        for (let i = 0; i < password.length; i++) {
-            let ch = password.charAt(i);
-            if (!isNaN(+ch)) countOfNumbers++;
-            else if (containsUppercase(ch)) countOfUpperCase++;
-            else if (containsLowercase(ch)) countOfLowerCase++;
-            else if (containsSpecialChar(ch)) countOfSpecialChar++;
-        }
-
-        let errObj = {
-            upperCase: {
-                pass: true,
-                message:
-                    'Password must contain at least one uppercase character.',
-            },
-            lowerCase: {
-                pass: true,
-                message:
-                    'Password must contain at least one lowercase character.',
-            },
-            specialCh: {
-                pass: true,
-                message:
-                    'Password must contain at least one special character.',
-            },
-            totalNumber: {
-                pass: true,
-                message:
-                    'Password must contain at least one numeric character.',
-            },
-        };
-
-        if (countOfLowerCase < 1) {
-            errObj = {
-                ...errObj,
-                lowerCase: { ...errObj.lowerCase, pass: false },
-            };
-        }
-        if (countOfNumbers < 1) {
-            errObj = {
-                ...errObj,
-                totalNumber: { ...errObj.totalNumber, pass: false },
-            };
-        }
-        if (countOfUpperCase < 1) {
-            errObj = {
-                ...errObj,
-                upperCase: { ...errObj.upperCase, pass: false },
-            };
-        }
-        if (countOfSpecialChar < 1) {
-            errObj = {
-                ...errObj,
-                specialCh: { ...errObj.specialCh, pass: false },
-            };
-        }
-
-        if (
-            countOfLowerCase < 1 ||
-            countOfUpperCase < 1 ||
-            countOfSpecialChar < 1 ||
-            countOfNumbers < 1
-        ) {
-            for (let key in errObj) {
-                if (!errObj[key as keyof typeof errObj].pass) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: ['password'],
-                        message: errObj[key as keyof typeof errObj].message,
-                    });
-                }
-            }
-        }
-    });
-
-type SignInSchemaClientType = z.infer<typeof signInSchemaClient>;

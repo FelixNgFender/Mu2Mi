@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { Track } from '@/models/track';
-import { Asset } from '@/types/asset';
 import { ColumnDef } from '@tanstack/react-table';
 import JSZip from 'jszip';
 import {
@@ -42,12 +41,10 @@ const getStatusIndicator = (
 
 const handleDownload = async (trackId: string) => {
     try {
-        const result = await downloadTrack(trackId);
-        if (result && result.success) {
-            console.log(result.data);
+        const { data } = await downloadTrack({ trackId });
+        if (data) {
             const zip = new JSZip();
-            const assets = result.data as Asset[];
-            const promises = assets.map((asset) =>
+            const promises = data.map((asset) =>
                 fetch(asset.url)
                     .then((response) => response.blob())
                     .then((blob) => {
@@ -74,7 +71,7 @@ const handleDownload = async (trackId: string) => {
 
 const handleDelete = async (trackId: string) => {
     try {
-        await deleteTrack(trackId);
+        await deleteTrack({ trackId });
     } catch (error) {
         // keep this in production to track user-reported errors
         console.error('Failed to delete track', error);
@@ -135,7 +132,7 @@ export const trackTableColumns: ColumnDef<Track>[] = [
     },
     {
         accessorKey: 'midiTranscriptionStatus',
-        header: 'MIDI Transcription Status',
+        header: 'Status',
         cell: ({ row }) => (
             <div className="capitalize">
                 <span className="mr-2">

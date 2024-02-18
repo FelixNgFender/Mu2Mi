@@ -20,11 +20,8 @@ const MidiTranscriptionPage = async () => {
     await queryClient.prefetchQuery({
         queryKey: ['polling-tracks'],
         queryFn: async () => {
-            const result = await getTracks();
-            if (result && !result.success) {
-                throw new Error(result.error);
-            }
-            return result.data;
+            const { data } = await getTracks({});
+            return data;
         },
         initialData: await trackModel.findManyByUserId(user.id),
     });

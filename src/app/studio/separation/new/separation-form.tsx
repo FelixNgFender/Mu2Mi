@@ -30,10 +30,14 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { separateTrackAndDetectBeat } from './actions';
+import {
+    SeparationFormType,
+    separationFormSchema,
+    trackSeparationModels,
+} from './schemas';
 
 const steps = [
     {
@@ -67,7 +71,7 @@ export const SeparationForm = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const delta = currentStep - previousStep;
 
-    const form = useForm<SeparationFormSchemaType>({
+    const form = useForm<SeparationFormType>({
         resolver: zodResolver(separationFormSchema),
         defaultValues: {
             file: null,
@@ -83,7 +87,7 @@ export const SeparationForm = () => {
         },
     });
 
-    type FieldName = keyof SeparationFormSchemaType;
+    type FieldName = keyof SeparationFormType;
 
     const next = async () => {
         const fields = steps[currentStep]?.fields;
@@ -149,35 +153,34 @@ export const SeparationForm = () => {
             size: file.size,
             checksum: await computeSHA256(file),
         });
-        if (!result) return;
-        if (!result.success) {
-            try {
-                const errors = JSON.parse(result.error);
-                for (const error of errors) {
-                    for (const path of error.path) {
-                        form.setError(path, {
-                            type: path,
-                            message: error.message,
-                        });
-                    }
-                }
-                setCurrentStep(-1);
-            } catch (e) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Uh oh! Something went wrong.',
-                    description: result.error,
+        if (result.validationErrors) {
+            for (const [path, value] of Object.entries(
+                result.validationErrors,
+            )) {
+                form.setError(path as FieldName, {
+                    type: path,
+                    message: value.join(', '),
                 });
             }
+            setCurrentStep(-1);
         }
-        if (result.success) {
+        if (result.serverError) {
+            toast({
+                variant: 'destructive',
+                title: 'Uh oh! Something went wrong.',
+                description: result.serverError,
+            });
+            setCurrentStep(-1);
+            form.reset();
+        }
+        if (result && result.data) {
             const { url, assetId } = result.data;
             await uploadFile(url, file);
             return assetId;
         }
     };
 
-    const onSubmit = async (data: SeparationFormSchemaType) => {
+    const onSubmit: SubmitHandler<SeparationFormType> = async (data) => {
         toast({
             description: 'Your file is being uploaded.',
         });
@@ -203,31 +206,27 @@ export const SeparationForm = () => {
             output_format: data.output_format,
         });
 
-        if (!result) return;
-        if (!result.success) {
-            try {
-                const errors = JSON.parse(result.error);
-                for (const error of errors) {
-                    for (const path of error.path) {
-                        form.setError(path, {
-                            type: path,
-                            message: error.message,
-                        });
-                    }
-                }
-                setCurrentStep(-1);
-            } catch (e) {
-                toast({
-                    variant: 'destructive',
-                    title: 'Uh oh! Something went wrong.',
-                    description: result.error,
+        if (result.validationErrors) {
+            for (const [path, value] of Object.entries(
+                result.validationErrors,
+            )) {
+                form.setError(path as FieldName, {
+                    type: path,
+                    message: value.join(', '),
                 });
-                form.reset();
-                setCurrentStep(-1);
-                return;
             }
+            setCurrentStep(-1);
         }
-        if (result.success) {
+        if (result.serverError) {
+            toast({
+                variant: 'destructive',
+                title: 'Uh oh! Something went wrong.',
+                description: result.serverError,
+            });
+            form.reset();
+            setCurrentStep(-1);
+        }
+        if (result.data && result.data.success) {
             toast({
                 title: 'File uploaded successfully.',
                 description: '🔥 We are cooking your track.',
@@ -363,9 +362,11 @@ export const SeparationForm = () => {
                                                 </FormControl>
                                                 <FormDescription>
                                                     Supports:{' '}
-                                                    {` ${allowedFileTypes.join(
-                                                        ', ',
-                                                    )}`}
+                                                    {` ${trackSeparationAssetConfig.allowedFileTypes
+                                                        .map((type) =>
+                                                            type.toUpperCase(),
+                                                        )
+                                                        .join(', ')}`}
                                                 </FormDescription>
                                                 <FormMessage />
                                                 {file && (
@@ -423,26 +424,30 @@ export const SeparationForm = () => {
                                                 defaultValue={field.value}
                                                 className="flex flex-col space-y-1"
                                             >
-                                                {models.map((model) => (
-                                                    <FormItem
-                                                        key={model.name}
-                                                        className="flex items-center space-x-3 space-y-0"
-                                                    >
-                                                        <FormControl>
-                                                            <RadioGroupItem
-                                                                value={
-                                                                    model.name
+                                                {trackSeparationModels.map(
+                                                    (model) => (
+                                                        <FormItem
+                                                            key={model.name}
+                                                            className="flex items-center space-x-3 space-y-0"
+                                                        >
+                                                            <FormControl>
+                                                                <RadioGroupItem
+                                                                    value={
+                                                                        model.name
+                                                                    }
+                                                                />
+                                                            </FormControl>
+                                                            <FormLabel className="font-normal">
+                                                                {model.name}
+                                                            </FormLabel>
+                                                            <FormDescription className="text-sm">
+                                                                {
+                                                                    model.description
                                                                 }
-                                                            />
-                                                        </FormControl>
-                                                        <FormLabel className="font-normal">
-                                                            {model.name}
-                                                        </FormLabel>
-                                                        <FormDescription className="text-sm">
-                                                            {model.description}
-                                                        </FormDescription>
-                                                    </FormItem>
-                                                ))}
+                                                            </FormDescription>
+                                                        </FormItem>
+                                                    ),
+                                                )}
                                             </RadioGroup>
                                         </FormControl>
                                         <FormMessage />
@@ -735,7 +740,7 @@ export const SeparationForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/new"
+                            href="/studio/separation/new"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
@@ -743,7 +748,7 @@ export const SeparationForm = () => {
                             Separate new track
                         </a>
                         <Link
-                            href="/studio"
+                            href="/studio/separation"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
@@ -756,88 +761,3 @@ export const SeparationForm = () => {
         </>
     );
 };
-
-const allowedFileTypes = trackSeparationAssetConfig.allowedMimeTypes.map(
-    (type) => type.toUpperCase().replace('AUDIO/', ''),
-);
-
-const models = [
-    {
-        name: 'htdemucs',
-        description:
-            'First version of Hybrid Transformer Demucs. Trained on MusDB + 800 songs. Default model.',
-    },
-    {
-        name: 'htdemucs_ft',
-        description:
-            'Fine-tuned version of htdemucs, separation will take 4 times more time but might be a bit better. Same training set as htdemucs.',
-    },
-    {
-        name: 'htdemucs_6s',
-        description:
-            '6 sources version of htdemucs, with piano and guitar being added as sources. Note that the piano source is not working great at the moment.',
-    },
-    {
-        name: 'hdemucs_mmi',
-        description: 'Hybrid Demucs v3, retrained on MusDB + 800 songs.',
-    },
-    {
-        name: 'mdx',
-        description:
-            'Trained only on MusDB HQ, winning model on track A at the MDX challenge.',
-    },
-    {
-        name: 'mdx_extra',
-        description:
-            'Trained with extra training data (including MusDB test set), ranked 2nd on the track B of the MDX challenge.',
-    },
-    {
-        name: 'mdx_q',
-        description:
-            'Quantized version of the previous models. Smaller download and storage but quality can be slightly worse.',
-    },
-    {
-        name: 'mdx_extra_q',
-        description:
-            'Quantized version of the previous models. Smaller download and storage but quality can be slightly worse.',
-    },
-] as const;
-
-const separationFormSchema = z.object({
-    file: z
-        .any()
-        .refine(
-            (files) => {
-                return (
-                    files?.[0]?.size <=
-                    trackSeparationAssetConfig.maxFileSizeBytes
-                );
-            },
-            `Max file size is ${
-                trackSeparationAssetConfig.maxFileSizeBytes / 1024 / 1024
-            } MB.`,
-        )
-        .refine(
-            (files) =>
-                trackSeparationAssetConfig.allowedMimeTypes.includes(
-                    files?.[0]?.type,
-                ),
-            `Only ${allowedFileTypes.join(', ')} files are allowed.`,
-        )
-        .transform((files) => files?.[0]),
-    model_name: z
-        .enum([...models.map((model) => model.name)] as [string, ...string[]])
-        .default('htdemucs'),
-    stem: z
-        .enum(['vocals', 'bass', 'drums', 'guitar', 'piano', 'other'])
-        .optional(),
-    clip_mode: z.enum(['rescale', 'clamp']).default('rescale'),
-    shifts: z.number().int().min(1).max(10).default(1),
-    overlap: z.number().default(0.25),
-    output_format: z.enum(['mp3', 'wav', 'flac']).default('mp3'),
-    mp3_bitrate: z.number().int().default(320),
-    float32: z.boolean().default(false),
-    smart_metronome: z.boolean().default(false),
-});
-
-type SeparationFormSchemaType = z.infer<typeof separationFormSchema>;

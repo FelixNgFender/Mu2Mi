@@ -14,15 +14,16 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { midiTranscriptionAssetConfig } from '@/config/asset';
+import { formatValidationErrors } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { transcribeMidi } from './actions';
+import { MidiFormSchemaType, midiFormSchema } from './schemas';
 
 const steps = [
     {
@@ -110,18 +111,19 @@ export const MidiForm = () => {
     const handleFilesUpload = async (files: FileList) => {
         try {
             const promises = Array.from(files).map(async (file) => {
-                const result = await getPresignedUrl({
-                    type: file.type as (typeof midiTranscriptionAssetConfig.allowedMimeTypes)[number],
-                    extension: file.name.split('.').pop() || '',
-                    size: file.size,
-                    checksum: await computeSHA256(file),
-                });
-                if (!result) return;
-                if (!result.success) {
-                    console.log('result.error', result.error);
-                    throw new Error(result.error);
+                const { data, validationErrors, serverError } =
+                    await getPresignedUrl({
+                        type: file.type as (typeof midiTranscriptionAssetConfig.allowedMimeTypes)[number],
+                        extension: file.name.split('.').pop() || '',
+                        size: file.size,
+                        checksum: await computeSHA256(file),
+                    });
+                if (validationErrors) {
+                    throw new Error(formatValidationErrors(validationErrors));
+                } else if (serverError || !data) {
+                    throw new Error(serverError);
                 }
-                const { url, assetId } = result.data;
+                const { url, assetId } = data;
                 await uploadFile(url, file);
                 return {
                     assetId,
@@ -130,7 +132,6 @@ export const MidiForm = () => {
             });
             return await Promise.all(promises);
         } catch (error) {
-            console.log('error', error);
             toast({
                 variant: 'destructive',
                 title: 'Uh oh! Something went wrong.',
@@ -139,7 +140,7 @@ export const MidiForm = () => {
         }
     };
 
-    const onSubmit = async (data: MidiFormSchemaType) => {
+    const onSubmit: SubmitHandler<MidiFormSchemaType> = async (data) => {
         toast({
             description: 'Your files are being uploaded.',
         });
@@ -154,38 +155,34 @@ export const MidiForm = () => {
         try {
             const promises = uploadedAssets.map(async (data) => {
                 return await transcribeMidi({
-                    name: data!.file.name,
-                    assetId: data!.assetId,
+                    name: data.file.name,
+                    assetId: data.assetId,
                 });
             });
             const results = await Promise.all(promises);
             for (const result of results) {
-                if (!result) throw new Error('Failed to transcribe MIDI');
-                if (!result.success) {
-                    try {
-                        const errors = JSON.parse(result.error);
-                        for (const error of errors) {
-                            for (const path of error.path) {
-                                form.setError(path, {
-                                    type: path,
-                                    message: error.message,
-                                });
-                            }
-                        }
-                        setCurrentStep(-1);
-                        throw new Error('Failed to transcribe MIDI');
-                    } catch (e) {
-                        toast({
-                            variant: 'destructive',
-                            title: 'Uh oh! Something went wrong.',
-                            description: result.error,
+                if (result.validationErrors) {
+                    for (const [path, value] of Object.entries(
+                        result.validationErrors,
+                    )) {
+                        form.setError(path as FieldName, {
+                            type: path,
+                            message: value.join(', '),
                         });
-                        form.reset();
-                        setCurrentStep(-1);
                     }
+                    setCurrentStep(-1);
+                }
+                if (result.serverError) {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Uh oh! Something went wrong.',
+                        description: result.serverError,
+                    });
+                    setCurrentStep(-1);
+                    form.reset();
                 }
             }
-            if (results.every((result) => result.success)) {
+            if (results.every((result) => result.data)) {
                 toast({
                     title: 'Files uploaded successfully.',
                     description: '🔥 We are cooking your tracks.',
@@ -339,9 +336,11 @@ export const MidiForm = () => {
                                                 </FormControl>
                                                 <FormDescription>
                                                     Supports:{' '}
-                                                    {` ${allowedFileTypes.join(
-                                                        ', ',
-                                                    )}`}
+                                                    {` ${midiTranscriptionAssetConfig.allowedFileTypes
+                                                        .map((type) =>
+                                                            type.toUpperCase(),
+                                                        )
+                                                        .join(', ')}`}
                                                 </FormDescription>
                                                 <FormMessage />
                                                 {files &&
@@ -428,7 +427,7 @@ export const MidiForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="new"
+                            href="/studio/midi/new"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
@@ -449,49 +448,3 @@ export const MidiForm = () => {
         </>
     );
 };
-
-const allowedFileTypes = midiTranscriptionAssetConfig.allowedMimeTypes.map(
-    (type) => type.toUpperCase().replace('AUDIO/', ''),
-);
-
-const midiFormSchema = z.object({
-    files: z
-        .any()
-        .refine((files: FileList | null) => {
-            return (
-                files &&
-                Array.from(files).length <=
-                    midiTranscriptionAssetConfig.maxNumFiles
-            );
-        }, `Max number of files is ${midiTranscriptionAssetConfig.maxNumFiles}.`)
-        .refine(
-            (files: FileList | null) => {
-                return (
-                    files &&
-                    Array.from(files).every(
-                        (file) =>
-                            file.size <=
-                            midiTranscriptionAssetConfig.maxFileSizeBytes,
-                    )
-                );
-            },
-            `Max file size is ${
-                midiTranscriptionAssetConfig.maxFileSizeBytes / 1024 / 1024
-            } MB.`,
-        )
-        .refine(
-            (files: FileList | null) => {
-                return (
-                    files &&
-                    Array.from(files).every((file) =>
-                        midiTranscriptionAssetConfig.allowedMimeTypes.includes(
-                            file.type as (typeof midiTranscriptionAssetConfig.allowedMimeTypes)[number],
-                        ),
-                    )
-                );
-            },
-            `Only ${allowedFileTypes.join(', ')} files are allowed.`,
-        ),
-});
-
-type MidiFormSchemaType = z.infer<typeof midiFormSchema>;

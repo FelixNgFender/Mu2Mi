@@ -2,7 +2,6 @@
 
 import { downloadTrack } from '@/app/studio/actions';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Asset } from '@/types/asset';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -28,11 +27,8 @@ const MidiTrackPage = ({ params }: MidiTrackPageProps) => {
     } = useQuery({
         queryKey: ['track-assets', params.id],
         queryFn: async () => {
-            const result = await downloadTrack(params.id);
-            if (result && !result.success) {
-                throw new Error(result.error);
-            }
-            return result.data as Asset[];
+            const { data } = await downloadTrack({ trackId: params.id });
+            return data;
         },
     });
 
@@ -52,7 +48,7 @@ const MidiTrackPage = ({ params }: MidiTrackPageProps) => {
 
     return (
         <MidiPlayer
-            initialURL={assetLinks.find((a) => a.type === 'midi')?.url}
+            initialURL={assetLinks?.find((a) => a.type === 'midi')?.url}
         />
     );
 };

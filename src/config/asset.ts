@@ -17,6 +17,7 @@ export const trackSeparationAssetConfig = {
         'audio/mov',
         'audio/wma',
     ],
+    allowedFileTypes: ['mp3', 'wav', 'flac', 'mp4', 'mov', 'wma'],
 } as const;
 
 export const midiTranscriptionAssetConfig = {
@@ -29,5 +30,6 @@ export const midiTranscriptionAssetConfig = {
         'audio/flac',
         'audio/m4a',
     ],
+    allowedFileTypes: ['mp3', 'ogg', 'wav', 'flac', 'm4a'],
     maxNumFiles: 5,
 } as const;

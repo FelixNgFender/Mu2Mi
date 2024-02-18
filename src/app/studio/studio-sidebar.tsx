@@ -10,7 +10,7 @@ export interface StudioSidebarNavProps {
     items: SidebarNavItem[];
 }
 
-export const StudioSidebar = async ({ items }: StudioSidebarNavProps) => {
+export const StudioSidebar = ({ items }: StudioSidebarNavProps) => {
     const pathname = usePathname();
     return items.length ? (
         <div className="space-y-8 px-3 py-4">

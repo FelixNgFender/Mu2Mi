@@ -4,7 +4,6 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Dropzone } from '@/components/ui/dropzone';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { Asset } from '@/types/asset';
 import EventEmitter from 'events';
 import {
     ChevronLeftCircle,
@@ -22,10 +21,11 @@ import { usePathname } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import WaveformPlaylist from 'waveform-playlist';
 
+import { downloadTrack } from '../actions';
 import './audio-player.css';
 
 type TrackPageProps = {
-    assetLinks: Asset[];
+    assetLinks: Awaited<ReturnType<typeof downloadTrack>>['data'];
 };
 
 const AudioPlayer = ({ assetLinks }: TrackPageProps) => {

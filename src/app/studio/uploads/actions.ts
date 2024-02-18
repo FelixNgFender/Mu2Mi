@@ -3,48 +3,24 @@
 import { assetConfig } from '@/config/asset';
 import { env } from '@/config/env';
 import { fileStorageClient } from '@/db';
-import { getUserSession } from '@/lib/auth';
 import { AppError } from '@/lib/error';
-import { errorHandler } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
+import { authAction } from '@/lib/safe-action';
 import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
-import { ActionResult } from '@/types/server-action';
 import crypto from 'crypto';
 import { z } from 'zod';
 
-export const getPresignedUrl = async (
-    data: SignedUrlBodySchemaType,
-): Promise<ActionResult> => {
-    const { user } = await getUserSession();
-    if (!user) {
-        return {
-            success: false,
-            error: httpStatus.clientError.unauthorized.humanMessage,
-        };
-    }
-    if (!user.emailVerified) {
-        return {
-            success: false,
-            error: httpStatus.clientError.unprocessableEntity.humanMessage,
-        };
-    }
-    const { type, extension, size, checksum } = data;
-    const result = signedUrlBodySchema.safeParse({
-        type,
-        extension,
-        size,
-        checksum,
-    });
+const schema = z.object({
+    type: z.enum(assetConfig.allowedMimeTypes),
+    size: z.number().max(assetConfig.maxFileSizeBytes),
+    extension: z.string(),
+    checksum: z.string(),
+});
 
-    if (!result.success) {
-        return {
-            success: false,
-            error: JSON.stringify(result.error.issues),
-        };
-    }
-
-    try {
+export const getPresignedUrl = authAction(
+    schema,
+    async ({ type, extension }, { user }) => {
         const objectName = `${crypto
             .randomBytes(32)
             .toString('hex')}.${extension}`;
@@ -73,26 +49,8 @@ export const getPresignedUrl = async (
             );
 
         return {
-            success: true,
-            data: {
-                url,
-                assetId: newAsset.id,
-            },
+            url,
+            assetId: newAsset.id,
         };
-    } catch (err) {
-        errorHandler.handleError(err as Error);
-        return {
-            success: false,
-            error: httpStatus.serverError.internalServerError.humanMessage,
-        };
-    }
-};
-
-const signedUrlBodySchema = z.object({
-    type: z.enum(assetConfig.allowedMimeTypes),
-    size: z.number().max(assetConfig.maxFileSizeBytes),
-    extension: z.string(),
-    checksum: z.string(),
-});
-
-type SignedUrlBodySchemaType = z.infer<typeof signedUrlBodySchema>;
+    },
+);

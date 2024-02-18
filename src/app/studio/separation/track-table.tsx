@@ -17,11 +17,11 @@ export const TrackTable = () => {
     } = useQuery({
         queryKey: ['polling-tracks'],
         queryFn: async () => {
-            const result = await getTracks();
-            if (result && !result.success) {
-                throw new Error(result.error);
+            const { data, serverError } = await getTracks({});
+            if (serverError || !data) {
+                throw new Error(serverError);
             }
-            return result.data;
+            return data;
         },
         refetchInterval: 3000,
     });
@@ -43,7 +43,6 @@ export const TrackTable = () => {
     return (
         <DataTable
             columns={trackTableColumns}
-            // @ts-expect-error - data prop is not required
             data={tracks.filter((track) => track.trackSeparationStatus)}
         />
     );

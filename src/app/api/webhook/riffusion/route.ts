@@ -6,7 +6,7 @@ import { replicateWebhookHandler } from '../replicate';
 
 export const POST = async (req: Request) => {
     try {
-        await replicateWebhookHandler<RiffusionWebhookBody>(
+        return await replicateWebhookHandler<RiffusionWebhookBody>(
             req,
             'riffusionStatus',
             'riffusion',
