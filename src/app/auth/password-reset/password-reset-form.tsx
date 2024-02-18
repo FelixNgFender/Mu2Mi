@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
+import { siteConfig } from '@/config/site';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -54,14 +55,15 @@ export const PasswordResetForm = () => {
             });
             form.reset();
         }
-        if (result.data && result.data.success) {
+        if (result.data) {
             toast({
                 title: 'Password reset link sent!',
                 description: 'Check your inbox for the link.',
                 action: (
                     <ToastAction altText="Open Gmail">
                         <Link
-                            href="https://mail.google.com/mail/"
+                            // https://growth.design/sniper-link
+                            href={`https://mail.google.com/mail/u/${result.data.email}/#search/from%3A%40${siteConfig.url}+in%3Aanywhere+newer_than%3A1d`}
                             target="_blank"
                             rel="noreferrer"
                         >

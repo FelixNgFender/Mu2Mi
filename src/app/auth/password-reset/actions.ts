@@ -40,7 +40,7 @@ export const requestPasswordReset = action(
         const verificationToken = await generatePasswordResetToken(user.id);
         await sendPasswordResetLink(email, verificationToken);
         return {
-            success: true,
+            email: user.email,
         };
     },
 );

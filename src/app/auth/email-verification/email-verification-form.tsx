@@ -6,6 +6,7 @@ import { Form } from '@/components/ui/form';
 import { OTPInput } from '@/components/ui/otp-input';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
+import { siteConfig } from '@/config/site';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -93,14 +94,15 @@ export const ResendVerificationCodeButton = () => {
             });
             form.reset();
         }
-        if (result.data && result.data.success) {
+        if (result.data) {
             toast({
                 title: 'Email verification link sent!',
                 description: 'Check your inbox for the link.',
                 action: (
                     <ToastAction altText="Open Gmail">
                         <Link
-                            href="https://mail.google.com/mail/"
+                            // https://growth.design/sniper-link
+                            href={`https://mail.google.com/mail/u/${result.data.email}/#search/from%3A%40${siteConfig.url}+in%3Aanywhere+newer_than%3A1d`}
                             target="_blank"
                             rel="noreferrer"
                         >

@@ -104,6 +104,6 @@ export const resendCode = action(resendCodeSchema, async () => {
     const code = await generateEmailVerificationCode(user.id, user.email);
     await sendEmailVerificationCode(user.email, code);
     return {
-        success: true,
+        email: user.email,
     };
 });
