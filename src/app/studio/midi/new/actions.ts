@@ -6,7 +6,6 @@ import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { replicateClient } from '@/lib/replicate';
 import { authAction } from '@/lib/safe-action';
-import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import { midiTranscriptionInputSchema } from '@/types/replicate';
@@ -24,7 +23,6 @@ const schema = midiTranscriptionInputSchema
 
 export const transcribeMidi = authAction(schema, async (data, { user }) => {
     const track = await trackModel.createOne({
-        id: generatePublicId(),
         userId: user.id,
         midiTranscriptionStatus: 'processing',
         name: data.name,

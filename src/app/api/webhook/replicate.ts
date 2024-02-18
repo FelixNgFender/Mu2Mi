@@ -3,7 +3,6 @@ import { env } from '@/config/env';
 import { fileStorageClient } from '@/db';
 import { AppError } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
-import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import {
@@ -131,7 +130,6 @@ const saveTrackAssetAndMetadata = async (
         },
     );
     const newAsset = await assetModel.createOne({
-        id: generatePublicId(),
         userId,
         name: objectName,
         mimeType: mimeType as any,

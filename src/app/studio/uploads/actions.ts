@@ -6,7 +6,6 @@ import { fileStorageClient } from '@/db';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { authAction } from '@/lib/safe-action';
-import { generatePublicId } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import crypto from 'crypto';
 import { z } from 'zod';
@@ -31,7 +30,6 @@ export const getPresignedUrl = authAction(
         );
 
         const newAsset = await assetModel.createOne({
-            id: generatePublicId(),
             userId: user.id,
             // we will put faith in the client to actually upload the file to S3
             // better solution would be set up a trigger on the S3 bucket to create the asset

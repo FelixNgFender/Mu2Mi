@@ -1,9 +1,13 @@
 import { db } from '@/db';
 import { assetTable } from '@/db/schema';
+import { generatePublicId } from '@/lib/utils';
 import { eq } from 'drizzle-orm';
 import 'server-only';
 
-type NewAsset = Omit<typeof assetTable.$inferInsert, 'createdAt' | 'updatedAt'>;
+type NewAsset = Omit<
+    typeof assetTable.$inferInsert,
+    'id' | 'createdAt' | 'updatedAt'
+>;
 
 export const assetModel = {
     async findOne(id: string) {
@@ -30,8 +34,13 @@ export const assetModel = {
     async createOne(asset: NewAsset) {
         return await db
             .insert(assetTable)
-            .values({ ...asset, createdAt: new Date(), updatedAt: new Date() })
-            .returning()
+            .values({
+                ...asset,
+                id: generatePublicId(),
+                createdAt: new Date(),
+                updatedAt: new Date(),
+            })
+            .returning({ id: assetTable.id })
             .then((assets) => assets[0]);
     },
 };
