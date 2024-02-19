@@ -29,8 +29,6 @@ class ReplicateClient {
         const webhook = new URL(`${env.ORIGIN}/api/webhook/separation`);
         webhook.searchParams.set('taskId', taskId);
         webhook.searchParams.set('userId', userId);
-        webhook.searchParams.set('secret', env.WEBHOOK_SECRET);
-        console.log('data before going into replicate', data);
         return this.replicate.predictions.create({
             version: env.TRACK_SEPARATION_MODEL_VERSION,
             input: data,
@@ -49,7 +47,6 @@ class ReplicateClient {
         const webhook = new URL(`${env.ORIGIN}/api/webhook/midi`);
         webhook.searchParams.set('taskId', taskId);
         webhook.searchParams.set('userId', userId);
-        webhook.searchParams.set('secret', env.WEBHOOK_SECRET);
         return this.replicate.predictions.create({
             version: env.MIDI_TRANSCRIPTION_MODEL_VERSION,
             input: data,
@@ -62,7 +59,6 @@ class ReplicateClient {
         const webhook = new URL(`${env.ORIGIN}/api/webhook/musicgen`);
         webhook.searchParams.set('taskId', taskId);
         webhook.searchParams.set('userId', userId);
-        webhook.searchParams.set('secret', env.WEBHOOK_SECRET);
         return this.replicate.predictions.create({
             version: env.MUSICGEN_MODEL_VERSION,
             input: data,
@@ -75,7 +71,6 @@ class ReplicateClient {
         const webhook = new URL(`${env.ORIGIN}/api/webhook/riffusion`);
         webhook.searchParams.set('taskId', taskId);
         webhook.searchParams.set('userId', userId);
-        webhook.searchParams.set('secret', env.WEBHOOK_SECRET);
         return this.replicate.predictions.create({
             version: env.RIFFUSION_MODEL_VERSION,
             input: data,

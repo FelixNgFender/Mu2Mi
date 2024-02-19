@@ -1,13 +1,9 @@
 import { separationFormSchema } from '@/app/studio/separation/new/schemas';
-import { env } from '@/config/env';
 import { z } from 'zod';
 
 export const webhookMetadataSchema = z.object({
     taskId: z.string().min(15).max(15), // = track id
     userId: z.string().min(15).max(15),
-    secret: z.string().refine((data) => data === env.WEBHOOK_SECRET, {
-        message: 'Invalid secret',
-    }),
 });
 
 export const trackSeparationInputSchema = separationFormSchema
@@ -18,11 +14,9 @@ export const trackSeparationInputSchema = separationFormSchema
         audio: z.string().url(),
     });
 
-const trackSeparationSchema = trackSeparationInputSchema
-    .merge(webhookMetadataSchema)
-    .omit({
-        secret: true,
-    });
+const trackSeparationSchema = trackSeparationInputSchema.merge(
+    webhookMetadataSchema,
+);
 
 export type TrackSeparationSchemaType = z.infer<typeof trackSeparationSchema>;
 
@@ -30,11 +24,9 @@ export const midiTranscriptionInputSchema = z.object({
     audio_file: z.string().url(),
 });
 
-const midiTranscriptionSchema = midiTranscriptionInputSchema
-    .merge(webhookMetadataSchema)
-    .omit({
-        secret: true,
-    });
+const midiTranscriptionSchema = midiTranscriptionInputSchema.merge(
+    webhookMetadataSchema,
+);
 
 export type MidiTranscriptionSchemaType = z.infer<
     typeof midiTranscriptionSchema
@@ -68,9 +60,7 @@ export const musicgenInputSchema = z.object({
     seed: z.number().int().optional(),
 });
 
-const musicgenSchema = musicgenInputSchema.merge(webhookMetadataSchema).omit({
-    secret: true,
-});
+const musicgenSchema = musicgenInputSchema.merge(webhookMetadataSchema);
 
 export type MusicgenSchemaType = z.infer<typeof musicgenSchema>;
 
@@ -97,9 +87,7 @@ export const riffusionInputSchema = z.object({
         .default('vibes'),
 });
 
-const riffusionSchema = riffusionInputSchema.merge(webhookMetadataSchema).omit({
-    secret: true,
-});
+const riffusionSchema = riffusionInputSchema.merge(webhookMetadataSchema);
 
 export type RiffusionSchemaType = z.infer<typeof riffusionSchema>;
 

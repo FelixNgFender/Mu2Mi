@@ -11,6 +11,7 @@ import {
 } from '@/types/replicate';
 import crypto from 'crypto';
 import { fileTypeFromBlob } from 'file-type';
+import { headers } from 'next/headers';
 
 export const replicateWebhookHandler = async <
     T extends ReplicateWebhookBodyTypes,
@@ -23,6 +24,53 @@ export const replicateWebhookHandler = async <
         | 'trackSeparationStatus',
     trackType?: (typeof assetConfig.trackAssetTypes)[number],
 ) => {
+    // https://replicate.com/docs/webhooks#verifying-webhooks
+    const body = await req.json();
+    const headersList = headers();
+    const webhookId = headersList.get('webhook-id');
+    const webhookTimestamp = headersList.get('webhook-timestamp');
+    const webhookSignatures = headersList.get('webhook-signature');
+    const signedContent = `${webhookId}.${webhookTimestamp}.${JSON.stringify(
+        body,
+    )}`;
+
+    if (
+        !webhookId ||
+        !webhookTimestamp ||
+        !webhookSignatures ||
+        !signedContent
+    ) {
+        return HttpResponse.badRequest('Missing required headers');
+    }
+
+    const secretBytes = Buffer.from(
+        // @ts-expect-error - Replicate webhook signing key should have base64 portion after _
+        env.REPLICATE_WEBHOOK_SECRET.split('_')[1],
+        'base64',
+    );
+    const computedSignature = crypto
+        .createHmac('sha256', secretBytes)
+        .update(signedContent)
+        .digest('base64');
+    const expectedSignatures = webhookSignatures
+        .split(' ')
+        .map((sig) => sig.split(',')[1]);
+    if (
+        !expectedSignatures.some(
+            (expectedSignature) => expectedSignature === computedSignature,
+        )
+    ) {
+        return HttpResponse.badRequest('Invalid signature');
+    }
+
+    const tolerance = 5 * 60 * 1000; // 5 minutes tolerance
+    const currentTimestamp = Math.floor(Date.now() / 1000); // current timestamp in seconds
+    const webhookTimestampSeconds = parseInt(webhookTimestamp);
+
+    if (Math.abs(currentTimestamp - webhookTimestampSeconds) > tolerance) {
+        return HttpResponse.badRequest('Timestamp out of tolerance');
+    }
+
     const searchParams = new URL(req.url).searchParams;
     const parsedParams = webhookMetadataSchema.safeParse(
         Object.fromEntries(searchParams),
@@ -33,7 +81,6 @@ export const replicateWebhookHandler = async <
     }
 
     const { taskId, userId } = parsedParams.data;
-    const body = await req.json();
     const { status, output, error } = body as T;
 
     if (error) {

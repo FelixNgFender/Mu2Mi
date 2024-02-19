@@ -52,7 +52,7 @@ const envSchema = z.object({
 
     // Replicate
     REPLICATE_API_TOKEN: isString,
-    WEBHOOK_SECRET: isString,
+    REPLICATE_WEBHOOK_SECRET: isString,
     TRACK_SEPARATION_MODEL_VERSION: isString,
     MIDI_TRANSCRIPTION_MODEL_VERSION: isString,
     MUSICGEN_MODEL_VERSION: isString,

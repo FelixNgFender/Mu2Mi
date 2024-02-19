@@ -1,4 +1,3 @@
-import { getUserSession } from '@/lib/auth';
 import { HttpResponse } from '@/lib/response';
 import { verifyRequestOrigin } from 'lucia';
 import { NextResponse } from 'next/server';
