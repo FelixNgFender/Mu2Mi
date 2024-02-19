@@ -3,13 +3,12 @@ import {
     MidiTranscriptionSchemaType,
     MusicgenSchemaType,
     RiffusionSchemaType,
-    SmartMetronomeSchemaType,
     TrackSeparationSchemaType,
 } from '@/types/replicate';
 import Replicate from 'replicate';
 import 'server-only';
 
-export class ReplicateClient {
+class ReplicateClient {
     replicate: Replicate;
 
     constructor({ auth }: { auth: string }) {
@@ -38,23 +37,6 @@ export class ReplicateClient {
             webhook: webhook.toString(),
             // start: immmediately on prediction start
             // completed: when the prediction reaches a terminal state (succeeded/canceled/failed)
-            webhook_events_filter: ['completed'],
-        });
-    }
-
-    async smartMetronome({
-        taskId,
-        userId,
-        ...data
-    }: SmartMetronomeSchemaType) {
-        const webhook = new URL(`${env.ORIGIN}/api/webhook/metronome`);
-        webhook.searchParams.set('taskId', taskId);
-        webhook.searchParams.set('userId', userId);
-        webhook.searchParams.set('secret', env.WEBHOOK_SECRET);
-        return this.replicate.predictions.create({
-            version: env.SMART_METRONOME_MODEL_VERSION,
-            input: data,
-            webhook: webhook.toString(),
             webhook_events_filter: ['completed'],
         });
     }

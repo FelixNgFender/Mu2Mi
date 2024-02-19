@@ -132,25 +132,13 @@ export const trackTableColumns: ColumnDef<Track>[] = [
     },
     {
         accessorKey: 'trackSeparationStatus',
-        header: 'Track Separation Status',
+        header: 'Status',
         cell: ({ row }) => (
             <div className="capitalize">
                 <span className="mr-2">
                     {getStatusIndicator(row.getValue('trackSeparationStatus'))}
                 </span>
                 {row.getValue('trackSeparationStatus')}
-            </div>
-        ),
-    },
-    {
-        accessorKey: 'smartMetronomeStatus',
-        header: 'Beat Detection Status',
-        cell: ({ row }) => (
-            <div className="capitalize">
-                <span className="mr-2">
-                    {getStatusIndicator(row.getValue('smartMetronomeStatus'))}
-                </span>
-                {row.getValue('smartMetronomeStatus')}
             </div>
         ),
     },

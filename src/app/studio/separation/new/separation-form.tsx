@@ -42,7 +42,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { separateTrackAndDetectBeat } from './actions';
+import { separateTrack } from './actions';
 import fourStemsImage from './assets/four-stems.jpg';
 import sixStemsImage from './assets/six-stems.jpg';
 import twoStemsImage from './assets/two-stems.jpg';
@@ -70,7 +70,6 @@ const steps = [
             'mp3_bitrate',
             'float32',
             'output_format',
-            'smart_metronome',
         ],
     },
     { id: 'Step 3', name: 'Upload file' },
@@ -99,7 +98,6 @@ export const SeparationForm = () => {
             mp3_bitrate: 320,
             float32: false,
             output_format: 'mp3',
-            smart_metronome: false,
         },
     });
 
@@ -207,10 +205,9 @@ export const SeparationForm = () => {
             return;
         }
 
-        const result = await separateTrackAndDetectBeat({
+        const result = await separateTrack({
             name: data.file.name,
             assetId: assetId,
-            smartMetronome: data.smart_metronome,
 
             model_name: data.model_name,
             stem: data.stem,
@@ -896,35 +893,6 @@ export const SeparationForm = () => {
                                                         <FormDescription>
                                                             Save WAV output as
                                                             float32 (2x bigger).
-                                                        </FormDescription>
-                                                    </div>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="smart_metronome"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
-                                                                field.onChange
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Generate smart
-                                                            metronome track
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            A smart click track
-                                                            that adapts to the
-                                                            tempo of your track.
                                                         </FormDescription>
                                                     </div>
                                                 </FormItem>

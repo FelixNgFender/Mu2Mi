@@ -13,7 +13,6 @@ export const webhookMetadataSchema = z.object({
 export const trackSeparationInputSchema = separationFormSchema
     .omit({
         file: true,
-        smart_metronome: true,
     })
     .extend({
         audio: z.string().url(),
@@ -26,21 +25,6 @@ const trackSeparationSchema = trackSeparationInputSchema
     });
 
 export type TrackSeparationSchemaType = z.infer<typeof trackSeparationSchema>;
-
-const smartMetronomeInputSchema = z.object({
-    audio: z.string().url(),
-    click_track: z.boolean().default(true),
-    combine_click_track: z.boolean().default(true),
-    detect_downbeat: z.boolean().default(false),
-});
-
-const smartMetronomeSchema = smartMetronomeInputSchema
-    .merge(webhookMetadataSchema)
-    .omit({
-        secret: true,
-    });
-
-export type SmartMetronomeSchemaType = z.infer<typeof smartMetronomeSchema>;
 
 export const midiTranscriptionInputSchema = z.object({
     audio_file: z.string().url(),
@@ -136,14 +120,6 @@ export interface TrackSeparationWebhookBody extends ReplicateWebhookBody {
     };
 }
 
-export interface SmartMetronomeWebhookBody extends ReplicateWebhookBody {
-    output: {
-        beats: string | null;
-        click: string | null;
-        combined: string | null;
-    };
-}
-
 export interface MidiTranscriptionWebhookBody extends ReplicateWebhookBody {
     output: string | null;
 }
@@ -161,7 +137,6 @@ export interface RiffusionWebhookBody extends ReplicateWebhookBody {
 
 export type ReplicateWebhookBodyTypes =
     | TrackSeparationWebhookBody
-    | SmartMetronomeWebhookBody
     | MidiTranscriptionWebhookBody
     | MusicGenWebhookBody
     | RiffusionWebhookBody;

@@ -86,7 +86,6 @@ export const separationFormSchema = z.object({
     output_format: z.enum(['mp3', 'wav', 'flac']).default('mp3'),
     mp3_bitrate: z.number().int().default(320),
     float32: z.boolean().default(false),
-    smart_metronome: z.boolean().default(false),
 });
 
 export type SeparationFormType = z.infer<typeof separationFormSchema>;

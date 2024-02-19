@@ -20,8 +20,7 @@ export const replicateWebhookHandler = async <
         | 'musicgenStatus'
         | 'riffusionStatus'
         | 'midiTranscriptionStatus'
-        | 'trackSeparationStatus'
-        | 'smartMetronomeStatus',
+        | 'trackSeparationStatus',
     trackType?: (typeof assetConfig.trackAssetTypes)[number],
 ) => {
     const searchParams = new URL(req.url).searchParams;
@@ -75,13 +74,6 @@ export const replicateWebhookHandler = async <
                 taskId,
                 userId,
                 (output as any).audio,
-                trackType,
-            );
-        } else if (typeof output === 'object' && trackType === 'metronome') {
-            await saveTrackAssetAndMetadata(
-                taskId,
-                userId,
-                (output as any).click,
                 trackType,
             );
         } else if (

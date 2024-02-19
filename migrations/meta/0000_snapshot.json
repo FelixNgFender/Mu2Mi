@@ -1,5 +1,5 @@
 {
-    "id": "d370df14-338c-43d3-ba24-4ae75b7c4b8e",
+    "id": "9d659bac-5f43-495c-a9d2-2de910976681",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "5",
     "dialect": "pg",
@@ -329,12 +329,6 @@
                     "primaryKey": false,
                     "notNull": false
                 },
-                "smart_metronome_status": {
-                    "name": "smart_metronome_status",
-                    "type": "replicate_task_status",
-                    "primaryKey": false,
-                    "notNull": false
-                },
                 "midi_transcription_status": {
                     "name": "midi_transcription_status",
                     "type": "replicate_task_status",
@@ -498,7 +492,6 @@
                 "drums": "drums",
                 "guitar": "guitar",
                 "piano": "piano",
-                "metronome": "metronome",
                 "midi": "midi",
                 "musicgen": "musicgen",
                 "riffusion": "riffusion"

@@ -11,7 +11,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "track_asset_type" AS ENUM('original', 'vocals', 'accompaniment', 'bass', 'drums', 'guitar', 'piano', 'metronome', 'midi', 'musicgen', 'riffusion');
+ CREATE TYPE "track_asset_type" AS ENUM('original', 'vocals', 'accompaniment', 'bass', 'drums', 'guitar', 'piano', 'midi', 'musicgen', 'riffusion');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -66,7 +66,6 @@ CREATE TABLE IF NOT EXISTS "track" (
 	"user_id" text NOT NULL,
 	"name" text NOT NULL,
 	"track_separation_status" "replicate_task_status",
-	"smart_metronome_status" "replicate_task_status",
 	"midi_transcription_status" "replicate_task_status",
 	"musicgen_status" "replicate_task_status",
 	"riffusion_status" "replicate_task_status",

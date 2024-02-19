@@ -19,18 +19,14 @@ const schema = trackSeparationInputSchema
     .extend({
         name: z.string(),
         assetId: z.string(),
-        smartMetronome: z.boolean(),
     });
 
-export const separateTrackAndDetectBeat = authAction(
+export const separateTrack = authAction(
     schema,
     async (data, { user }) => {
         const track = await trackModel.createOne({
             userId: user.id,
             trackSeparationStatus: 'processing',
-            smartMetronomeStatus: data.smartMetronome
-                ? 'processing'
-                : undefined,
             name: data.name,
         });
 
@@ -68,16 +64,6 @@ export const separateTrackAndDetectBeat = authAction(
             userId: user.id,
             audio: url,
         });
-        if (data.smartMetronome) {
-            await replicateClient.smartMetronome({
-                taskId: track.id,
-                userId: user.id,
-                audio: url,
-                click_track: true,
-                combine_click_track: false,
-                detect_downbeat: false,
-            });
-        }
 
         revalidatePath('/studio/separation'); // refresh track table on studio page
         return {
