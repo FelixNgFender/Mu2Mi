@@ -905,14 +905,46 @@ export const SeparationForm = () => {
                     )}
 
                     {currentStep === 2 && (
-                        <>
-                            <h2 className="text-base font-semibold leading-7 text-gray-900">
-                                Complete
+                        <motion.div
+                            className="flex flex-1 flex-col space-y-8"
+                            initial={{
+                                x: delta >= 0 ? '50%' : '-50%',
+                                opacity: 0,
+                            }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        >
+                            <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+                                Submission complete
                             </h2>
-                            <p className="mt-1 text-sm leading-6 text-gray-600">
-                                Thank you for your submission.
+                            <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
+                                Your track has been submitted for processing.{' '}
+                                <a
+                                    href="/studio/separation/new"
+                                    className={cn(
+                                        buttonVariants({
+                                            variant: 'link',
+                                        }),
+                                        'p-0',
+                                    )}
+                                >
+                                    Separate a new track
+                                </a>{' '}
+                                or{' '}
+                                <Link
+                                    href="/studio/separation"
+                                    className={cn(
+                                        buttonVariants({
+                                            variant: 'link',
+                                        }),
+                                        'p-0',
+                                    )}
+                                >
+                                    view the status
+                                </Link>{' '}
+                                of your newly submitted track.
                             </p>
-                        </>
+                        </motion.div>
                     )}
                 </form>
             </Form>
