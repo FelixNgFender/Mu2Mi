@@ -1,4 +1,4 @@
-import { trackSeparationModels } from '@/app/studio/separation/new/schemas';
+import { separationFormSchema } from '@/app/studio/separation/new/schemas';
 import { env } from '@/config/env';
 import { z } from 'zod';
 
@@ -10,24 +10,14 @@ export const webhookMetadataSchema = z.object({
     }),
 });
 
-export const trackSeparationInputSchema = z.object({
-    audio: z.string().url(),
-    model_name: z
-        .enum([...trackSeparationModels.map((model) => model.name)] as [
-            string,
-            ...string[],
-        ])
-        .default('htdemucs'),
-    stem: z
-        .enum(['vocals', 'bass', 'drums', 'guitar', 'piano', 'other'])
-        .optional(),
-    clip_mode: z.enum(['rescale', 'clamp']).default('rescale'),
-    shifts: z.number().int().min(1).max(10).default(1),
-    overlap: z.number().default(0.25),
-    mp3_bitrate: z.number().int().default(320),
-    float32: z.boolean().default(false),
-    output_format: z.enum(['mp3', 'wav', 'flac']).default('mp3'),
-});
+export const trackSeparationInputSchema = separationFormSchema
+    .omit({
+        file: true,
+        smart_metronome: true,
+    })
+    .extend({
+        audio: z.string().url(),
+    });
 
 const trackSeparationSchema = trackSeparationInputSchema
     .merge(webhookMetadataSchema)

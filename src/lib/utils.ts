@@ -12,3 +12,5 @@ export const formatValidationErrors = (
         .map(([key, value]) => `${key}: ${value?.join(', ') ?? ''}`)
         .join(', ');
 };
+
+export const zodEnum = <T>(arr: T[]): [T, ...T[]] => arr as [T, ...T[]];
