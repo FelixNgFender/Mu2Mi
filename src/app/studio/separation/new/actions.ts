@@ -6,7 +6,6 @@ import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { replicateClient } from '@/lib/replicate';
 import { authAction } from '@/lib/safe-action';
-import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import { trackSeparationInputSchema } from '@/types/replicate';
 import { revalidatePath } from 'next/cache';
@@ -21,53 +20,40 @@ const schema = trackSeparationInputSchema
         assetId: z.string(),
     });
 
-export const separateTrack = authAction(
-    schema,
-    async (data, { user }) => {
-        const track = await trackModel.createOne({
+export const separateTrack = authAction(schema, async (data, { user }) => {
+    const newTrack = await trackModel.createOneAndUpdateAsset(
+        {
             userId: user.id,
             trackSeparationStatus: 'processing',
             name: data.name,
-        });
+        },
+        data.assetId,
+    );
 
-        if (!track) {
-            throw new AppError(
-                'HttpError',
-                'Failed to create track',
-                true,
-                httpStatus.serverError.internalServerError.code,
-            );
-        }
-
-        const asset = await assetModel.updateOne(data.assetId, {
-            trackId: track.id,
-        });
-
-        if (!asset) {
-            throw new AppError(
-                'HttpError',
-                'Failed to update asset',
-                true,
-                httpStatus.serverError.internalServerError.code,
-            );
-        }
-
-        const url = await fileStorageClient.presignedGetObject(
-            env.S3_BUCKET_NAME,
-            asset.name,
-            env.S3_PRESIGNED_URL_EXPIRATION_S,
+    if (!newTrack) {
+        throw new AppError(
+            'HttpError',
+            'Failed to create track',
+            true,
+            httpStatus.serverError.internalServerError.code,
         );
+    }
 
-        await replicateClient.separateTrack({
-            ...data,
-            taskId: track.id,
-            userId: user.id,
-            audio: url,
-        });
+    const url = await fileStorageClient.presignedGetObject(
+        env.S3_BUCKET_NAME,
+        newTrack.assetName,
+        env.S3_PRESIGNED_URL_EXPIRATION_S,
+    );
 
-        revalidatePath('/studio/separation'); // refresh track table on studio page
-        return {
-            success: true,
-        };
-    },
-);
+    await replicateClient.separateTrack({
+        ...data,
+        taskId: newTrack.trackId,
+        userId: user.id,
+        audio: url,
+    });
+
+    revalidatePath('/studio/separation'); // refresh track table on studio page
+    return {
+        success: true,
+    };
+});

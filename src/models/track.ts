@@ -1,5 +1,5 @@
 import { db } from '@/db';
-import { trackTable } from '@/db/schema';
+import { assetTable, trackTable } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import 'server-only';
 
@@ -53,5 +53,41 @@ export const trackModel = {
                 id: trackTable.id,
             })
             .then((tracks) => tracks[0]);
+    },
+
+    async createOneAndUpdateAsset(track: NewTrack, assetId: string) {
+        return await db.transaction(async (tx) => {
+            const newTrack = await tx
+                .insert(trackTable)
+                .values({
+                    ...track,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                })
+                .returning({
+                    id: trackTable.id,
+                })
+                .then((tracks) => tracks[0]);
+
+            if (!newTrack) {
+                return;
+            }
+
+            const newAsset = await tx
+                .update(assetTable)
+                .set({ trackId: newTrack.id })
+                .where(eq(trackTable.id, assetId))
+                .returning({ name: assetTable.name })
+                .then((assets) => assets[0]);
+
+            if (!newAsset) {
+                return;
+            }
+
+            return {
+                trackId: newTrack.id,
+                assetName: newAsset.name,
+            };
+        });
     },
 };

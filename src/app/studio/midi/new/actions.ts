@@ -6,7 +6,6 @@ import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { replicateClient } from '@/lib/replicate';
 import { authAction } from '@/lib/safe-action';
-import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import { midiTranscriptionInputSchema } from '@/types/replicate';
 import { revalidatePath } from 'next/cache';
@@ -22,13 +21,16 @@ const schema = midiTranscriptionInputSchema
     });
 
 export const transcribeMidi = authAction(schema, async (data, { user }) => {
-    const track = await trackModel.createOne({
-        userId: user.id,
-        midiTranscriptionStatus: 'processing',
-        name: data.name,
-    });
+    const newTrack = await trackModel.createOneAndUpdateAsset(
+        {
+            userId: user.id,
+            midiTranscriptionStatus: 'processing',
+            name: data.name,
+        },
+        data.assetId,
+    );
 
-    if (!track) {
+    if (!newTrack) {
         throw new AppError(
             'HttpError',
             'Failed to create track',
@@ -37,28 +39,15 @@ export const transcribeMidi = authAction(schema, async (data, { user }) => {
         );
     }
 
-    const asset = await assetModel.updateOne(data.assetId, {
-        trackId: track.id,
-    });
-
-    if (!asset) {
-        throw new AppError(
-            'HttpError',
-            'Failed to update asset',
-            true,
-            httpStatus.serverError.internalServerError.code,
-        );
-    }
-
     const url = await fileStorageClient.presignedGetObject(
         env.S3_BUCKET_NAME,
-        asset.name,
+        newTrack.assetName,
         env.S3_PRESIGNED_URL_EXPIRATION_S,
     );
 
     await replicateClient.midiTranscription({
         ...data,
-        taskId: track.id,
+        taskId: newTrack.trackId,
         userId: user.id,
         audio_file: url,
     });
