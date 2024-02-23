@@ -5,6 +5,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 
 const MidiPlayer = dynamic(() => import('../midi-player'), {
     ssr: false,
@@ -19,6 +20,8 @@ type MidiTrackPageProps = {
 };
 
 const MidiTrackPage = ({ params }: MidiTrackPageProps) => {
+    const searchParams = useSearchParams();
+    const callback = searchParams.get('callback');
     const {
         isPending,
         isError,
@@ -49,6 +52,7 @@ const MidiTrackPage = ({ params }: MidiTrackPageProps) => {
     return (
         <MidiPlayer
             initialURL={assetLinks?.find((a) => a.type === 'midi')?.url}
+            callback={callback ? callback : undefined}
         />
     );
 };

@@ -1,5 +1,5 @@
 DO $$ BEGIN
- CREATE TYPE "mime_type" AS ENUM('audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/flac', 'audio/mp4', 'audio/mov', 'audio/wma', 'audio/ogg', 'audio/m4a', 'audio/midi', 'audio/x-midi');
+ CREATE TYPE "mime_type" AS ENUM('audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/flac', 'audio/mp4', 'audio/mov', 'audio/wma', 'audio/ogg', 'audio/m4a', 'image/png', 'application/json', 'audio/midi', 'audio/x-midi');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -11,7 +11,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "track_asset_type" AS ENUM('original', 'vocals', 'accompaniment', 'bass', 'drums', 'guitar', 'piano', 'midi', 'musicgen', 'riffusion');
+ CREATE TYPE "track_asset_type" AS ENUM('original', 'vocals', 'accompaniment', 'bass', 'drums', 'guitar', 'piano', 'analysis', 'analysis_sonic', 'analysis_viz', 'midi', 'musicgen', 'riffusion');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS "track" (
 	"user_id" text NOT NULL,
 	"name" text NOT NULL,
 	"track_separation_status" "replicate_task_status",
+	"track_analysis_status" "replicate_task_status",
 	"midi_transcription_status" "replicate_task_status",
 	"musicgen_status" "replicate_task_status",
 	"riffusion_status" "replicate_task_status",

@@ -13,7 +13,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
@@ -30,16 +29,16 @@ import {
 } from '@magenta/music/es6';
 import { ChevronLeftCircle, Loader2, Pause, Play } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 
 import './midi-player.css';
 
 type MidiPlayerProps = {
     initialURL?: string;
+    callback?: string;
 };
 
-const MidiPlayer = ({ initialURL }: MidiPlayerProps) => {
+const MidiPlayer = ({ initialURL, callback }: MidiPlayerProps) => {
     const playerRef = useRef<SoundFontPlayer | null>(null);
     const svgRef = useRef<SVGSVGElement | null>(null);
     const waterfallRef = useRef<HTMLDivElement | null>(null);
@@ -55,8 +54,6 @@ const MidiPlayer = ({ initialURL }: MidiPlayerProps) => {
     const [midiUrl, setMidiUrl] = useState<string | null>(initialURL ?? null);
     const [tempo, setTempo] = useState(100);
     const { toast } = useToast();
-    const pathname = usePathname();
-    const isTrackPage = pathname.includes('/studio/track/midi/');
 
     useEffect(() => {
         if (playerRef.current) {
@@ -157,9 +154,9 @@ const MidiPlayer = ({ initialURL }: MidiPlayerProps) => {
                     className="my-1 flex w-full justify-between space-x-2"
                     role="group"
                 >
-                    {isTrackPage && (
+                    {callback && (
                         <Link
-                            href="/studio/midi"
+                            href={callback}
                             className={cn(
                                 buttonVariants({ variant: 'link' }),
                                 'my-auto self-start',
@@ -259,7 +256,7 @@ const MidiPlayer = ({ initialURL }: MidiPlayerProps) => {
                 </div>
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
-            {!isTrackPage && (
+            {!callback && (
                 <Dropzone
                     classNameWrapper="w-full flex-1 max-h-64"
                     className="h-full w-full"

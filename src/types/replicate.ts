@@ -1,3 +1,4 @@
+import { analysisFormSchema } from '@/app/studio/analysis/new/schemas';
 import { separationFormSchema } from '@/app/studio/separation/new/schemas';
 import { z } from 'zod';
 
@@ -19,6 +20,20 @@ const trackSeparationSchema = trackSeparationInputSchema.merge(
 );
 
 export type TrackSeparationSchemaType = z.infer<typeof trackSeparationSchema>;
+
+export const trackAnalysisInputSchema = analysisFormSchema
+    .omit({
+        file: true,
+    })
+    .extend({
+        music_input: z.string().url(),
+    });
+
+const trackAnalysisSchema = trackAnalysisInputSchema.merge(
+    webhookMetadataSchema,
+);
+
+export type TrackAnalysisSchemaType = z.infer<typeof trackAnalysisSchema>;
 
 export const midiTranscriptionInputSchema = z.object({
     audio_file: z.string().url(),
@@ -108,6 +123,10 @@ export interface TrackSeparationWebhookBody extends ReplicateWebhookBody {
     };
 }
 
+export interface TrackAnalysisWebhookBody extends ReplicateWebhookBody {
+    output: [string | null, string | null, string | null];
+}
+
 export interface MidiTranscriptionWebhookBody extends ReplicateWebhookBody {
     output: string | null;
 }
@@ -125,6 +144,7 @@ export interface RiffusionWebhookBody extends ReplicateWebhookBody {
 
 export type ReplicateWebhookBodyTypes =
     | TrackSeparationWebhookBody
+    | TrackAnalysisWebhookBody
     | MidiTranscriptionWebhookBody
     | MusicGenWebhookBody
     | RiffusionWebhookBody;

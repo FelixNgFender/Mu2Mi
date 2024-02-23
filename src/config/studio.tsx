@@ -130,3 +130,10 @@ export const studioConfig: StudioConfig = {
         },
     ],
 };
+
+export type TrackStatusColumn =
+    | 'trackSeparationStatus'
+    | 'trackAnalysisStatus'
+    | 'midiTranscriptionStatus'
+    | 'musicgenStatus'
+    | 'riffusionStatus';

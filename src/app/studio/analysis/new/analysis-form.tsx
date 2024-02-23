@@ -20,8 +20,6 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
     Select,
     SelectContent,
@@ -31,7 +29,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { trackSeparationAssetConfig } from '@/config/asset';
+import { trackAnalysisAssetConfig } from '@/config/asset';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
@@ -42,14 +40,15 @@ import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { getPresignedUrl } from '../../actions';
-import { separateTrack } from './actions';
-import fourStemsImage from './assets/four-stems.jpg';
-import sixStemsImage from './assets/six-stems.jpg';
-import twoStemsImage from './assets/two-stems.jpg';
+import { analyzeTrack } from './actions';
+import allImage from './assets/all.jpg';
+import defaultPresetImage from './assets/default.jpg';
+import withSonificationImage from './assets/with-sonification.jpg';
+import withVisualizationImage from './assets/with-visualization.jpg';
 import {
-    SeparationFormType,
-    separationFormSchema,
-    trackSeparationModels,
+    AnalysisFormType,
+    analysisFormSchema,
+    trackAnalysisModels,
 } from './schemas';
 
 const steps = [
@@ -62,46 +61,44 @@ const steps = [
         id: 'Step 2',
         name: 'Preferences',
         fields: [
-            'model_name',
-            'stem',
-            'clip_mode',
-            'shifts',
-            'overlap',
-            'mp3_bitrate',
-            'float32',
-            'output_format',
+            'visualize',
+            'sonify',
+            'activ',
+            'embed',
+            'model',
+            'include_activations',
+            'include_embeddings',
         ],
     },
     { id: 'Step 3', name: 'Upload file' },
 ];
 
-export const SeparationForm = () => {
+export const AnalysisForm = () => {
     const { toast } = useToast();
 
     const [file, setFile] = useState<File | null>(null);
     const [selectedPreset, setSelectedPreset] = useState<
-        (typeof separationPresets)[number]['id'] | null
+        (typeof analysisPresets)[number]['id'] | null
     >(null);
     const [previousStep, setPreviousStep] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
     const delta = currentStep - previousStep;
 
-    const form = useForm<SeparationFormType>({
-        resolver: zodResolver(separationFormSchema),
+    const form = useForm<AnalysisFormType>({
+        resolver: zodResolver(analysisFormSchema),
         defaultValues: {
             file: null,
-            model_name: 'htdemucs',
-            stem: undefined,
-            clip_mode: 'rescale',
-            shifts: 1,
-            overlap: 0.25,
-            mp3_bitrate: 320,
-            float32: false,
-            output_format: 'mp3',
+            visualize: false,
+            sonify: false,
+            activ: false,
+            embed: false,
+            model: 'harmonix-all',
+            include_activations: false,
+            include_embeddings: false,
         },
     });
 
-    type FieldName = keyof SeparationFormType;
+    type FieldName = keyof AnalysisFormType;
 
     const next = async () => {
         const fields = steps[currentStep]?.fields;
@@ -162,7 +159,7 @@ export const SeparationForm = () => {
 
     const handleFileUpload = async (file: File) => {
         const result = await getPresignedUrl({
-            type: file.type as (typeof trackSeparationAssetConfig.allowedMimeTypes)[number],
+            type: file.type as (typeof trackAnalysisAssetConfig.allowedMimeTypes)[number],
             extension: file.name.split('.').pop() || '',
             size: file.size,
             checksum: await computeSHA256(file),
@@ -194,7 +191,7 @@ export const SeparationForm = () => {
         }
     };
 
-    const onSubmit: SubmitHandler<SeparationFormType> = async (data) => {
+    const onSubmit: SubmitHandler<AnalysisFormType> = async (data) => {
         toast({
             description: 'Your file is being uploaded.',
         });
@@ -205,18 +202,17 @@ export const SeparationForm = () => {
             return;
         }
 
-        const result = await separateTrack({
+        const result = await analyzeTrack({
             name: data.file.name,
             assetId: assetId,
 
-            model_name: data.model_name,
-            stem: data.stem,
-            clip_mode: data.clip_mode,
-            shifts: data.shifts,
-            overlap: data.overlap,
-            mp3_bitrate: data.mp3_bitrate,
-            float32: data.float32,
-            output_format: data.output_format,
+            visualize: data.visualize,
+            sonify: data.sonify,
+            activ: data.activ,
+            embed: data.embed,
+            model: data.model,
+            include_activations: data.include_activations,
+            include_embeddings: data.include_embeddings,
         });
 
         if (result.validationErrors) {
@@ -254,94 +250,64 @@ export const SeparationForm = () => {
         });
     };
 
-    const separationPresets = [
+    const analysisPresets = [
         {
-            id: 'two-stems',
-            icon: twoStemsImage,
-            name: 'Two stems',
-            description: 'Separate your track into vocals and accompaniment.',
-            labels: ['vocals', 'accompaniment'],
+            id: 'default',
+            icon: defaultPresetImage,
+            name: 'Default',
+            description:
+                "Analyzes the track's musical structure (tempo, beats, downbeats, section boundaries, and segment labels).",
+            labels: ['analysis'],
             onClick: () => {
                 resetAllButFile();
-                form.setValue('model_name', 'htdemucs', {
-                    shouldValidate: true,
-                });
-                form.setValue('stem', 'vocals', {
-                    shouldValidate: true,
-                });
-                setSelectedPreset('two-stems');
+                setSelectedPreset('default');
             },
         },
         {
-            id: 'two-stems-finetuned',
-            icon: twoStemsImage,
-            name: 'Two stems (finetuned)',
+            id: 'with-visualization',
+            icon: withVisualizationImage,
+            name: 'With visualization',
             description:
-                'Same as two stems. Takes longer but improves quality.',
-            labels: ['vocals', 'accompaniment'],
+                "Same as default. Also includes a visualization of the track's musical structure.",
+            labels: ['analysis', 'visualization'],
             onClick: () => {
                 resetAllButFile();
-                form.setValue('model_name', 'htdemucs_ft', {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                    shouldTouch: true,
-                });
-                form.setValue('stem', 'vocals', {
+                form.setValue('visualize', true, {
                     shouldValidate: true,
                 });
-                setSelectedPreset('two-stems-finetuned');
+                setSelectedPreset('with-visualization');
             },
         },
         {
-            id: 'four-stems',
-            icon: fourStemsImage,
-            name: 'Four stems',
+            id: 'with-sonification',
+            icon: withSonificationImage,
+            name: 'With sonification',
             description:
-                'Separate your track into vocals, accompaniment, bass, and drums.',
-            labels: ['vocals', 'accompaniment', 'bass', 'drums'],
+                'Same as default. Also includes a mix of a click track with section callouts and the original audio.',
+            labels: ['analysis', 'sonification'],
             onClick: () => {
                 resetAllButFile();
-                form.setValue('model_name', 'htdemucs', {
+                form.setValue('sonify', true, {
                     shouldValidate: true,
                 });
-                setSelectedPreset('four-stems');
+                setSelectedPreset('with-sonification');
             },
         },
         {
-            id: 'four-stems-finetuned',
-            icon: fourStemsImage,
-            name: 'Four stems (finetuned)',
-            description:
-                'Same as four stems. Takes longer but improves quality.',
-            labels: ['vocals', 'accompaniment', 'bass', 'drums'],
+            id: 'all',
+            icon: allImage,
+            name: 'All',
+            description: 'Includes all available data.',
+            labels: ['analysis', 'sonification', 'visualization'],
             onClick: () => {
                 resetAllButFile();
-                form.setValue('model_name', 'htdemucs_ft', {
+                form.setValue('sonify', true, {
                     shouldValidate: true,
                 });
-                setSelectedPreset('four-stems-finetuned');
-            },
-        },
-        {
-            id: 'six-stems',
-            icon: sixStemsImage,
-            name: 'Six stems',
-            description:
-                'Separate your track into vocals, accompaniment, bass, drums, guitar, and piano.',
-            labels: [
-                'vocals',
-                'accompaniment',
-                'bass',
-                'drums',
-                'guitar',
-                'piano',
-            ],
-            onClick: () => {
-                resetAllButFile();
-                form.setValue('model_name', 'htdemucs_6s', {
+                form.setValue('visualize', true, {
                     shouldValidate: true,
                 });
-                setSelectedPreset('six-stems');
+                setSelectedPreset('all');
             },
         },
     ] as const;
@@ -449,7 +415,7 @@ export const SeparationForm = () => {
                                                             form.formState
                                                                 .isSubmitting
                                                         }
-                                                        accept={trackSeparationAssetConfig.allowedMimeTypes.join(
+                                                        accept={trackAnalysisAssetConfig.allowedMimeTypes.join(
                                                             ', ',
                                                         )}
                                                         dropMessage={
@@ -473,7 +439,7 @@ export const SeparationForm = () => {
                                                 </FormControl>
                                                 <FormDescription>
                                                     Supports:{' '}
-                                                    {` ${trackSeparationAssetConfig.allowedFileTypes
+                                                    {` ${trackAnalysisAssetConfig.allowedFileTypes
                                                         .map((type) =>
                                                             type.toUpperCase(),
                                                         )
@@ -523,7 +489,7 @@ export const SeparationForm = () => {
                                 Choose a preset
                             </h2>
                             <div className="flex flex-col space-y-4 p-4 pt-0">
-                                {separationPresets.map((item) => (
+                                {analysisPresets.map((item) => (
                                     <BackgroundGradient
                                         key={item.id}
                                         className="rounded-3xl bg-background"
@@ -585,233 +551,15 @@ export const SeparationForm = () => {
                                     <AccordionContent className="flex flex-1 flex-col space-y-8 p-4">
                                         <FormField
                                             control={form.control}
-                                            name="model_name"
+                                            name="model"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-3">
-                                                    <FormLabel>Model</FormLabel>
+                                                    <FormLabel>
+                                                        Model name
+                                                    </FormLabel>
                                                     <FormDescription>
                                                         Choose a model to
-                                                        separate your track
-                                                        with.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <RadioGroup
-                                                            onValueChange={
-                                                                field.onChange
-                                                            }
-                                                            value={field.value}
-                                                            className="flex flex-col space-y-1"
-                                                        >
-                                                            {trackSeparationModels.map(
-                                                                (model) => (
-                                                                    <FormItem
-                                                                        key={
-                                                                            model.name
-                                                                        }
-                                                                        className="flex items-center space-x-3 space-y-0"
-                                                                    >
-                                                                        <FormControl>
-                                                                            <RadioGroupItem
-                                                                                value={
-                                                                                    model.name
-                                                                                }
-                                                                            />
-                                                                        </FormControl>
-                                                                        <FormLabel className="font-normal">
-                                                                            {
-                                                                                model.name
-                                                                            }
-                                                                        </FormLabel>
-                                                                        <FormDescription className="no-scrollbar overflow-x-auto whitespace-nowrap text-sm">
-                                                                            {
-                                                                                model.description
-                                                                            }
-                                                                        </FormDescription>
-                                                                    </FormItem>
-                                                                ),
-                                                            )}
-                                                        </RadioGroup>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="stem"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <FormLabel>
-                                                        Separate into stem
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Only separate audio into
-                                                        the chosen stem and
-                                                        others (no stem).
-                                                        Optional.
-                                                    </FormDescription>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        value={field.value}
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger>
-                                                                {field.value ? (
-                                                                    <SelectValue placeholder="Choose a stem" />
-                                                                ) : (
-                                                                    'Choose a stem'
-                                                                )}
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {[
-                                                                'vocals',
-                                                                'bass',
-                                                                'drums',
-                                                                'guitar',
-                                                                'piano',
-                                                                'other',
-                                                            ].map((stem) => (
-                                                                <SelectItem
-                                                                    key={stem}
-                                                                    value={stem}
-                                                                >
-                                                                    {stem[0]?.toUpperCase() +
-                                                                        stem.slice(
-                                                                            1,
-                                                                        )}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="clip_mode"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <FormLabel>
-                                                        Clip mode
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Strategy for avoiding
-                                                        clipping: rescaling
-                                                        entire signal if
-                                                        necessary (rescale) or
-                                                        hard clipping (clamp).
-                                                    </FormDescription>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        defaultValue={
-                                                            field.value
-                                                        }
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Choose clip mode" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {[
-                                                                'rescale',
-                                                                'clamp',
-                                                            ].map(
-                                                                (clipMode) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            clipMode
-                                                                        }
-                                                                        value={
-                                                                            clipMode
-                                                                        }
-                                                                    >
-                                                                        {clipMode[0]?.toUpperCase() +
-                                                                            clipMode.slice(
-                                                                                1,
-                                                                            )}
-                                                                    </SelectItem>
-                                                                ),
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="shifts"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Shifts
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Number of random shifts
-                                                        for equivariant
-                                                        stabilization. Increase
-                                                        separation time but
-                                                        improves quality of
-                                                        track separation.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="overlap"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Overlap
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Overlap between the
-                                                        splits.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="output_format"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <FormLabel>
-                                                        Output format
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Format of the output
-                                                        file.
+                                                        analyze your track with.
                                                     </FormDescription>
                                                     <Select
                                                         onValueChange={
@@ -825,20 +573,20 @@ export const SeparationForm = () => {
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            {[
-                                                                'mp3',
-                                                                'wav',
-                                                                'flac',
-                                                            ].map((format) => (
-                                                                <SelectItem
-                                                                    key={format}
-                                                                    value={
-                                                                        format
-                                                                    }
-                                                                >
-                                                                    {format.toUpperCase()}
-                                                                </SelectItem>
-                                                            ))}
+                                                            {trackAnalysisModels.map(
+                                                                (model) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            model
+                                                                        }
+                                                                        value={
+                                                                            model
+                                                                        }
+                                                                    >
+                                                                        {model}
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
@@ -847,33 +595,7 @@ export const SeparationForm = () => {
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="mp3_bitrate"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        MP3 bitrate
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Bitrate of the converted
-                                                        MP3 track.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="float32"
+                                            name="visualize"
                                             render={({ field }) => (
                                                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                                     <FormControl>
@@ -888,11 +610,131 @@ export const SeparationForm = () => {
                                                     </FormControl>
                                                     <div className="space-y-1 leading-none">
                                                         <FormLabel>
-                                                            Save as float32
+                                                            Visualize track
                                                         </FormLabel>
                                                         <FormDescription>
-                                                            Save WAV output as
-                                                            float32 (2x bigger).
+                                                            Save track
+                                                            analysis&apos;s
+                                                            visualization.
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="sonify"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Sonify track
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Save track
+                                                            analysis&apos;s
+                                                            sonification. This
+                                                            will include a mix
+                                                            of a click track
+                                                            with section
+                                                            callouts and the
+                                                            original audio.
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="activ"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Save activations
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Save frame-level raw
+                                                            activations from
+                                                            sigmoid and softmax
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="include_activations"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Include activations
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Whether to include
+                                                            activations in the
+                                                            analysis results or
+                                                            not.
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="include_embeddings"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Include embeddings
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Whether to include
+                                                            embeddings in the
+                                                            analysis results or
+                                                            not.
                                                         </FormDescription>
                                                     </div>
                                                 </FormItem>
@@ -920,7 +762,7 @@ export const SeparationForm = () => {
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
                                 Your track has been submitted for processing.{' '}
                                 <a
-                                    href="/studio/separation/new"
+                                    href="/studio/analysis/new"
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -928,11 +770,11 @@ export const SeparationForm = () => {
                                         'p-0',
                                     )}
                                 >
-                                    Separate a new track
+                                    Analyze a new track
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio/separation"
+                                    href="/studio/analysis"
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -985,15 +827,15 @@ export const SeparationForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/separation/new"
+                            href="/studio/analysis/new"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
                         >
-                            Separate new track
+                            Analyze new track
                         </a>
                         <Link
-                            href="/studio/separation"
+                            href="/studio/analysis"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

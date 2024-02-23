@@ -3,6 +3,7 @@ import {
     MidiTranscriptionSchemaType,
     MusicgenSchemaType,
     RiffusionSchemaType,
+    TrackAnalysisSchemaType,
     TrackSeparationSchemaType,
 } from '@/types/replicate';
 import Replicate from 'replicate';
@@ -35,6 +36,18 @@ class ReplicateClient {
             webhook: webhook.toString(),
             // start: immmediately on prediction start
             // completed: when the prediction reaches a terminal state (succeeded/canceled/failed)
+            webhook_events_filter: ['completed'],
+        });
+    }
+
+    async analyzeTrack({ taskId, userId, ...data }: TrackAnalysisSchemaType) {
+        const webhook = new URL(`${env.ORIGIN}/api/webhook/analysis`);
+        webhook.searchParams.set('taskId', taskId);
+        webhook.searchParams.set('userId', userId);
+        return this.replicate.predictions.create({
+            version: env.TRACK_ANALYSIS_MODEL_VERSION,
+            input: data,
+            webhook: webhook.toString(),
             webhook_events_filter: ['completed'],
         });
     }

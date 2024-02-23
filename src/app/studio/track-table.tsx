@@ -2,13 +2,20 @@
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DataTable } from '@/components/ui/data-table';
+import { TrackStatusColumn } from '@/config/studio';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
-import { getTracks } from '../actions';
-import { trackTableColumns } from './track-table-columns';
+import { getTracks } from './actions';
+import { trackTableColumnsBuiler } from './track-table-columns';
 
-export const TrackTable = () => {
+type TrackTableProps = {
+    filter: TrackStatusColumn;
+};
+
+export const TrackTable = ({ filter }: TrackTableProps) => {
+    const pathname = usePathname();
     const {
         isPending,
         isError,
@@ -40,10 +47,26 @@ export const TrackTable = () => {
         );
     }
 
+    const previewPath = pathname.includes('separation')
+        ? '/studio/track'
+        : pathname.includes('analysis')
+          ? '/studio/track'
+          : pathname.includes('midi')
+            ? '/studio/track/midi'
+            : undefined;
+
+    const callback = pathname.includes('separation')
+        ? '/studio/separation'
+        : pathname.includes('analysis')
+          ? '/studio/analysis'
+          : pathname.includes('midi')
+            ? '/studio/midi'
+            : undefined;
+
     return (
         <DataTable
-            columns={trackTableColumns}
-            data={tracks.filter((track) => track.midiTranscriptionStatus)}
+            columns={trackTableColumnsBuiler(filter, previewPath, callback)}
+            data={tracks.filter((track) => track[filter])}
         />
     );
 };

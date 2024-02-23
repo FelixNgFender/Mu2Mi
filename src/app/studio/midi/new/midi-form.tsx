@@ -1,6 +1,5 @@
 'use client';
 
-import { getPresignedUrl } from '@/app/studio/uploads/actions';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Dropzone } from '@/components/ui/dropzone';
 import {
@@ -22,6 +21,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import { getPresignedUrl } from '../../actions';
 import { transcribeMidi } from './actions';
 import { MidiFormSchemaType, midiFormSchema } from './schemas';
 

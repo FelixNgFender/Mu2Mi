@@ -1,5 +1,6 @@
 import { assetConfig } from '@/config/asset';
 import { env } from '@/config/env';
+import { TrackStatusColumn } from '@/config/studio';
 import { fileStorageClient } from '@/db';
 import { AppError } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
@@ -12,16 +13,13 @@ import {
 import crypto from 'crypto';
 import { fileTypeFromBlob } from 'file-type';
 import { headers } from 'next/headers';
+import path from 'path';
 
 export const replicateWebhookHandler = async <
     T extends ReplicateWebhookBodyTypes,
 >(
     req: Request,
-    statusField:
-        | 'musicgenStatus'
-        | 'riffusionStatus'
-        | 'midiTranscriptionStatus'
-        | 'trackSeparationStatus',
+    statusField: TrackStatusColumn,
     trackType?: (typeof assetConfig.trackAssetTypes)[number],
 ) => {
     // https://replicate.com/docs/webhooks#verifying-webhooks
@@ -136,6 +134,46 @@ export const replicateWebhookHandler = async <
                             url,
                             stem === 'other' ? 'accompaniment' : (stem as any),
                         );
+                    }
+                }),
+            );
+        } else if (
+            Array.isArray(output) &&
+            statusField === 'trackAnalysisStatus'
+        ) {
+            await Promise.all(
+                output.map(async (url) => {
+                    if (url) {
+                        const extension = path.extname(url);
+                        switch (extension) {
+                            case '.json': {
+                                await saveTrackAssetAndMetadata(
+                                    taskId,
+                                    userId,
+                                    url,
+                                    'analysis',
+                                );
+                                break;
+                            }
+                            case '.png': {
+                                await saveTrackAssetAndMetadata(
+                                    taskId,
+                                    userId,
+                                    url,
+                                    'analysis_viz',
+                                );
+                                break;
+                            }
+                            case '.mp3': {
+                                await saveTrackAssetAndMetadata(
+                                    taskId,
+                                    userId,
+                                    url,
+                                    'analysis_sonic',
+                                );
+                                break;
+                            }
+                        }
                     }
                 }),
             );

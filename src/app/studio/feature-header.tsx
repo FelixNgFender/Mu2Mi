@@ -1,23 +1,31 @@
-'use client';
-
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { LucideUpload } from 'lucide-react';
 import Link from 'next/link';
 
-export const MidiHeader = () => {
+type FeatureHeaderProps = {
+    title: string;
+    href: string;
+    ctaLabel: string;
+};
+
+export const FeatureHeader = ({
+    title,
+    href,
+    ctaLabel,
+}: FeatureHeaderProps) => {
     return (
         <>
             <div className="flex w-full items-end justify-between">
                 <h1 className="text-lg font-extrabold tracking-tight lg:text-xl">
-                    MIDI Transcription
+                    {title}
                 </h1>
                 <Link
-                    href="midi/new"
+                    href={href}
                     className={cn(buttonVariants({ variant: 'default' }))}
                 >
                     <LucideUpload className="mr-2 h-4 w-4" />
-                    Upload Tracks
+                    {ctaLabel}
                 </Link>
             </div>
         </>

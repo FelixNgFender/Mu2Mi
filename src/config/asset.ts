@@ -20,6 +20,19 @@ export const trackSeparationAssetConfig = {
     allowedFileTypes: ['mp3', 'wav', 'flac', 'mp4', 'mov', 'wma'],
 } as const;
 
+export const trackAnalysisAssetConfig = {
+    maxFileSizeBytes: 1024 * 1024 * 50, // 50 MB
+    allowedMimeTypes: [
+        'audio/mp3',
+        'audio/mpeg',
+        'audio/ogg',
+        'audio/wav',
+        'audio/flac',
+        'audio/m4a',
+    ],
+    allowedFileTypes: ['mp3', 'ogg', 'wav', 'flac', 'm4a'],
+} as const;
+
 export const midiTranscriptionAssetConfig = {
     maxFileSizeBytes: 1024 * 1024 * 50, // 50 MB
     allowedMimeTypes: [

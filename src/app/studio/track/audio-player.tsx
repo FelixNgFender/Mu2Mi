@@ -26,13 +26,13 @@ import './audio-player.css';
 
 type TrackPageProps = {
     assetLinks: Awaited<ReturnType<typeof downloadTrack>>['data'];
+    callback?: string;
 };
 
-const AudioPlayer = ({ assetLinks }: TrackPageProps) => {
+const AudioPlayer = ({ assetLinks, callback }: TrackPageProps) => {
     const [hasDropped, setHasDropped] = useState(false);
     const [ee] = useState(new EventEmitter());
     const pathname = usePathname();
-    const isTrackPage = pathname.includes('/studio/track/');
 
     const playlist = useCallback(
         (node: HTMLDivElement | null) => {
@@ -108,9 +108,9 @@ const AudioPlayer = ({ assetLinks }: TrackPageProps) => {
                     className="my-1 flex justify-between space-x-2"
                     role="group"
                 >
-                    {isTrackPage && (
+                    {callback && (
                         <Link
-                            href="/studio/separation"
+                            href={callback}
                             className={cn(
                                 buttonVariants({ variant: 'link' }),
                                 'self-start',
@@ -217,7 +217,7 @@ const AudioPlayer = ({ assetLinks }: TrackPageProps) => {
                 </div>
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
-            {!isTrackPage && !hasDropped && (
+            {!callback && !hasDropped && (
                 <Dropzone
                     classNameWrapper="w-full flex-1 max-h-64"
                     className="h-full w-full"

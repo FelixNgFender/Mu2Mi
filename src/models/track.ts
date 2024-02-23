@@ -76,7 +76,7 @@ export const trackModel = {
             const newAsset = await tx
                 .update(assetTable)
                 .set({ trackId: newTrack.id })
-                .where(eq(trackTable.id, assetId))
+                .where(eq(assetTable.id, assetId))
                 .returning({ name: assetTable.name })
                 .then((assets) => assets[0]);
 
