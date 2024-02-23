@@ -11,7 +11,6 @@ import {
     webhookMetadataSchema,
 } from '@/types/replicate';
 import crypto from 'crypto';
-import { fileTypeFromBlob } from 'file-type';
 import { headers } from 'next/headers';
 import path from 'path';
 
@@ -192,18 +191,16 @@ const saveTrackAssetAndMetadata = async (
     trackType?: (typeof assetConfig.trackAssetTypes)[number],
 ) => {
     const blob = await fetch(url).then((res) => res.blob());
-    const fileType = await fileTypeFromBlob(blob);
-    const fileExtension = fileType?.ext;
-    const mimeType = fileType?.mime;
     const objectName = `${crypto
         .randomBytes(32)
-        .toString('hex')}.${fileExtension}`;
+        .toString('hex')}.${path.extname(url)}`;
+    const mimeType = blob.type === '' ? 'application/octet-stream' : blob.type;
     await fileStorageClient.putObject(
         env.S3_BUCKET_NAME,
         objectName,
         Buffer.from(await blob.arrayBuffer()),
         {
-            'Content-Type': mimeType || 'binary/octet-stream',
+            'Content-Type': mimeType,
         },
     );
     const newAsset = await assetModel.createOne({

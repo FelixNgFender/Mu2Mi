@@ -1,5 +1,5 @@
 DO $$ BEGIN
- CREATE TYPE "mime_type" AS ENUM('audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/flac', 'audio/mp4', 'audio/mov', 'audio/wma', 'audio/ogg', 'audio/m4a', 'image/png', 'application/json', 'audio/midi', 'audio/x-midi');
+ CREATE TYPE "mime_type" AS ENUM('audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/flac', 'audio/mp4', 'audio/mov', 'audio/wma', 'audio/ogg', 'audio/m4a', 'application/json', 'image/png', 'audio/sp-midi');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
