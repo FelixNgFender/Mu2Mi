@@ -2,7 +2,6 @@ import { env } from '@/config/env';
 import {
     MidiTranscriptionSchemaType,
     MusicgenSchemaType,
-    RiffusionSchemaType,
     TrackAnalysisSchemaType,
     TrackSeparationSchemaType,
 } from '@/types/replicate';
@@ -74,18 +73,6 @@ class ReplicateClient {
         webhook.searchParams.set('userId', userId);
         return this.replicate.predictions.create({
             version: env.MUSICGEN_MODEL_VERSION,
-            input: data,
-            webhook: webhook.toString(),
-            webhook_events_filter: ['completed'],
-        });
-    }
-
-    async riffusion({ taskId, userId, ...data }: RiffusionSchemaType) {
-        const webhook = new URL(`${env.ORIGIN}/api/webhook/riffusion`);
-        webhook.searchParams.set('taskId', taskId);
-        webhook.searchParams.set('userId', userId);
-        return this.replicate.predictions.create({
-            version: env.RIFFUSION_MODEL_VERSION,
             input: data,
             webhook: webhook.toString(),
             webhook_events_filter: ['completed'],

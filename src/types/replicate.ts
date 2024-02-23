@@ -79,33 +79,6 @@ const musicgenSchema = musicgenInputSchema.merge(webhookMetadataSchema);
 
 export type MusicgenSchemaType = z.infer<typeof musicgenSchema>;
 
-export const riffusionInputSchema = z.object({
-    prompt_a: z.string().default('funky synth solo'),
-    denoising: z.number().min(0).max(1).default(0.75),
-    prompt_b: z.string().optional(),
-    alpha: z.number().min(0).max(1).default(0.5),
-    num_inference_steps: z.number().int().min(1).default(50),
-    seed_image_id: z
-        .enum([
-            'agile',
-            'marim',
-            'mask_beat_lines_80',
-            'mask_gradient_dark',
-            'mask_gradient_top_70',
-            'mask_graident_top_fifth_75',
-            'mask_top_third_75',
-            'mask_top_third_95',
-            'motorway',
-            'og_beat',
-            'vibes',
-        ])
-        .default('vibes'),
-});
-
-const riffusionSchema = riffusionInputSchema.merge(webhookMetadataSchema);
-
-export type RiffusionSchemaType = z.infer<typeof riffusionSchema>;
-
 interface ReplicateWebhookBody {
     status: 'starting' | 'succeeded' | 'failed' | 'canceled';
     error: string | null;
@@ -135,16 +108,8 @@ export interface MusicGenWebhookBody extends ReplicateWebhookBody {
     output: string | null;
 }
 
-export interface RiffusionWebhookBody extends ReplicateWebhookBody {
-    output: {
-        audio: string | null;
-        spectrogram: string | null;
-    };
-}
-
 export type ReplicateWebhookBodyTypes =
     | TrackSeparationWebhookBody
     | TrackAnalysisWebhookBody
     | MidiTranscriptionWebhookBody
-    | MusicGenWebhookBody
-    | RiffusionWebhookBody;
+    | MusicGenWebhookBody;

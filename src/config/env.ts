@@ -57,7 +57,6 @@ const envSchema = z.object({
     TRACK_ANALYSIS_MODEL_VERSION: isString,
     MIDI_TRANSCRIPTION_MODEL_VERSION: isString,
     MUSICGEN_MODEL_VERSION: isString,
-    RIFFUSION_MODEL_VERSION: isString,
 });
 
 /**

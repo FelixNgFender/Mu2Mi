@@ -113,13 +113,6 @@ export const replicateWebhookHandler = async <
     ) {
         if (typeof output === 'string') {
             await saveTrackAssetAndMetadata(taskId, userId, output, trackType);
-        } else if (typeof output === 'object' && trackType === 'riffusion') {
-            await saveTrackAssetAndMetadata(
-                taskId,
-                userId,
-                (output as any).audio,
-                trackType,
-            );
         } else if (
             typeof output === 'object' &&
             statusField === 'trackSeparationStatus'

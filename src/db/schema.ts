@@ -174,7 +174,6 @@ export const trackAssetType = pgEnum('track_asset_type', [
     'analysis_viz',
     'midi',
     'musicgen',
-    'riffusion',
 ]);
 
 // TODO: Opportunity to optimize: use DB as soft cache before hitting S3
@@ -242,7 +241,6 @@ export const trackTable = pgTable(
         trackAnalysisStatus: trackStatusEnum('track_analysis_status'),
         midiTranscriptionStatus: trackStatusEnum('midi_transcription_status'),
         musicgenStatus: trackStatusEnum('musicgen_status'),
-        riffusionStatus: trackStatusEnum('riffusion_status'),
         ...updateAndCreatedAt,
     },
     (table) => {

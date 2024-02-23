@@ -135,5 +135,4 @@ export type TrackStatusColumn =
     | 'trackSeparationStatus'
     | 'trackAnalysisStatus'
     | 'midiTranscriptionStatus'
-    | 'musicgenStatus'
-    | 'riffusionStatus';
+    | 'musicgenStatus';
