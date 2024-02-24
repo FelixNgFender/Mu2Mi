@@ -1,49 +1,140 @@
-import { trackAnalysisAssetConfig } from '@/config/asset';
+import { lyricsTranscriptionAssetConfig } from '@/config/asset';
 import { z } from 'zod';
 
-export const trackAnalysisModels = [
-    'harmonix-all',
-    'harmonix-fold0',
-    'harmonix-fold1',
-    'harmonix-fold2',
-    'harmonix-fold3',
-    'harmonix-fold4',
-    'harmonix-fold5',
-    'harmonix-fold6',
-    'harmonix-fold7',
+export const lyricsTranscriptionSupportedLanguages = [
+    'None',
+    'afrikaans',
+    'albanian',
+    'amharic',
+    'arabic',
+    'armenian',
+    'assamese',
+    'azerbaijani',
+    'bashkir',
+    'basque',
+    'belarusian',
+    'bengali',
+    'bosnian',
+    'breton',
+    'bulgarian',
+    'cantonese',
+    'catalan',
+    'chinese',
+    'croatian',
+    'czech',
+    'danish',
+    'dutch',
+    'english',
+    'estonian',
+    'faroese',
+    'finnish',
+    'french',
+    'galician',
+    'georgian',
+    'german',
+    'greek',
+    'gujarati',
+    'haitian creole',
+    'hausa',
+    'hawaiian',
+    'hebrew',
+    'hindi',
+    'hungarian',
+    'icelandic',
+    'indonesian',
+    'italian',
+    'japanese',
+    'javanese',
+    'kannada',
+    'kazakh',
+    'khmer',
+    'korean',
+    'lao',
+    'latin',
+    'latvian',
+    'lingala',
+    'lithuanian',
+    'luxembourgish',
+    'macedonian',
+    'malagasy',
+    'malay',
+    'malayalam',
+    'maltese',
+    'maori',
+    'marathi',
+    'mongolian',
+    'myanmar',
+    'nepali',
+    'norwegian',
+    'nynorsk',
+    'occitan',
+    'pashto',
+    'persian',
+    'polish',
+    'portuguese',
+    'punjabi',
+    'romanian',
+    'russian',
+    'sanskrit',
+    'serbian',
+    'shona',
+    'sindhi',
+    'sinhala',
+    'slovak',
+    'slovenian',
+    'somali',
+    'spanish',
+    'sundanese',
+    'swahili',
+    'swedish',
+    'tagalog',
+    'tajik',
+    'tamil',
+    'tatar',
+    'telugu',
+    'thai',
+    'tibetan',
+    'turkish',
+    'turkmen',
+    'ukrainian',
+    'urdu',
+    'uzbek',
+    'vietnamese',
+    'welsh',
+    'yiddish',
+    'yoruba',
 ] as const;
 
-export const analysisFormSchema = z.object({
+export const lyricsFormSchema = z.object({
     file: z
         .any()
         .refine(
             (files) => {
                 return (
                     files?.[0]?.size <=
-                    trackAnalysisAssetConfig.maxFileSizeBytes
+                    lyricsTranscriptionAssetConfig.maxFileSizeBytes
                 );
             },
             `Max file size is ${
-                trackAnalysisAssetConfig.maxFileSizeBytes / 1024 / 1024
+                lyricsTranscriptionAssetConfig.maxFileSizeBytes / 1024 / 1024
             } MB.`,
         )
         .refine(
             (files) =>
-                trackAnalysisAssetConfig.allowedMimeTypes.includes(
+                lyricsTranscriptionAssetConfig.allowedMimeTypes.includes(
                     files?.[0]?.type,
                 ),
-            `Only ${trackAnalysisAssetConfig.allowedFileTypes
+            `Only ${lyricsTranscriptionAssetConfig.allowedFileTypes
                 .map((type) => type.toUpperCase())
                 .join(', ')} files are allowed.`,
         )
         .transform((files) => files?.[0]),
-    visualize: z.boolean().default(false),
-    sonify: z.boolean().default(false),
-    activ: z.boolean().default(false),
-    embed: z.boolean().default(false),
-    model: z.enum(trackAnalysisModels).default('harmonix-all'),
-    include_activations: z.boolean().default(false),
-    include_embeddings: z.boolean().default(false),
+    task: z.enum(['transcribe', 'translate']).default('transcribe'),
+    language: z.enum(lyricsTranscriptionSupportedLanguages).default('None'),
+    batch_size: z.number().positive().int().lte(64).default(24),
+    timestamp: z.enum(['chunk', 'word']).default('chunk'),
+    diarise_audio: z.boolean().optional().default(false),
+    hf_token: z.string().optional(),
 });
 
-export type AnalysisFormType = z.infer<typeof analysisFormSchema>;
+export type LyricsFormType = z.infer<typeof lyricsFormSchema>;

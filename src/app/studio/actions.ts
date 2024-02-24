@@ -6,6 +6,7 @@ import { fileStorageClient } from '@/db';
 import { AppError, errorHandler } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { authAction } from '@/lib/safe-action';
+import { generateObjectKey } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import crypto from 'crypto';
@@ -73,9 +74,7 @@ const getPresignedUrlSchema = z.object({
 export const getPresignedUrl = authAction(
     getPresignedUrlSchema,
     async ({ type, extension }, { user }) => {
-        const objectName = `${crypto
-            .randomBytes(32)
-            .toString('hex')}.${extension}`;
+        const objectName = generateObjectKey(extension);
         const url = await fileStorageClient.presignedPutObject(
             env.S3_BUCKET_NAME,
             objectName,

@@ -1,7 +1,7 @@
-import { AnalysisForm } from './analysis-form';
+import { LyricsForm } from './lyrics-form';
 
-const NewAnalysisPage = async () => {
-    return <AnalysisForm />;
+const NewLyricsPage = async () => {
+    return <LyricsForm />;
 };
 
-export default NewAnalysisPage;
+export default NewLyricsPage;

@@ -46,3 +46,16 @@ export const midiTranscriptionAssetConfig = {
     allowedFileTypes: ['mp3', 'ogg', 'wav', 'flac', 'm4a'],
     maxNumFiles: 5,
 } as const;
+
+export const lyricsTranscriptionAssetConfig = {
+    maxFileSizeBytes: 1024 * 1024 * 50, // 50 MB
+    allowedMimeTypes: [
+        'audio/mp3',
+        'audio/mpeg',
+        'audio/ogg',
+        'audio/wav',
+        'audio/flac',
+        'audio/m4a',
+    ],
+    allowedFileTypes: ['mp3', 'ogg', 'wav', 'flac', 'm4a'],
+} as const;

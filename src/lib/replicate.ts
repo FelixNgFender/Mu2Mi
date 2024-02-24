@@ -1,5 +1,6 @@
 import { env } from '@/config/env';
 import {
+    LyricsTranscriptionSchemaType,
     MidiTranscriptionSchemaType,
     MusicgenSchemaType,
     TrackAnalysisSchemaType,
@@ -19,6 +20,18 @@ class ReplicateClient {
         // https://github.com/replicate/replicate-javascript/issues/136#issuecomment-1847442879
         this.replicate.fetch = (input: RequestInfo | URL, init?: RequestInit) =>
             fetch(input, { ...init, cache: 'no-store' });
+    }
+
+    async musicgen({ taskId, userId, ...data }: MusicgenSchemaType) {
+        const webhook = new URL(`${env.ORIGIN}/api/webhook/musicgen`);
+        webhook.searchParams.set('taskId', taskId);
+        webhook.searchParams.set('userId', userId);
+        return this.replicate.predictions.create({
+            version: env.MUSICGEN_MODEL_VERSION,
+            input: data,
+            webhook: webhook.toString(),
+            webhook_events_filter: ['completed'],
+        });
     }
 
     async separateTrack({
@@ -67,12 +80,16 @@ class ReplicateClient {
         });
     }
 
-    async musicgen({ taskId, userId, ...data }: MusicgenSchemaType) {
-        const webhook = new URL(`${env.ORIGIN}/api/webhook/musicgen`);
+    async lyricsTranscription({
+        taskId,
+        userId,
+        ...data
+    }: LyricsTranscriptionSchemaType) {
+        const webhook = new URL(`${env.ORIGIN}/api/webhook/lyrics`);
         webhook.searchParams.set('taskId', taskId);
         webhook.searchParams.set('userId', userId);
         return this.replicate.predictions.create({
-            version: env.MUSICGEN_MODEL_VERSION,
+            version: env.LYRICS_TRANSCRIPTION_MODEL_VERSION,
             input: data,
             webhook: webhook.toString(),
             webhook_events_filter: ['completed'],

@@ -1,4 +1,5 @@
 import { analysisFormSchema } from '@/app/studio/analysis/new/schemas';
+import { lyricsFormSchema } from '@/app/studio/lyrics/new/schemas';
 import { separationFormSchema } from '@/app/studio/separation/new/schemas';
 import { z } from 'zod';
 
@@ -6,6 +7,38 @@ export const webhookMetadataSchema = z.object({
     taskId: z.string().min(15).max(15), // = track id
     userId: z.string().min(15).max(15),
 });
+
+export const musicgenInputSchema = z.object({
+    model_version: z
+        .enum([
+            'stereo-melody-large',
+            'stereo-large',
+            'melody-large',
+            'large',
+            'encode-decode',
+        ])
+        .default('stereo-melody-large'),
+    prompt: z.string(),
+    input_audio: z.string().url().optional(),
+    duration: z.number().int().min(1).max(60).default(8),
+    continuation: z.boolean().optional(),
+    continuation_start: z.number().int().min(0).optional(),
+    continuation_end: z.number().int().min(0).optional(),
+    multi_band_diffusion: z.boolean().optional(),
+    normalization_strategy: z
+        .enum(['loudness', 'clip', 'peak', 'rms'])
+        .default('loudness'),
+    top_k: z.number().int().optional().default(250),
+    top_p: z.number().optional().default(0),
+    temperature: z.number().optional().default(1),
+    classifier_free_guidance: z.number().int().optional().default(3),
+    output_format: z.enum(['mp3', 'wav']).default('wav'),
+    seed: z.number().int().optional(),
+});
+
+const musicgenSchema = musicgenInputSchema.merge(webhookMetadataSchema);
+
+export type MusicgenSchemaType = z.infer<typeof musicgenSchema>;
 
 export const trackSeparationInputSchema = separationFormSchema
     .omit({
@@ -47,42 +80,30 @@ export type MidiTranscriptionSchemaType = z.infer<
     typeof midiTranscriptionSchema
 >;
 
-export const musicgenInputSchema = z.object({
-    model_version: z
-        .enum([
-            'stereo-melody-large',
-            'stereo-large',
-            'melody-large',
-            'large',
-            'encode-decode',
-        ])
-        .default('stereo-melody-large'),
-    prompt: z.string(),
-    input_audio: z.string().url().optional(),
-    duration: z.number().int().min(1).max(60).default(8),
-    continuation: z.boolean().optional(),
-    continuation_start: z.number().int().min(0).optional(),
-    continuation_end: z.number().int().min(0).optional(),
-    multi_band_diffusion: z.boolean().optional(),
-    normalization_strategy: z
-        .enum(['loudness', 'clip', 'peak', 'rms'])
-        .default('loudness'),
-    top_k: z.number().int().optional().default(250),
-    top_p: z.number().optional().default(0),
-    temperature: z.number().optional().default(1),
-    classifier_free_guidance: z.number().int().optional().default(3),
-    output_format: z.enum(['mp3', 'wav']).default('wav'),
-    seed: z.number().int().optional(),
-});
+export const lyricsTranscriptionInputSchema = lyricsFormSchema
+    .omit({
+        file: true,
+    })
+    .extend({
+        audio: z.string().url(),
+    });
 
-const musicgenSchema = musicgenInputSchema.merge(webhookMetadataSchema);
+const lyricsTranscriptionSchema = lyricsTranscriptionInputSchema.merge(
+    webhookMetadataSchema,
+);
 
-export type MusicgenSchemaType = z.infer<typeof musicgenSchema>;
+export type LyricsTranscriptionSchemaType = z.infer<
+    typeof lyricsTranscriptionSchema
+>;
 
 interface ReplicateWebhookBody {
     status: 'starting' | 'succeeded' | 'failed' | 'canceled';
     error: string | null;
     output: any;
+}
+
+export interface MusicGenWebhookBody extends ReplicateWebhookBody {
+    output: string | null;
 }
 
 export interface TrackSeparationWebhookBody extends ReplicateWebhookBody {
@@ -104,12 +125,19 @@ export interface MidiTranscriptionWebhookBody extends ReplicateWebhookBody {
     output: string | null;
 }
 
-export interface MusicGenWebhookBody extends ReplicateWebhookBody {
-    output: string | null;
+export interface LyricsTranscriptionWebhookBody extends ReplicateWebhookBody {
+    output: {
+        text: string | null;
+        chunks: Array<{
+            text: string;
+            timestamp: Array<number>;
+        }>;
+    };
 }
 
 export type ReplicateWebhookBodyTypes =
+    | MusicGenWebhookBody
     | TrackSeparationWebhookBody
     | TrackAnalysisWebhookBody
     | MidiTranscriptionWebhookBody
-    | MusicGenWebhookBody;
+    | LyricsTranscriptionWebhookBody;

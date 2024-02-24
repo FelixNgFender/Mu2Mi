@@ -4,6 +4,7 @@ import { TrackStatusColumn } from '@/config/studio';
 import { fileStorageClient } from '@/db';
 import { AppError } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
+import { generateObjectKey } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
 import {
@@ -114,12 +115,12 @@ export const replicateWebhookHandler = async <
         if (typeof output === 'string') {
             await saveTrackAssetAndMetadata(taskId, userId, output, trackType);
         } else if (
-            typeof output === 'object' &&
-            statusField === 'trackSeparationStatus'
+            statusField === 'trackSeparationStatus' &&
+            typeof output === 'object'
         ) {
             await Promise.all(
                 Object.entries(output).map(async ([stem, url]) => {
-                    if (url) {
+                    if (url && typeof url === 'string') {
                         await saveTrackAssetAndMetadata(
                             taskId,
                             userId,
@@ -130,8 +131,8 @@ export const replicateWebhookHandler = async <
                 }),
             );
         } else if (
-            Array.isArray(output) &&
-            statusField === 'trackAnalysisStatus'
+            statusField === 'trackAnalysisStatus' &&
+            Array.isArray(output)
         ) {
             await Promise.all(
                 output.map(async (url) => {
@@ -169,6 +170,11 @@ export const replicateWebhookHandler = async <
                     }
                 }),
             );
+        } else if (
+            statusField === 'lyricsTranscriptionStatus' &&
+            typeof output === 'object'
+        ) {
+            await saveTrackAssetAndMetadata(taskId, userId, output, 'lyrics');
         }
         await trackModel.updateOne(taskId, {
             [statusField]: status,
@@ -180,18 +186,28 @@ export const replicateWebhookHandler = async <
 const saveTrackAssetAndMetadata = async (
     taskId: string,
     userId: string,
-    url: string,
+    data: string | Record<string, any>,
     trackType?: (typeof assetConfig.trackAssetTypes)[number],
 ) => {
-    const blob = await fetch(url).then((res) => res.blob());
-    const objectName = `${crypto
-        .randomBytes(32)
-        .toString('hex')}.${path.extname(url)}`;
-    const mimeType = blob.type === '' ? 'application/octet-stream' : blob.type;
+    let objectName: string;
+    let mimeType: string;
+    let fileData: Buffer;
+
+    if (typeof data === 'string') {
+        const blob = await fetch(data).then((res) => res.blob());
+        objectName = generateObjectKey(path.extname(data));
+        mimeType = blob.type === '' ? 'application/octet-stream' : blob.type;
+        fileData = Buffer.from(await blob.arrayBuffer());
+    } else {
+        objectName = generateObjectKey('.json');
+        mimeType = 'application/json';
+        fileData = Buffer.from(JSON.stringify(data));
+    }
+
     await fileStorageClient.putObject(
         env.S3_BUCKET_NAME,
         objectName,
-        Buffer.from(await blob.arrayBuffer()),
+        fileData,
         {
             'Content-Type': mimeType,
         },

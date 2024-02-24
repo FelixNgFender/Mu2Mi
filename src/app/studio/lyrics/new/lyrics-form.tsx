@@ -6,10 +6,15 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
-import { BackgroundGradient } from '@/components/ui/background-gradient';
-import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from '@/components/ui/command';
 import { Dropzone } from '@/components/ui/dropzone';
 import {
     Form,
@@ -21,35 +26,48 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import { PresetCard } from '@/components/ui/preset-card';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
-import { trackAnalysisAssetConfig } from '@/config/asset';
+import { lyricsTranscriptionAssetConfig } from '@/config/asset';
+import { Preset } from '@/config/studio';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import Image from 'next/image';
+import {
+    Check,
+    ChevronLeft,
+    ChevronRight,
+    ChevronsUpDown,
+    Loader2,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { getPresignedUrl } from '../../actions';
-import { analyzeTrack } from './actions';
-import allImage from './assets/all.jpg';
-import defaultPresetImage from './assets/default.jpg';
-import withSonificationImage from './assets/with-sonification.jpg';
-import withVisualizationImage from './assets/with-visualization.jpg';
+import { transcribeLyrics } from './actions';
+import transcribeEnglishImage from './assets/transcribe-english.jpg';
+import transcribeJapaneseImage from './assets/transcribe-japanese.jpg';
+import translateEnglishImage from './assets/translate-english.jpg';
 import {
-    AnalysisFormType,
-    analysisFormSchema,
-    trackAnalysisModels,
+    LyricsFormType,
+    lyricsFormSchema,
+    lyricsTranscriptionSupportedLanguages,
 } from './schemas';
+
+function uppercaseFirstLetter(str: string) {
+    return str
+        .split(' ')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
 
 const steps = [
     {
@@ -60,45 +78,34 @@ const steps = [
     {
         id: 'Step 2',
         name: 'Preferences',
-        fields: [
-            'visualize',
-            'sonify',
-            'activ',
-            'embed',
-            'model',
-            'include_activations',
-            'include_embeddings',
-        ],
+        fields: ['task', 'language', 'batch_size', 'timestamp'],
     },
     { id: 'Step 3', name: 'Upload file' },
 ];
 
-export const AnalysisForm = () => {
+export const LyricsForm = () => {
     const { toast } = useToast();
 
     const [file, setFile] = useState<File | null>(null);
     const [selectedPreset, setSelectedPreset] = useState<
-        (typeof analysisPresets)[number]['id'] | null
+        (typeof lyricsPresets)[number]['id'] | null
     >(null);
     const [previousStep, setPreviousStep] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
     const delta = currentStep - previousStep;
 
-    const form = useForm<AnalysisFormType>({
-        resolver: zodResolver(analysisFormSchema),
+    const form = useForm<LyricsFormType>({
+        resolver: zodResolver(lyricsFormSchema),
         defaultValues: {
             file: null,
-            visualize: false,
-            sonify: false,
-            activ: false,
-            embed: false,
-            model: 'harmonix-all',
-            include_activations: false,
-            include_embeddings: false,
+            task: 'transcribe',
+            language: 'None',
+            batch_size: 24,
+            timestamp: 'chunk',
         },
     });
 
-    type FieldName = keyof AnalysisFormType;
+    type FieldName = keyof LyricsFormType;
 
     const next = async () => {
         const fields = steps[currentStep]?.fields;
@@ -159,7 +166,7 @@ export const AnalysisForm = () => {
 
     const handleFileUpload = async (file: File) => {
         const result = await getPresignedUrl({
-            type: file.type as (typeof trackAnalysisAssetConfig.allowedMimeTypes)[number],
+            type: file.type as (typeof lyricsTranscriptionAssetConfig.allowedMimeTypes)[number],
             extension: file.name.split('.').pop() || '',
             size: file.size,
             checksum: await computeSHA256(file),
@@ -191,7 +198,7 @@ export const AnalysisForm = () => {
         }
     };
 
-    const onSubmit: SubmitHandler<AnalysisFormType> = async (data) => {
+    const onSubmit: SubmitHandler<LyricsFormType> = async (data) => {
         toast({
             description: 'Your file is being uploaded.',
         });
@@ -202,17 +209,14 @@ export const AnalysisForm = () => {
             return;
         }
 
-        const result = await analyzeTrack({
+        const result = await transcribeLyrics({
             name: data.file.name,
             assetId: assetId,
 
-            visualize: data.visualize,
-            sonify: data.sonify,
-            activ: data.activ,
-            embed: data.embed,
-            model: data.model,
-            include_activations: data.include_activations,
-            include_embeddings: data.include_embeddings,
+            task: data.task,
+            language: data.language,
+            batch_size: data.batch_size,
+            timestamp: data.timestamp,
         });
 
         if (result.validationErrors) {
@@ -250,67 +254,58 @@ export const AnalysisForm = () => {
         });
     };
 
-    const analysisPresets = [
+    const lyricsPresets: Preset[] = [
         {
-            id: 'default',
-            icon: defaultPresetImage,
-            name: 'Default',
+            id: 'transcribe-english',
+            icon: transcribeEnglishImage,
+            name: 'Transcribe English lyrics',
             description:
-                "Analyzes the track's musical structure (tempo, beats, downbeats, section boundaries, and segment labels).",
-            labels: ['analysis'],
+                'Word-level, time-accurate transcription of English lyrics.',
+            labels: ['transcribe', 'english'],
             onClick: () => {
                 resetAllButFile();
-                setSelectedPreset('default');
+                form.setValue('language', 'english', {
+                    shouldValidate: true,
+                });
+                form.setValue('timestamp', 'word', {
+                    shouldValidate: true,
+                });
+                setSelectedPreset('transcribe-english');
             },
         },
         {
-            id: 'with-visualization',
-            icon: withVisualizationImage,
-            name: 'With visualization',
+            id: 'transcribe-japanese',
+            icon: transcribeJapaneseImage,
+            name: 'Transcribe Japanese lyrics',
             description:
-                "Same as default. Also includes a visualization of the track's musical structure.",
-            labels: ['analysis', 'visualization'],
+                'Word-level, time-accurate transcription of Japanese lyrics.',
+            labels: ['transcribe', 'japanese'],
             onClick: () => {
                 resetAllButFile();
-                form.setValue('visualize', true, {
+                form.setValue('language', 'japanese', {
                     shouldValidate: true,
                 });
-                setSelectedPreset('with-visualization');
+                form.setValue('timestamp', 'word', {
+                    shouldValidate: true,
+                });
+                setSelectedPreset('transcribe-japanese');
             },
         },
         {
-            id: 'with-sonification',
-            icon: withSonificationImage,
-            name: 'With sonification',
-            description:
-                'Same as default. Also includes a mix of a click track with section callouts and the original audio.',
-            labels: ['analysis', 'sonification'],
+            id: 'translate-english',
+            icon: translateEnglishImage,
+            name: 'Translate to English lyrics',
+            description: 'Translate lyrics in any language to English.',
+            labels: ['translate', 'english'],
             onClick: () => {
                 resetAllButFile();
-                form.setValue('sonify', true, {
+                form.setValue('task', 'translate', {
                     shouldValidate: true,
                 });
-                setSelectedPreset('with-sonification');
+                setSelectedPreset('translate-english');
             },
         },
-        {
-            id: 'all',
-            icon: allImage,
-            name: 'All',
-            description: 'Includes all available data.',
-            labels: ['analysis', 'sonification', 'visualization'],
-            onClick: () => {
-                resetAllButFile();
-                form.setValue('sonify', true, {
-                    shouldValidate: true,
-                });
-                form.setValue('visualize', true, {
-                    shouldValidate: true,
-                });
-                setSelectedPreset('all');
-            },
-        },
-    ] as const;
+    ];
 
     return (
         <>
@@ -415,7 +410,7 @@ export const AnalysisForm = () => {
                                                             form.formState
                                                                 .isSubmitting
                                                         }
-                                                        accept={trackAnalysisAssetConfig.allowedMimeTypes.join(
+                                                        accept={lyricsTranscriptionAssetConfig.allowedMimeTypes.join(
                                                             ', ',
                                                         )}
                                                         dropMessage={
@@ -439,7 +434,7 @@ export const AnalysisForm = () => {
                                                 </FormControl>
                                                 <FormDescription>
                                                     Supports:{' '}
-                                                    {` ${trackAnalysisAssetConfig.allowedFileTypes
+                                                    {` ${lyricsTranscriptionAssetConfig.allowedFileTypes
                                                         .map((type) =>
                                                             type.toUpperCase(),
                                                         )
@@ -489,58 +484,12 @@ export const AnalysisForm = () => {
                                 Choose a preset
                             </h2>
                             <div className="flex flex-col space-y-4 p-4 pt-0">
-                                {analysisPresets.map((item) => (
-                                    <BackgroundGradient
+                                {lyricsPresets.map((item) => (
+                                    <PresetCard
                                         key={item.id}
-                                        className="rounded-3xl bg-background"
-                                    >
-                                        <button
-                                            type="button"
-                                            className={cn(
-                                                'flex w-full items-center space-x-4 rounded-3xl p-4 transition-all hover:bg-accent',
-                                                selectedPreset === item.id &&
-                                                    'bg-muted',
-                                            )}
-                                            onClick={item.onClick}
-                                        >
-                                            <Image
-                                                src={item.icon}
-                                                alt={item.name}
-                                                className="h-24 w-24 rounded-xl"
-                                            />
-                                            <div className="flex flex-1 flex-col items-start space-y-2 text-left text-base">
-                                                <div className="flex w-full flex-col space-y-1">
-                                                    <div className="flex items-center">
-                                                        <div className="flex items-center space-x-2">
-                                                            <div className="font-semibold">
-                                                                {item.name}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="line-clamp-2 text-sm text-muted-foreground">
-                                                    {item.description.substring(
-                                                        0,
-                                                        300,
-                                                    )}
-                                                </div>
-                                                {item.labels.length ? (
-                                                    <div className="flex items-center space-x-2">
-                                                        {item.labels.map(
-                                                            (label) => (
-                                                                <Badge
-                                                                    key={label}
-                                                                    variant="secondary"
-                                                                >
-                                                                    {label}
-                                                                </Badge>
-                                                            ),
-                                                        )}
-                                                    </div>
-                                                ) : null}
-                                            </div>
-                                        </button>
-                                    </BackgroundGradient>
+                                        item={item}
+                                        selectedItemId={selectedPreset}
+                                    />
                                 ))}
                             </div>
                             <Accordion type="single" collapsible>
@@ -551,192 +500,213 @@ export const AnalysisForm = () => {
                                     <AccordionContent className="flex flex-1 flex-col space-y-8 p-4">
                                         <FormField
                                             control={form.control}
-                                            name="model"
+                                            name="task"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-3">
                                                     <FormLabel>
-                                                        Model name
+                                                        Task to perform
                                                     </FormLabel>
-                                                    <FormDescription>
-                                                        Choose a model to
-                                                        analyze your track with.
-                                                    </FormDescription>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        value={field.value}
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Choose output format" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {trackAnalysisModels.map(
-                                                                (model) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            model
-                                                                        }
-                                                                        value={
-                                                                            model
-                                                                        }
-                                                                    >
-                                                                        {model}
-                                                                    </SelectItem>
-                                                                ),
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
+                                                    <FormControl>
+                                                        <RadioGroup
+                                                            onValueChange={
+                                                                field.onChange
+                                                            }
+                                                            value={field.value}
+                                                            className="flex flex-col space-y-1"
+                                                        >
+                                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                                <FormControl>
+                                                                    <RadioGroupItem value="transcribe" />
+                                                                </FormControl>
+                                                                <FormLabel>
+                                                                    Transcribe
+                                                                </FormLabel>
+                                                            </FormItem>
+                                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                                <FormControl>
+                                                                    <RadioGroupItem value="translate" />
+                                                                </FormControl>
+                                                                <FormLabel>
+                                                                    Translate to
+                                                                    English
+                                                                </FormLabel>
+                                                            </FormItem>
+                                                        </RadioGroup>
+                                                    </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="visualize"
+                                            name="language"
                                             render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
-                                                                field.onChange
-                                                            }
-                                                        />
-                                                    </FormControl>
+                                                <FormItem className="flex flex-col">
                                                     <div className="space-y-1 leading-none">
                                                         <FormLabel>
-                                                            Visualize track
+                                                            Audio language
                                                         </FormLabel>
                                                         <FormDescription>
-                                                            Save track
-                                                            analysis&apos;s
-                                                            visualization.
+                                                            Specify
+                                                            &apos;None&apos; to
+                                                            perform language
+                                                            detection.
                                                         </FormDescription>
                                                     </div>
+                                                    <Popover>
+                                                        <PopoverTrigger asChild>
+                                                            <FormControl>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    role="combobox"
+                                                                    className={cn(
+                                                                        'w-[200px] justify-between',
+                                                                        field.value &&
+                                                                            'text-muted-foreground',
+                                                                    )}
+                                                                >
+                                                                    {field.value &&
+                                                                        uppercaseFirstLetter(
+                                                                            field.value,
+                                                                        )}
+                                                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                                                </Button>
+                                                            </FormControl>
+                                                        </PopoverTrigger>
+                                                        <PopoverContent className="w-[200px] p-0">
+                                                            <Command>
+                                                                <CommandInput placeholder="Search language..." />
+                                                                <CommandList>
+                                                                    <CommandEmpty>
+                                                                        No
+                                                                        language
+                                                                        found.
+                                                                    </CommandEmpty>
+                                                                    <CommandGroup>
+                                                                        {lyricsTranscriptionSupportedLanguages.map(
+                                                                            (
+                                                                                language,
+                                                                            ) => (
+                                                                                <CommandItem
+                                                                                    value={
+                                                                                        language
+                                                                                    }
+                                                                                    key={
+                                                                                        language
+                                                                                    }
+                                                                                    onSelect={() => {
+                                                                                        form.setValue(
+                                                                                            'language',
+                                                                                            language,
+                                                                                        );
+                                                                                    }}
+                                                                                >
+                                                                                    <Check
+                                                                                        className={cn(
+                                                                                            'mr-2 h-4 w-4',
+                                                                                            language ===
+                                                                                                field.value
+                                                                                                ? 'opacity-100'
+                                                                                                : 'opacity-0',
+                                                                                        )}
+                                                                                    />
+                                                                                    {field.value &&
+                                                                                        uppercaseFirstLetter(
+                                                                                            language,
+                                                                                        )}
+                                                                                </CommandItem>
+                                                                            ),
+                                                                        )}
+                                                                    </CommandGroup>
+                                                                </CommandList>
+                                                            </Command>
+                                                        </PopoverContent>
+                                                    </Popover>
+                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="sonify"
+                                            name="batch_size"
                                             render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
-                                                                field.onChange
-                                                            }
-                                                        />
-                                                    </FormControl>
+                                                <FormItem className="space-y-3">
                                                     <div className="space-y-1 leading-none">
                                                         <FormLabel>
-                                                            Sonify track
+                                                            Batch size:{' '}
+                                                            {field.value}
                                                         </FormLabel>
                                                         <FormDescription>
-                                                            Save track
-                                                            analysis&apos;s
-                                                            sonification. This
-                                                            will include a mix
-                                                            of a click track
-                                                            with section
-                                                            callouts and the
-                                                            original audio.
+                                                            Number of parallel
+                                                            batches you want to
+                                                            compute. Reduce if
+                                                            you face OOMs.
                                                         </FormDescription>
                                                     </div>
+                                                    <FormControl>
+                                                        <Slider
+                                                            onValueChange={(
+                                                                v,
+                                                            ) =>
+                                                                field.onChange(
+                                                                    v[0],
+                                                                )
+                                                            }
+                                                            value={[
+                                                                field.value,
+                                                            ]}
+                                                            min={1}
+                                                            max={64}
+                                                            step={1}
+                                                            className="max-w-64"
+                                                        />
+                                                    </FormControl>
                                                 </FormItem>
                                             )}
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="activ"
+                                            name="timestamp"
                                             render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
-                                                                field.onChange
-                                                            }
-                                                        />
-                                                    </FormControl>
+                                                <FormItem className="space-y-3">
                                                     <div className="space-y-1 leading-none">
                                                         <FormLabel>
-                                                            Save activations
+                                                            Timestamp level
                                                         </FormLabel>
                                                         <FormDescription>
-                                                            Save frame-level raw
-                                                            activations from
-                                                            sigmoid and softmax
+                                                            Whisper supports
+                                                            both chunked as well
+                                                            as word level
+                                                            timestamps.
                                                         </FormDescription>
                                                     </div>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="include_activations"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                                     <FormControl>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
+                                                        <RadioGroup
+                                                            onValueChange={
                                                                 field.onChange
                                                             }
-                                                        />
+                                                            value={field.value}
+                                                            className="flex flex-col space-y-1"
+                                                        >
+                                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                                <FormControl>
+                                                                    <RadioGroupItem value="chunk" />
+                                                                </FormControl>
+                                                                <FormLabel>
+                                                                    Chunk
+                                                                </FormLabel>
+                                                            </FormItem>
+                                                            <FormItem className="flex items-center space-x-3 space-y-0">
+                                                                <FormControl>
+                                                                    <RadioGroupItem value="word" />
+                                                                </FormControl>
+                                                                <FormLabel>
+                                                                    Word
+                                                                </FormLabel>
+                                                            </FormItem>
+                                                        </RadioGroup>
                                                     </FormControl>
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Include activations
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Whether to include
-                                                            activations in the
-                                                            analysis results or
-                                                            not.
-                                                        </FormDescription>
-                                                    </div>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="include_embeddings"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
-                                                                field.onChange
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Include embeddings
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Whether to include
-                                                            embeddings in the
-                                                            analysis results or
-                                                            not.
-                                                        </FormDescription>
-                                                    </div>
+                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
@@ -762,7 +732,7 @@ export const AnalysisForm = () => {
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
                                 Your track has been submitted for processing.{' '}
                                 <a
-                                    href="/studio/analysis/new"
+                                    href="/studio/lyrics/new"
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -770,11 +740,11 @@ export const AnalysisForm = () => {
                                         'p-0',
                                     )}
                                 >
-                                    Analyze a new track
+                                    Transcribe a new track
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio/analysis"
+                                    href="/studio/lyrics"
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -827,15 +797,15 @@ export const AnalysisForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/analysis/new"
+                            href="/studio/lyrics/new"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
                         >
-                            Analyze new track
+                            Transcribe new track
                         </a>
                         <Link
-                            href="/studio/analysis"
+                            href="/studio/lyrics"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

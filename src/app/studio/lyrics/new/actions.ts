@@ -7,24 +7,24 @@ import { httpStatus } from '@/lib/http';
 import { replicateClient } from '@/lib/replicate';
 import { authAction } from '@/lib/safe-action';
 import { trackModel } from '@/models/track';
-import { trackAnalysisInputSchema } from '@/types/replicate';
+import { lyricsTranscriptionInputSchema } from '@/types/replicate';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
-const schema = trackAnalysisInputSchema
+const schema = lyricsTranscriptionInputSchema
     .omit({
-        music_input: true,
+        audio: true,
     })
     .extend({
         name: z.string(),
         assetId: z.string(),
     });
 
-export const analyzeTrack = authAction(schema, async (data, { user }) => {
+export const transcribeLyrics = authAction(schema, async (data, { user }) => {
     const newTrack = await trackModel.createOneAndUpdateAsset(
         {
             userId: user.id,
-            trackAnalysisStatus: 'processing',
+            lyricsTranscriptionStatus: 'processing',
             name: data.name,
         },
         data.assetId,
@@ -45,14 +45,14 @@ export const analyzeTrack = authAction(schema, async (data, { user }) => {
         env.S3_PRESIGNED_URL_EXPIRATION_S,
     );
 
-    await replicateClient.analyzeTrack({
+    await replicateClient.lyricsTranscription({
         ...data,
         taskId: newTrack.trackId,
         userId: user.id,
-        music_input: url,
+        audio: url,
     });
 
-    revalidatePath('/studio/analysis'); // refresh track table on studio page
+    revalidatePath('/studio/lyrics'); // refresh track table on studio page
     return {
         success: true,
     };

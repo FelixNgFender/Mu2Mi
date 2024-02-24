@@ -6,8 +6,6 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
-import { BackgroundGradient } from '@/components/ui/background-gradient';
-import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dropzone } from '@/components/ui/dropzone';
@@ -21,6 +19,7 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { PresetCard } from '@/components/ui/preset-card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
     Select,
@@ -32,11 +31,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { trackSeparationAssetConfig } from '@/config/asset';
+import { Preset } from '@/config/studio';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
@@ -254,7 +253,7 @@ export const SeparationForm = () => {
         });
     };
 
-    const separationPresets = [
+    const separationPresets: Preset[] = [
         {
             id: 'two-stems',
             icon: twoStemsImage,
@@ -344,7 +343,7 @@ export const SeparationForm = () => {
                 setSelectedPreset('six-stems');
             },
         },
-    ] as const;
+    ];
 
     return (
         <>
@@ -524,57 +523,11 @@ export const SeparationForm = () => {
                             </h2>
                             <div className="flex flex-col space-y-4 p-4 pt-0">
                                 {separationPresets.map((item) => (
-                                    <BackgroundGradient
+                                    <PresetCard
                                         key={item.id}
-                                        className="rounded-3xl bg-background"
-                                    >
-                                        <button
-                                            type="button"
-                                            className={cn(
-                                                'flex w-full items-center space-x-4 rounded-3xl p-4 transition-all hover:bg-accent',
-                                                selectedPreset === item.id &&
-                                                    'bg-muted',
-                                            )}
-                                            onClick={item.onClick}
-                                        >
-                                            <Image
-                                                src={item.icon}
-                                                alt={item.name}
-                                                className="h-24 w-24 rounded-xl"
-                                            />
-                                            <div className="flex flex-1 flex-col items-start space-y-2 text-left text-base">
-                                                <div className="flex w-full flex-col space-y-1">
-                                                    <div className="flex items-center">
-                                                        <div className="flex items-center space-x-2">
-                                                            <div className="font-semibold">
-                                                                {item.name}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="line-clamp-2 text-sm text-muted-foreground">
-                                                    {item.description.substring(
-                                                        0,
-                                                        300,
-                                                    )}
-                                                </div>
-                                                {item.labels.length ? (
-                                                    <div className="flex items-center space-x-2">
-                                                        {item.labels.map(
-                                                            (label) => (
-                                                                <Badge
-                                                                    key={label}
-                                                                    variant="secondary"
-                                                                >
-                                                                    {label}
-                                                                </Badge>
-                                                            ),
-                                                        )}
-                                                    </div>
-                                                ) : null}
-                                            </div>
-                                        </button>
-                                    </BackgroundGradient>
+                                        item={item}
+                                        selectedItemId={selectedPreset}
+                                    />
                                 ))}
                             </div>
                             <Accordion type="single" collapsible>

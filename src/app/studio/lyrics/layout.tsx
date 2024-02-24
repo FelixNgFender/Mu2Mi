@@ -1,8 +1,8 @@
-type AnalysisLayoutProps = {
+type LyricsLayoutProps = {
     children: React.ReactNode;
 };
 
-const AnalysisLayout = ({ children }: AnalysisLayoutProps) => {
+const LyricsLayout = ({ children }: LyricsLayoutProps) => {
     return (
         <section className="container relative flex h-full max-w-screen-lg flex-col space-y-4 py-4">
             {children}
@@ -10,4 +10,4 @@ const AnalysisLayout = ({ children }: AnalysisLayoutProps) => {
     );
 };
 
-export default AnalysisLayout;
+export default LyricsLayout;

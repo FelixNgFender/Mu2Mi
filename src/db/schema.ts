@@ -162,6 +162,7 @@ export const mimeType = pgEnum('mime_type', [
 ]);
 
 export const trackAssetType = pgEnum('track_asset_type', [
+    'musicgen',
     'original',
     'vocals',
     'accompaniment',
@@ -173,7 +174,7 @@ export const trackAssetType = pgEnum('track_asset_type', [
     'analysis_sonic',
     'analysis_viz',
     'midi',
-    'musicgen',
+    'lyrics',
 ]);
 
 // TODO: Opportunity to optimize: use DB as soft cache before hitting S3
@@ -237,10 +238,13 @@ export const trackTable = pgTable(
             .notNull()
             .references(() => userTable.id, cascadingUpdateAndDelete),
         name: text('name').notNull(),
+        musicgenStatus: trackStatusEnum('musicgen_status'),
         trackSeparationStatus: trackStatusEnum('track_separation_status'),
         trackAnalysisStatus: trackStatusEnum('track_analysis_status'),
         midiTranscriptionStatus: trackStatusEnum('midi_transcription_status'),
-        musicgenStatus: trackStatusEnum('musicgen_status'),
+        lyricsTranscriptionStatus: trackStatusEnum(
+            'lyrics_transcription_status',
+        ),
         ...updateAndCreatedAt,
     },
     (table) => {

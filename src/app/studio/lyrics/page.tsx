@@ -5,11 +5,11 @@ const LyricsPage = async () => {
     return (
         <>
             <FeatureHeader
-                title="Track Analysis"
-                href="analysis/new"
+                title="Lyrics Transcription"
+                href="lyrics/new"
                 ctaLabel="Upload Track"
             />
-            <TrackTable filter="trackAnalysisStatus" />
+            <TrackTable filter="lyricsTranscriptionStatus" />
         </>
     );
 };
