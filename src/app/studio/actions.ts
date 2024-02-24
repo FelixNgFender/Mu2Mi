@@ -3,13 +3,12 @@
 import { assetConfig } from '@/config/asset';
 import { env } from '@/config/env';
 import { fileStorageClient } from '@/db';
-import { AppError, errorHandler } from '@/lib/error';
+import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { authAction } from '@/lib/safe-action';
 import { generateObjectKey } from '@/lib/utils';
 import { assetModel } from '@/models/asset';
 import { trackModel } from '@/models/track';
-import crypto from 'crypto';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -29,10 +28,7 @@ export const downloadTrack = authAction(
                     env.S3_PRESIGNED_URL_EXPIRATION_S,
                 )
                 .catch((err) => {
-                    errorHandler.handleError(
-                        new AppError('FatalError', err.message, true),
-                    );
-                    return '';
+                    throw new AppError('FatalError', err.message, true);
                 });
             return { id: asset.id, url, type: asset.type };
         });

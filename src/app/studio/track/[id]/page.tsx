@@ -44,7 +44,12 @@ const TrackPage = ({ params }: TrackPageProps) => {
     } = useQuery({
         queryKey: ['track-assets', params.id],
         queryFn: async () => {
-            const { data } = await downloadTrack({ trackId: params.id });
+            const { data, serverError } = await downloadTrack({
+                trackId: params.id,
+            });
+            if (serverError || !data) {
+                throw new Error(serverError);
+            }
             return data;
         },
     });
@@ -73,13 +78,13 @@ const TrackPage = ({ params }: TrackPageProps) => {
                 )}
                 callback={callback ? callback : undefined}
             />
-            {assetLinks?.find((link) => link.type === 'analysis_viz') && (
+            {assetLinks.find((link) => link.type === 'analysis_viz') && (
                 <ScrollArea className="w-full whitespace-nowrap rounded-md border px-4 py-2 sm:border-0">
                     <div className="relative mx-auto min-h-96 w-[1024px]">
                         <Image
                             loader={imageLoader}
                             src={
-                                assetLinks?.find(
+                                assetLinks.find(
                                     (link) => link.type === 'analysis_viz',
                                 )?.url!
                             }

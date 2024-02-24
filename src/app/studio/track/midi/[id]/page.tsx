@@ -30,7 +30,12 @@ const MidiTrackPage = ({ params }: MidiTrackPageProps) => {
     } = useQuery({
         queryKey: ['track-assets', params.id],
         queryFn: async () => {
-            const { data } = await downloadTrack({ trackId: params.id });
+            const { data, serverError } = await downloadTrack({
+                trackId: params.id,
+            });
+            if (serverError || !data) {
+                throw new Error(serverError);
+            }
             return data;
         },
     });
@@ -51,7 +56,7 @@ const MidiTrackPage = ({ params }: MidiTrackPageProps) => {
 
     return (
         <MidiPlayer
-            initialURL={assetLinks?.find((a) => a.type === 'midi')?.url}
+            initialURL={assetLinks.find((a) => a.type === 'midi')?.url}
             callback={callback ? callback : undefined}
         />
     );
