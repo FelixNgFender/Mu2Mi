@@ -17,7 +17,6 @@ import {
     ZoomOut,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import WaveformPlaylist from 'waveform-playlist';
 
@@ -32,7 +31,6 @@ type TrackPageProps = {
 const AudioPlayer = ({ assetLinks, callback }: TrackPageProps) => {
     const [hasDropped, setHasDropped] = useState(false);
     const [ee] = useState(new EventEmitter());
-    const pathname = usePathname();
 
     const playlist = useCallback(
         (node: HTMLDivElement | null) => {

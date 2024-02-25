@@ -53,7 +53,9 @@ export const TrackTable = ({ filter }: TrackTableProps) => {
           ? '/studio/track'
           : pathname.includes('midi')
             ? '/studio/track/midi'
-            : undefined;
+            : pathname.includes('lyrics')
+              ? '/studio/track/karaoke'
+              : undefined;
 
     const callback = pathname.includes('separation')
         ? '/studio/separation'
@@ -61,7 +63,9 @@ export const TrackTable = ({ filter }: TrackTableProps) => {
           ? '/studio/analysis'
           : pathname.includes('midi')
             ? '/studio/midi'
-            : undefined;
+            : pathname.includes('lyrics')
+              ? '/studio/lyrics'
+              : undefined;
 
     return (
         <DataTable

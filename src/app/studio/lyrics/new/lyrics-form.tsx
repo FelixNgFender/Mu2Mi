@@ -260,14 +260,11 @@ export const LyricsForm = () => {
             icon: transcribeEnglishImage,
             name: 'Transcribe English lyrics',
             description:
-                'Word-level, time-accurate transcription of English lyrics.',
+                'Sentence-level, time-accurate transcription of English lyrics.',
             labels: ['transcribe', 'english'],
             onClick: () => {
                 resetAllButFile();
                 form.setValue('language', 'english', {
-                    shouldValidate: true,
-                });
-                form.setValue('timestamp', 'word', {
                     shouldValidate: true,
                 });
                 setSelectedPreset('transcribe-english');
@@ -278,14 +275,11 @@ export const LyricsForm = () => {
             icon: transcribeJapaneseImage,
             name: 'Transcribe Japanese lyrics',
             description:
-                'Word-level, time-accurate transcription of Japanese lyrics.',
+                'Sentence-level, time-accurate transcription of Japanese lyrics.',
             labels: ['transcribe', 'japanese'],
             onClick: () => {
                 resetAllButFile();
                 form.setValue('language', 'japanese', {
-                    shouldValidate: true,
-                });
-                form.setValue('timestamp', 'word', {
                     shouldValidate: true,
                 });
                 setSelectedPreset('transcribe-japanese');

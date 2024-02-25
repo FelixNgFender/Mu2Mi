@@ -71,7 +71,7 @@ const TrackPage = ({ params }: TrackPageProps) => {
     return (
         <>
             <AudioPlayer
-                assetLinks={assetLinks?.filter(
+                assetLinks={assetLinks.filter(
                     (link) =>
                         link.type !== 'analysis_viz' &&
                         link.type !== 'analysis',
