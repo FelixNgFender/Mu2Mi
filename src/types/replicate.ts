@@ -1,3 +1,4 @@
+import { generationFormSchema } from '@/app/studio/(generation)/new/schemas';
 import { analysisFormSchema } from '@/app/studio/analysis/new/schemas';
 import { lyricsFormSchema } from '@/app/studio/lyrics/new/schemas';
 import { separationFormSchema } from '@/app/studio/separation/new/schemas';
@@ -8,33 +9,13 @@ export const webhookMetadataSchema = z.object({
     userId: z.string().min(15).max(15),
 });
 
-export const musicgenInputSchema = z.object({
-    model_version: z
-        .enum([
-            'stereo-melody-large',
-            'stereo-large',
-            'melody-large',
-            'large',
-            'encode-decode',
-        ])
-        .default('stereo-melody-large'),
-    prompt: z.string(),
-    input_audio: z.string().url().optional(),
-    duration: z.number().int().min(1).max(60).default(8),
-    continuation: z.boolean().optional(),
-    continuation_start: z.number().int().min(0).optional(),
-    continuation_end: z.number().int().min(0).optional(),
-    multi_band_diffusion: z.boolean().optional(),
-    normalization_strategy: z
-        .enum(['loudness', 'clip', 'peak', 'rms'])
-        .default('loudness'),
-    top_k: z.number().int().optional().default(250),
-    top_p: z.number().optional().default(0),
-    temperature: z.number().optional().default(1),
-    classifier_free_guidance: z.number().int().optional().default(3),
-    output_format: z.enum(['mp3', 'wav']).default('wav'),
-    seed: z.number().int().optional(),
-});
+export const musicgenInputSchema = generationFormSchema
+    .omit({
+        file: true,
+    })
+    .extend({
+        input_audio: z.string().url().optional(),
+    });
 
 const musicgenSchema = musicgenInputSchema.merge(webhookMetadataSchema);
 

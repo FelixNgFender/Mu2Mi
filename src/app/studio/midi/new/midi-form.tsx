@@ -13,7 +13,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { midiTranscriptionAssetConfig } from '@/config/asset';
-import { formatValidationErrors } from '@/lib/utils';
+import { cn, formatValidationErrors } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
@@ -379,14 +379,46 @@ export const MidiForm = () => {
                     )}
 
                     {currentStep === 1 && (
-                        <>
-                            <h2 className="text-base font-semibold leading-7 text-gray-900">
-                                Complete
+                        <motion.div
+                            className="flex flex-1 flex-col space-y-8"
+                            initial={{
+                                x: delta >= 0 ? '50%' : '-50%',
+                                opacity: 0,
+                            }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        >
+                            <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+                                Submission complete
                             </h2>
-                            <p className="mt-1 text-sm leading-6 text-gray-600">
-                                Thank you for your submission.
+                            <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
+                                Your track has been submitted for processing.{' '}
+                                <a
+                                    href="/studio/midi/new"
+                                    className={cn(
+                                        buttonVariants({
+                                            variant: 'link',
+                                        }),
+                                        'p-0',
+                                    )}
+                                >
+                                    Transcribe a new track
+                                </a>{' '}
+                                or{' '}
+                                <Link
+                                    href="/studio/midi"
+                                    className={cn(
+                                        buttonVariants({
+                                            variant: 'link',
+                                        }),
+                                        'p-0',
+                                    )}
+                                >
+                                    view the status
+                                </Link>{' '}
+                                of your newly submitted track.
                             </p>
-                        </>
+                        </motion.div>
                     )}
                 </form>
             </Form>

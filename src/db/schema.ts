@@ -159,6 +159,7 @@ export const mimeType = pgEnum('mime_type', [
     'application/json',
     'image/png',
     'audio/sp-midi',
+    'audio/x-wav',
 ]);
 
 export const trackAssetType = pgEnum('track_asset_type', [

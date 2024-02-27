@@ -282,8 +282,6 @@ export const SeparationForm = () => {
                 resetAllButFile();
                 form.setValue('model_name', 'htdemucs_ft', {
                     shouldValidate: true,
-                    shouldDirty: true,
-                    shouldTouch: true,
                 });
                 form.setValue('stem', 'vocals', {
                     shouldValidate: true,

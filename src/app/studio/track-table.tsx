@@ -47,25 +47,31 @@ export const TrackTable = ({ filter }: TrackTableProps) => {
         );
     }
 
-    const previewPath = pathname.includes('separation')
-        ? '/studio/track'
-        : pathname.includes('analysis')
-          ? '/studio/track'
-          : pathname.includes('midi')
-            ? '/studio/track/midi'
-            : pathname.includes('lyrics')
-              ? '/studio/track/karaoke'
-              : undefined;
+    const previewPath =
+        pathname === '/studio'
+            ? '/studio/track'
+            : pathname.includes('separation')
+              ? '/studio/track'
+              : pathname.includes('analysis')
+                ? '/studio/track'
+                : pathname.includes('midi')
+                  ? '/studio/track/midi'
+                  : pathname.includes('lyrics')
+                    ? '/studio/track/karaoke'
+                    : undefined;
 
-    const callback = pathname.includes('separation')
-        ? '/studio/separation'
-        : pathname.includes('analysis')
-          ? '/studio/analysis'
-          : pathname.includes('midi')
-            ? '/studio/midi'
-            : pathname.includes('lyrics')
-              ? '/studio/lyrics'
-              : undefined;
+    const callback =
+        pathname === '/studio'
+            ? '/studio'
+            : pathname.includes('separation')
+              ? '/studio/separation'
+              : pathname.includes('analysis')
+                ? '/studio/analysis'
+                : pathname.includes('midi')
+                  ? '/studio/midi'
+                  : pathname.includes('lyrics')
+                    ? '/studio/lyrics'
+                    : undefined;
 
     return (
         <DataTable
