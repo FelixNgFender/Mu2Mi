@@ -43,4 +43,4 @@ export const midiFormSchema = z.object({
         ),
 });
 
-export type MidiFormSchemaType = z.infer<typeof midiFormSchema>;
+export type MidiFormType = z.infer<typeof midiFormSchema>;

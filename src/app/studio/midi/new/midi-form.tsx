@@ -23,7 +23,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { getPresignedUrl } from '../../actions';
 import { transcribeMidi } from './actions';
-import { MidiFormSchemaType, midiFormSchema } from './schemas';
+import { MidiFormType, midiFormSchema } from './schemas';
 
 const steps = [
     {
@@ -42,14 +42,14 @@ export const MidiForm = () => {
     const [currentStep, setCurrentStep] = useState(0);
     const delta = currentStep - previousStep;
 
-    const form = useForm<MidiFormSchemaType>({
+    const form = useForm<MidiFormType>({
         resolver: zodResolver(midiFormSchema),
         defaultValues: {
             files: null,
         },
     });
 
-    type FieldName = keyof MidiFormSchemaType;
+    type FieldName = keyof MidiFormType;
 
     const next = async () => {
         const fields = steps[currentStep]?.fields;
@@ -140,7 +140,7 @@ export const MidiForm = () => {
         }
     };
 
-    const onSubmit: SubmitHandler<MidiFormSchemaType> = async (data) => {
+    const onSubmit: SubmitHandler<MidiFormType> = async (data) => {
         toast({
             description: 'Your files are being uploaded.',
         });
