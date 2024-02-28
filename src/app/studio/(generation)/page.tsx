@@ -9,7 +9,7 @@ const GenerationPage = async () => {
                 href="studio/new"
                 ctaLabel="Create Track"
             />
-            <TrackTable filter="musicgenStatus" />
+            <TrackTable filter="musicGenerationStatus" />
         </>
     );
 };

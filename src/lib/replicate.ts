@@ -2,7 +2,7 @@ import { env } from '@/config/env';
 import {
     LyricsTranscriptionSchemaType,
     MidiTranscriptionSchemaType,
-    MusicgenSchemaType,
+    MusicGenerationSchemaType,
     TrackAnalysisSchemaType,
     TrackSeparationSchemaType,
 } from '@/types/replicate';
@@ -22,12 +22,16 @@ class ReplicateClient {
             fetch(input, { ...init, cache: 'no-store' });
     }
 
-    async musicgen({ taskId, userId, ...data }: MusicgenSchemaType) {
-        const webhook = new URL(`${env.ORIGIN}/api/webhook/musicgen`);
+    async generateMusic({
+        taskId,
+        userId,
+        ...data
+    }: MusicGenerationSchemaType) {
+        const webhook = new URL(`${env.ORIGIN}/api/webhook/generation`);
         webhook.searchParams.set('taskId', taskId);
         webhook.searchParams.set('userId', userId);
         return this.replicate.predictions.create({
-            version: env.MUSICGEN_MODEL_VERSION,
+            version: env.MUSIC_GENERATION_MODEL_VERSION,
             input: data,
             webhook: webhook.toString(),
             webhook_events_filter: ['completed'],

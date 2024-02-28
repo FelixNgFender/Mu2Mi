@@ -142,7 +142,7 @@ export type Preset = {
 };
 
 export type TrackStatusColumn =
-    | 'musicgenStatus'
+    | 'musicGenerationStatus'
     | 'trackSeparationStatus'
     | 'trackAnalysisStatus'
     | 'midiTranscriptionStatus'

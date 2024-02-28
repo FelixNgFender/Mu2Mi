@@ -9,7 +9,7 @@ export const webhookMetadataSchema = z.object({
     userId: z.string().min(15).max(15),
 });
 
-export const musicgenInputSchema = generationFormSchema
+export const musicGenerationInputSchema = generationFormSchema
     .omit({
         file: true,
     })
@@ -17,9 +17,11 @@ export const musicgenInputSchema = generationFormSchema
         input_audio: z.string().url().optional(),
     });
 
-const musicgenSchema = musicgenInputSchema.merge(webhookMetadataSchema);
+const musicGenerationSchema = musicGenerationInputSchema.merge(
+    webhookMetadataSchema,
+);
 
-export type MusicgenSchemaType = z.infer<typeof musicgenSchema>;
+export type MusicGenerationSchemaType = z.infer<typeof musicGenerationSchema>;
 
 export const trackSeparationInputSchema = separationFormSchema
     .omit({
@@ -83,7 +85,7 @@ interface ReplicateWebhookBody {
     output: any;
 }
 
-export interface MusicGenWebhookBody extends ReplicateWebhookBody {
+export interface MusicGenerationWebhookBody extends ReplicateWebhookBody {
     output: string | null;
 }
 
@@ -117,7 +119,7 @@ export interface LyricsTranscriptionWebhookBody extends ReplicateWebhookBody {
 }
 
 export type ReplicateWebhookBodyTypes =
-    | MusicGenWebhookBody
+    | MusicGenerationWebhookBody
     | TrackSeparationWebhookBody
     | TrackAnalysisWebhookBody
     | MidiTranscriptionWebhookBody

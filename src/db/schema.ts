@@ -163,7 +163,7 @@ export const mimeType = pgEnum('mime_type', [
 ]);
 
 export const trackAssetType = pgEnum('track_asset_type', [
-    'musicgen',
+    'generation',
     'original',
     'vocals',
     'accompaniment',
@@ -239,7 +239,7 @@ export const trackTable = pgTable(
             .notNull()
             .references(() => userTable.id, cascadingUpdateAndDelete),
         name: text('name').notNull(),
-        musicgenStatus: trackStatusEnum('musicgen_status'),
+        musicGenerationStatus: trackStatusEnum('music_generation_status'),
         trackSeparationStatus: trackStatusEnum('track_separation_status'),
         trackAnalysisStatus: trackStatusEnum('track_analysis_status'),
         midiTranscriptionStatus: trackStatusEnum('midi_transcription_status'),

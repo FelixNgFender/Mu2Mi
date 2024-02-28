@@ -7,11 +7,11 @@ import { httpStatus } from '@/lib/http';
 import { replicateClient } from '@/lib/replicate';
 import { authAction } from '@/lib/safe-action';
 import { trackModel } from '@/models/track';
-import { musicgenInputSchema } from '@/types/replicate';
+import { musicGenerationInputSchema } from '@/types/replicate';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
-const schema = musicgenInputSchema
+const schema = musicGenerationInputSchema
     .omit({
         input_audio: true,
     })
@@ -25,7 +25,7 @@ export const generateMusic = authAction(schema, async (data, { user }) => {
         const newTrack = await trackModel.createOneAndUpdateAsset(
             {
                 userId: user.id,
-                musicgenStatus: 'processing',
+                musicGenerationStatus: 'processing',
                 name: data.name,
             },
             data.assetId,
@@ -46,7 +46,7 @@ export const generateMusic = authAction(schema, async (data, { user }) => {
             env.S3_PRESIGNED_URL_EXPIRATION_S,
         );
 
-        await replicateClient.musicgen({
+        await replicateClient.generateMusic({
             ...data,
             taskId: newTrack.trackId,
             userId: user.id,
@@ -55,7 +55,7 @@ export const generateMusic = authAction(schema, async (data, { user }) => {
     } else {
         const newTrack = await trackModel.createOne({
             userId: user.id,
-            musicgenStatus: 'processing',
+            musicGenerationStatus: 'processing',
             name: data.name,
         });
 
@@ -68,7 +68,7 @@ export const generateMusic = authAction(schema, async (data, { user }) => {
             );
         }
 
-        await replicateClient.musicgen({
+        await replicateClient.generateMusic({
             ...data,
             taskId: newTrack.id,
             userId: user.id,
