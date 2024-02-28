@@ -2,7 +2,7 @@
 
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { SidebarNavItem } from '@/types/nav';
+import { SidebarNavItem } from '@/types/studio';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

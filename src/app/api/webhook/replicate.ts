@@ -1,4 +1,3 @@
-import { assetConfig } from '@/config/asset';
 import { env } from '@/config/env';
 import { fileStorageClient } from '@/db';
 import { AppError } from '@/lib/error';
@@ -10,7 +9,7 @@ import {
     ReplicateWebhookBodyTypes,
     webhookMetadataSchema,
 } from '@/types/replicate';
-import { TrackStatusColumn } from '@/types/studio';
+import { TrackAssetType, TrackStatusColumn } from '@/types/studio';
 import crypto from 'crypto';
 import { headers } from 'next/headers';
 import path from 'path';
@@ -20,7 +19,7 @@ export const replicateWebhookHandler = async <
 >(
     req: Request,
     statusField: TrackStatusColumn,
-    trackType?: (typeof assetConfig.trackAssetTypes)[number],
+    trackType?: TrackAssetType,
 ) => {
     // https://replicate.com/docs/webhooks#verifying-webhooks
     const body = await req.json();
@@ -203,7 +202,7 @@ const saveTrackAssetAndMetadata = async (
     taskId: string,
     userId: string,
     data: string | Record<string, any>,
-    trackType?: (typeof assetConfig.trackAssetTypes)[number],
+    trackType?: TrackAssetType,
 ) => {
     let objectName: string;
     let mimeType: string;

@@ -1,5 +1,6 @@
 // This file should not contain any runtime logic besides defining the schema.
 // See https://orm.drizzle.team/docs/migrations#quick-start
+import { getTableColumns } from 'drizzle-orm';
 import {
     boolean,
     index,
@@ -256,3 +257,8 @@ export const trackTable = pgTable(
         };
     },
 );
+
+const { id, userId, name, updatedAt, createdAt, ...rest } =
+    getTableColumns(trackTable);
+
+export type TrackTableStatusColumn = keyof typeof rest;

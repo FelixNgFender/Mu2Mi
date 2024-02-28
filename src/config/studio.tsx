@@ -1,5 +1,5 @@
 import { Icons } from '@/components/icons';
-import { MainNavItem, SidebarNavItem } from '@/types/nav';
+import { MainNavItem, SidebarNavItem } from '@/types/studio';
 import {
     Activity,
     BrainCircuit,

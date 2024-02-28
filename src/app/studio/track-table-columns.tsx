@@ -9,9 +9,9 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { TrackStatusColumn } from '@/types/studio';
 import { cn } from '@/lib/utils';
 import type { Track } from '@/models/track';
+import { TrackStatus, TrackStatusColumn } from '@/types/studio';
 import { ColumnDef } from '@tanstack/react-table';
 import JSZip from 'jszip';
 import {
@@ -25,9 +25,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-const getStatusIndicator = (
-    status: 'processing' | 'succeeded' | 'failed' | 'canceled',
-) => {
+const getStatusIndicator = (status: TrackStatus) => {
     switch (status) {
         case 'processing':
             return <Loader2 className="inline h-4 w-4 animate-spin" />;
