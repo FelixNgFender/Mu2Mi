@@ -1,6 +1,7 @@
 import { env } from '@/config/env';
 import { errorHandler } from '@/lib/error';
 import { logger } from '@/lib/logger';
+import { DrizzleLogger } from 'drizzle-orm/logger';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { Client as MinioClient } from 'minio';
 import postgres from 'postgres';
@@ -9,10 +10,16 @@ import 'server-only';
 
 import * as schema from './schema';
 
+class DatabaseLogger implements DrizzleLogger {
+    logQuery(query: string, params: unknown[]): void {
+        logger.info(JSON.stringify({ query, params }));
+    }
+}
+
 // TODO: PostgresError: sorry, too many clients already
 const queryClient = postgres(env.DATABASE_URL);
 const db = drizzle(queryClient, {
-    logger: env.DATABASE_LOGGING,
+    logger: env.DATABASE_LOGGING && new DatabaseLogger(),
     schema,
 });
 
