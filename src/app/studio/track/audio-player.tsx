@@ -17,7 +17,7 @@ import {
     ZoomOut,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import WaveformPlaylist from 'waveform-playlist';
 
 import { downloadTrack } from '../actions';
@@ -31,73 +31,72 @@ type TrackPageProps = {
 const AudioPlayer = ({ assetLinks, callback }: TrackPageProps) => {
     const [hasDropped, setHasDropped] = useState(false);
     const [ee] = useState(new EventEmitter());
+    const playlist = useRef<HTMLDivElement | null>(null);
 
-    const playlist = useCallback(
-        (node: HTMLDivElement | null) => {
-            // @ts-expect-error - WaveformPlaylist is not typed
-            let playlistInstance;
-            if (node !== null && assetLinks) {
-                playlistInstance = WaveformPlaylist(
-                    {
-                        container: node,
-                        samplesPerPixel: 2048,
-                        mono: true,
-                        exclSolo: true,
-                        timescale: true,
-                        controls: {
-                            show: true,
-                            width: 200,
-                        },
-                        colors: {
-                            waveOutlineColor: 'black',
-                        },
-                        waveHeight: 128,
-                        barWidth: 1,
-                        barGap: 0,
-                        state: 'cursor',
-                        zoomLevels: [512, 1024, 2048, 4096],
-                        isAutomaticScroll: true,
+    useEffect(() => {
+        // @ts-expect-error - WaveformPlaylist is not typed
+        let playlistInstance;
+
+        if (playlist.current !== null && assetLinks) {
+            playlistInstance = WaveformPlaylist(
+                {
+                    container: playlist.current,
+                    samplesPerPixel: 2048,
+                    mono: true,
+                    exclSolo: true,
+                    timescale: true,
+                    controls: {
+                        show: true,
+                        width: 200,
                     },
-                    ee,
-                );
-                ee.on('audiorenderingfinished', function (type, data) {
-                    if (type === 'wav') {
-                        const url = URL.createObjectURL(data);
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = url;
-                        a.download = `mu2mi-mixdown-${Date.now()}.wav`;
-                        document.body.appendChild(a);
-                        a.click();
-                        window.URL.revokeObjectURL(url);
-                    }
-                });
-
-                playlistInstance.load(
-                    assetLinks.map((asset) => {
-                        return {
-                            src: asset.url,
-                            name:
-                                (asset.type &&
-                                    asset.type.charAt(0).toUpperCase() +
-                                        asset.type.slice(1)) ||
-                                'track' + Date.now(),
-                        };
-                    }),
-                );
-                playlistInstance.initExporter();
-            }
-
-            return () => {
-                // @ts-expect-error - WaveformPlaylist is not typed
-                if (playlistInstance) {
-                    // Stops playout if playlist is playing, removes all tracks from the playlist
-                    ee.emit('clear');
+                    colors: {
+                        waveOutlineColor: 'black',
+                    },
+                    waveHeight: 128,
+                    barWidth: 1,
+                    barGap: 0,
+                    state: 'cursor',
+                    zoomLevels: [512, 1024, 2048, 4096],
+                    isAutomaticScroll: true,
+                },
+                ee,
+            );
+            ee.on('audiorenderingfinished', function (type, data) {
+                if (type === 'wav') {
+                    const url = URL.createObjectURL(data);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `mu2mi-mixdown-${Date.now()}.wav`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
                 }
-            };
-        },
-        [assetLinks, ee],
-    );
+            });
+
+            playlistInstance.load(
+                assetLinks.map((asset) => {
+                    return {
+                        src: asset.url,
+                        name:
+                            (asset.type &&
+                                asset.type.charAt(0).toUpperCase() +
+                                    asset.type.slice(1)) ||
+                            'track' + Date.now(),
+                    };
+                }),
+            );
+            playlistInstance.initExporter();
+        }
+
+        return () => {
+            // @ts-expect-error - WaveformPlaylist is not typed
+            if (playlistInstance) {
+                // Stops playout if playlist is playing, removes all tracks from the playlist
+                ee.emit('clear');
+            }
+        };
+    }, [assetLinks, ee]);
 
     return (
         <>
@@ -234,6 +233,7 @@ const AudioPlayer = ({ assetLinks, callback }: TrackPageProps) => {
                     }}
                 />
             )}
+            {/* Renders twice in development, once in production */}
             <div className="flex-1" ref={playlist} />
         </>
     );
