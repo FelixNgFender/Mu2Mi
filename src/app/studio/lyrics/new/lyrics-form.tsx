@@ -36,7 +36,7 @@ import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { lyricsTranscriptionAssetConfig } from '@/config/asset';
-import { Preset } from '@/config/studio';
+import { Preset } from '@/types/studio';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';

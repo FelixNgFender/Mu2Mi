@@ -9,7 +9,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { TrackStatusColumn } from '@/config/studio';
+import { TrackStatusColumn } from '@/types/studio';
 import { cn } from '@/lib/utils';
 import type { Track } from '@/models/track';
 import { ColumnDef } from '@tanstack/react-table';

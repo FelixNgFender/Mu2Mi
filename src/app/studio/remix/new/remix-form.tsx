@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/accordion';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Dropzone } from '@/components/ui/dropzone';
 import {
     Form,
     FormControl,
@@ -28,11 +29,12 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { musicGenerationAssetConfig } from '@/config/asset';
-import { Preset } from '@/types/studio';
+import { styleRemixAssetConfig } from '@/config/asset';
 import { cn } from '@/lib/utils';
+import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
@@ -41,73 +43,77 @@ import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { getPresignedUrl } from '../../actions';
-import { generateMusic } from './actions';
-import melodyLargeImage from './assets/melody-large.jpg';
-import stereoMelodyImage from './assets/stereo-melody-large.jpg';
+import { remixTrack } from './actions';
+import chordLargeImage from './assets/chord-large.jpg';
+import chordImage from './assets/chord.jpg';
 import {
-    MusicGenerationFormType,
-    musicGenerationFormSchema,
-    musicGenerationModels,
+    StyleRemixFormType,
+    styleRemixFormSchema,
+    styleRemixModels,
 } from './schemas';
 
 const steps = [
     {
         id: 'Step 1',
+        name: 'Select file',
+        fields: ['file'],
+    },
+    {
+        id: 'Step 2',
         name: 'Preferences',
         fields: [
-            'file',
             'model_version',
             'prompt',
-            'duration',
-            'continuation',
-            'continuation_start',
-            'continuation_end',
             'multi_band_diffusion',
             'normalization_strategy',
+            'beat_sync_threshold',
+            'large_chord_voca',
+            'chroma_coefficient',
             'top_k',
             'top_p',
             'temperature',
             'classifier_free_guidance',
             'output_format',
+            'return_instrumental',
             'seed',
         ],
     },
-    { id: 'Step 2', name: 'Generate track' },
+    { id: 'Step 3', name: 'Upload file' },
 ];
 
-export const GenerationForm = () => {
+export const RemixForm = () => {
     const { toast } = useToast();
 
     const [file, setFile] = useState<File | null>(null);
     const [selectedPreset, setSelectedPreset] = useState<
-        (typeof generationPresets)[number]['id'] | null
+        (typeof remixPresets)[number]['id'] | null
     >(null);
     const [previousStep, setPreviousStep] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
     const delta = currentStep - previousStep;
 
-    const form = useForm<MusicGenerationFormType>({
-        resolver: zodResolver(musicGenerationFormSchema),
+    const form = useForm<StyleRemixFormType>({
+        resolver: zodResolver(styleRemixFormSchema),
         defaultValues: {
             file: null,
-            model_version: 'melody-large',
+            model_version: 'chord',
             prompt: '',
-            duration: 8,
-            continuation: false,
-            continuation_start: 0,
-            continuation_end: 0,
             multi_band_diffusion: false,
             normalization_strategy: 'loudness',
+            beat_sync_threshold: 0.75,
+            large_chord_voca: true,
+            chroma_coefficient: 1,
             top_k: 250,
             top_p: 0,
             temperature: 1,
             classifier_free_guidance: 3,
             output_format: 'mp3',
+            return_instrumental: true,
             seed: undefined,
         },
     });
 
-    type FieldName = keyof MusicGenerationFormType;
+    type FieldName = keyof StyleRemixFormType;
 
     const next = async () => {
         const fields = steps[currentStep]?.fields;
@@ -168,7 +174,7 @@ export const GenerationForm = () => {
 
     const handleFileUpload = async (file: File) => {
         const result = await getPresignedUrl({
-            type: file.type as (typeof musicGenerationAssetConfig.allowedMimeTypes)[number],
+            type: file.type as (typeof styleRemixAssetConfig.allowedMimeTypes)[number],
             extension: file.name.split('.').pop() || '',
             size: file.size,
             checksum: await computeSHA256(file),
@@ -200,39 +206,34 @@ export const GenerationForm = () => {
         }
     };
 
-    const onSubmit: SubmitHandler<MusicGenerationFormType> = async (data) => {
+    const onSubmit: SubmitHandler<StyleRemixFormType> = async (data) => {
         toast({
             description: 'Your file is being uploaded.',
         });
-
-        let assetId: string | undefined;
-
-        if (data.file) {
-            assetId = await handleFileUpload(data.file);
-            if (!assetId) {
-                form.reset();
-                setCurrentStep(-1);
-                return;
-            }
+        const assetId = await handleFileUpload(data.file);
+        if (!assetId) {
+            form.reset();
+            setCurrentStep(-1);
+            return;
         }
 
-        const result = await generateMusic({
-            name: data.prompt,
+        const result = await remixTrack({
+            name: data.file.name,
             assetId: assetId,
 
             model_version: data.model_version,
             prompt: data.prompt,
-            duration: data.duration,
-            continuation: data.continuation,
-            continuation_start: data.continuation_start ?? undefined,
-            continuation_end: data.continuation_end,
             multi_band_diffusion: data.multi_band_diffusion,
             normalization_strategy: data.normalization_strategy,
+            beat_sync_threshold: data.beat_sync_threshold,
+            large_chord_voca: data.large_chord_voca,
+            chroma_coefficient: data.chroma_coefficient,
             top_k: data.top_k,
             top_p: data.top_p,
             temperature: data.temperature,
             classifier_free_guidance: data.classifier_free_guidance,
             output_format: data.output_format,
+            return_instrumental: data.return_instrumental,
             seed: data.seed,
         });
 
@@ -271,32 +272,31 @@ export const GenerationForm = () => {
         });
     };
 
-    const generationPresets: Preset[] = [
+    const remixPresets: Preset[] = [
         {
-            id: 'melody-large',
-            icon: melodyLargeImage,
+            id: 'chord',
+            icon: chordImage,
             name: 'Default',
             description:
-                "Text-to-music or melody-to-music. Uses the 'melody-large' model.",
-            labels: ['text-to-music', 'melody-to-music'],
+                "Remixes your track to another style. Uses the 'chord' model.",
+            labels: ['remix', 'chord'],
             onClick: () => {
                 resetAllButFile();
-                setSelectedPreset('melody-large');
+                setSelectedPreset('chord');
             },
         },
         {
-            id: 'stereo-melody-large',
-            icon: stereoMelodyImage,
-            name: 'Stereo',
-            description:
-                'Same as default, but fine-tuned for stereo generation.',
-            labels: ['text-to-music', 'melody-to-music', 'stereo'],
+            id: 'chord-large',
+            icon: chordLargeImage,
+            name: 'High quality',
+            description: 'Takes longer than default, but higher quality.',
+            labels: ['remix', 'chord-large'],
             onClick: () => {
                 resetAllButFile();
-                form.setValue('model_version', 'stereo-melody-large', {
+                form.setValue('model_version', 'chord-large', {
                     shouldValidate: true,
                 });
-                setSelectedPreset('stereo-melody-large');
+                setSelectedPreset('chord-large');
             },
         },
     ];
@@ -364,10 +364,121 @@ export const GenerationForm = () => {
                             transition={{ duration: 0.3, ease: 'easeInOut' }}
                         >
                             <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+                                Submit your track
+                            </h2>
+                            <Tabs
+                                defaultValue="local"
+                                className="flex flex-1 flex-col"
+                            >
+                                <TabsList className="mb-4 self-start">
+                                    <TabsTrigger value="local">
+                                        Local file
+                                    </TabsTrigger>
+                                    <TabsTrigger value="remote">
+                                        Remote file
+                                    </TabsTrigger>
+                                    <TabsTrigger value="youtube">
+                                        YouTube
+                                    </TabsTrigger>
+                                </TabsList>
+                                <TabsContent
+                                    value="local"
+                                    className="data-[state=active]:flex data-[state=active]:flex-1 data-[state=active]:flex-col"
+                                >
+                                    <FormField
+                                        name="file"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-1 flex-col items-center space-y-4">
+                                                <FormControl>
+                                                    <Dropzone
+                                                        classNameWrapper="w-full flex-1 max-h-64"
+                                                        className="h-full w-full"
+                                                        name={field.name}
+                                                        required
+                                                        ref={field.ref}
+                                                        disabled={
+                                                            form.formState
+                                                                .isSubmitting
+                                                        }
+                                                        aria-disabled={
+                                                            form.formState
+                                                                .isSubmitting
+                                                        }
+                                                        accept={styleRemixAssetConfig.allowedMimeTypes.join(
+                                                            ', ',
+                                                        )}
+                                                        dropMessage={
+                                                            field.value
+                                                                ? field.value[0]
+                                                                      ?.name
+                                                                : "Drop like it's hot 🔥"
+                                                        }
+                                                        handleOnDrop={(
+                                                            acceptedFiles: FileList | null,
+                                                        ) => {
+                                                            field.onChange(
+                                                                acceptedFiles,
+                                                            );
+                                                            setFile(
+                                                                acceptedFiles?.[0] ||
+                                                                    null,
+                                                            );
+                                                        }}
+                                                    />
+                                                </FormControl>
+                                                <FormDescription>
+                                                    Supports:{' '}
+                                                    {` ${styleRemixAssetConfig.allowedFileTypes
+                                                        .map((type) =>
+                                                            type.toUpperCase(),
+                                                        )
+                                                        .join(', ')}`}
+                                                </FormDescription>
+                                                <FormMessage />
+                                                {file && (
+                                                    <audio
+                                                        controls
+                                                        src={URL.createObjectURL(
+                                                            file,
+                                                        )}
+                                                    />
+                                                )}
+                                            </FormItem>
+                                        )}
+                                    />
+                                </TabsContent>
+                                {/* TODO: implement */}
+                                <TabsContent
+                                    value="remote"
+                                    className="data-[state=active]:flex data-[state=active]:flex-1 data-[state=active]:flex-col"
+                                >
+                                    remote
+                                </TabsContent>
+                                <TabsContent
+                                    value="youtube"
+                                    className="data-[state=active]:flex data-[state=active]:flex-1 data-[state=active]:flex-col"
+                                >
+                                    youtube
+                                </TabsContent>
+                            </Tabs>
+                        </motion.div>
+                    )}
+
+                    {currentStep === 1 && (
+                        <motion.div
+                            className="flex flex-1 flex-col space-y-8"
+                            initial={{
+                                x: delta >= 0 ? '50%' : '-50%',
+                                opacity: 0,
+                            }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        >
+                            <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
                                 Choose a preset
                             </h2>
                             <div className="flex flex-col space-y-4 p-4 pt-0">
-                                {generationPresets.map((item) => (
+                                {remixPresets.map((item) => (
                                     <PresetCard
                                         key={item.id}
                                         item={item}
@@ -383,7 +494,7 @@ export const GenerationForm = () => {
                                         <FormLabel>Prompt</FormLabel>
                                         <FormControl>
                                             <Textarea
-                                                placeholder="110bpm 64kbps 16khz lofi hiphop summer smooth"
+                                                placeholder="country style"
                                                 {...field}
                                             />
                                         </FormControl>
@@ -411,7 +522,7 @@ export const GenerationForm = () => {
                                                     </FormLabel>
                                                     <FormDescription>
                                                         Choose a model version
-                                                        to generate your track.
+                                                        to remix your track.
                                                     </FormDescription>
                                                     <FormControl>
                                                         <RadioGroup
@@ -421,7 +532,7 @@ export const GenerationForm = () => {
                                                             value={field.value}
                                                             className="flex flex-col space-y-1"
                                                         >
-                                                            {musicGenerationModels.map(
+                                                            {styleRemixModels.map(
                                                                 (model) => (
                                                                     <FormItem
                                                                         key={
@@ -441,207 +552,10 @@ export const GenerationForm = () => {
                                                                                 model.name
                                                                             }
                                                                         </FormLabel>
-                                                                        <FormDescription className="no-scrollbar overflow-x-auto whitespace-nowrap text-sm">
-                                                                            {
-                                                                                model.description
-                                                                            }
-                                                                        </FormDescription>
                                                                     </FormItem>
                                                                 ),
                                                             )}
                                                         </RadioGroup>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="file"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <FormLabel>
-                                                        Input audio
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        An audio file that will
-                                                        influence the generated
-                                                        music. If
-                                                        &apos;Continuation&apos;
-                                                        is checked, the
-                                                        generated music will be
-                                                        a continuation of the
-                                                        audio file. Otherwise,
-                                                        the generated music will
-                                                        mimic the audio
-                                                        file&apos;s melody.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="file"
-                                                            name={field.name}
-                                                            ref={field.ref}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                            aria-disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                            accept={musicGenerationAssetConfig.allowedMimeTypes.join(
-                                                                ', ',
-                                                            )}
-                                                            placeholder="Choose a file"
-                                                            onChange={(e) => {
-                                                                const file =
-                                                                    e.target
-                                                                        .files?.[0];
-                                                                if (file) {
-                                                                    field.onChange(
-                                                                        file,
-                                                                    );
-                                                                    setFile(
-                                                                        file,
-                                                                    );
-                                                                }
-                                                            }}
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                    {file && (
-                                                        <audio
-                                                            controls
-                                                            src={URL.createObjectURL(
-                                                                file,
-                                                            )}
-                                                        />
-                                                    )}
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="duration"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Duration:{' '}
-                                                            {field.value}{' '}
-                                                            seconds
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Duration of the
-                                                            generated audio.
-                                                        </FormDescription>
-                                                    </div>
-                                                    <FormControl>
-                                                        <Slider
-                                                            {...field}
-                                                            onValueChange={(
-                                                                v,
-                                                            ) =>
-                                                                field.onChange(
-                                                                    v[0],
-                                                                )
-                                                            }
-                                                            value={[
-                                                                field.value,
-                                                            ]}
-                                                            min={1}
-                                                            max={60}
-                                                            step={1}
-                                                            className="max-w-64"
-                                                        />
-                                                    </FormControl>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="continuation"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
-                                                                field.onChange
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Continuation
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            If checked,
-                                                            generated music will
-                                                            continue from input
-                                                            audio. Otherwise,
-                                                            generated music will
-                                                            mimic input
-                                                            audio&apos;s melody.
-                                                        </FormDescription>
-                                                    </div>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="continuation_start"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Continuation start
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Start time of the audio
-                                                        file to use for
-                                                        continuation.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="continuation_end"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Continuation end
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        End time of the audio
-                                                        file to use for
-                                                        continuation. If -1 or
-                                                        empty, will default to
-                                                        the end of the audio
-                                                        clip.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -729,6 +643,113 @@ export const GenerationForm = () => {
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="beat_sync_threshold"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Beat sync threshold
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        When beat syncing, if
+                                                        the gap between
+                                                        generated downbeat
+                                                        timing and input audio
+                                                        downbeat timing is
+                                                        larger than this,
+                                                        consider the beats are
+                                                        not corresponding. If
+                                                        empty or -1,
+                                                        &apos;1.1/(bpm/60)&apos;
+                                                        will be used as the
+                                                        value. 0.75 is a good
+                                                        value to set.
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            {...field}
+                                                            disabled={
+                                                                form.formState
+                                                                    .isSubmitting
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="large_chord_voca"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Multi-band diffusion
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            If checked, more
+                                                            chords like 7th,
+                                                            diminished are used.
+                                                            Else, only the 12
+                                                            major and 12 minor
+                                                            chords are used.
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="chroma_coefficient"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-3">
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Chroma coefficient:{' '}
+                                                            {field.value}
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Coefficient value
+                                                            multiplied to
+                                                            multi-hot chord
+                                                            chroma.
+                                                        </FormDescription>
+                                                    </div>
+                                                    <FormControl>
+                                                        <Slider
+                                                            {...field}
+                                                            onValueChange={(
+                                                                v,
+                                                            ) =>
+                                                                field.onChange(
+                                                                    v[0],
+                                                                )
+                                                            }
+                                                            value={[
+                                                                field.value,
+                                                            ]}
+                                                            min={0.5}
+                                                            max={2}
+                                                            step={0.01}
+                                                            className="max-w-64"
+                                                        />
+                                                    </FormControl>
                                                 </FormItem>
                                             )}
                                         />
@@ -870,6 +891,35 @@ export const GenerationForm = () => {
                                         />
                                         <FormField
                                             control={form.control}
+                                            name="return_instrumental"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Return instrumental
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            If checked, the
+                                                            instrumental audio
+                                                            will also be
+                                                            returned.
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
                                             name="output_format"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-3">
@@ -918,7 +968,7 @@ export const GenerationForm = () => {
                         </motion.div>
                     )}
 
-                    {currentStep === 1 && (
+                    {currentStep === 2 && (
                         <motion.div
                             className="flex flex-1 flex-col space-y-8"
                             initial={{
@@ -932,9 +982,9 @@ export const GenerationForm = () => {
                                 Submission complete
                             </h2>
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
-                                Your track is generating.{' '}
+                                Your track has been submitted for processing.{' '}
                                 <a
-                                    href="/studio/new"
+                                    href="/studio/remix/new"
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -942,11 +992,11 @@ export const GenerationForm = () => {
                                         'p-0',
                                     )}
                                 >
-                                    Generate a new track
+                                    Remix a new track
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio"
+                                    href="/studio/remix"
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -999,15 +1049,15 @@ export const GenerationForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/new"
+                            href="/studio/remix/new"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
                         >
-                            Generate new track
+                            Remix new track
                         </a>
                         <Link
-                            href="/studio"
+                            href="/studio/remix"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

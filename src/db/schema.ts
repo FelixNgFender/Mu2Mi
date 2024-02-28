@@ -164,6 +164,7 @@ export const mimeType = pgEnum('mime_type', [
 
 export const trackAssetType = pgEnum('track_asset_type', [
     'generation',
+    'remix',
     'original',
     'vocals',
     'accompaniment',
@@ -240,6 +241,7 @@ export const trackTable = pgTable(
             .references(() => userTable.id, cascadingUpdateAndDelete),
         name: text('name').notNull(),
         musicGenerationStatus: trackStatusEnum('music_generation_status'),
+        styleRemixStatus: trackStatusEnum('style_remix_status'),
         trackSeparationStatus: trackStatusEnum('track_separation_status'),
         trackAnalysisStatus: trackStatusEnum('track_analysis_status'),
         midiTranscriptionStatus: trackStatusEnum('midi_transcription_status'),

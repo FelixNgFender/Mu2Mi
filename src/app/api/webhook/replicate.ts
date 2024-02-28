@@ -1,6 +1,5 @@
 import { assetConfig } from '@/config/asset';
 import { env } from '@/config/env';
-import { TrackStatusColumn } from '@/config/studio';
 import { fileStorageClient } from '@/db';
 import { AppError } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
@@ -11,6 +10,7 @@ import {
     ReplicateWebhookBodyTypes,
     webhookMetadataSchema,
 } from '@/types/replicate';
+import { TrackStatusColumn } from '@/types/studio';
 import crypto from 'crypto';
 import { headers } from 'next/headers';
 import path from 'path';
@@ -114,6 +114,22 @@ export const replicateWebhookHandler = async <
     ) {
         if (typeof output === 'string') {
             await saveTrackAssetAndMetadata(taskId, userId, output, trackType);
+        } else if (
+            statusField === 'styleRemixStatus' &&
+            Array.isArray(output)
+        ) {
+            await Promise.all(
+                output.map(async (url) => {
+                    if (url) {
+                        await saveTrackAssetAndMetadata(
+                            taskId,
+                            userId,
+                            url,
+                            'remix',
+                        );
+                    }
+                }),
+            );
         } else if (
             statusField === 'trackSeparationStatus' &&
             typeof output === 'object'

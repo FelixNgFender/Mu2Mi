@@ -6,7 +6,20 @@ export const assetConfig = {
     trackAssetTypes: trackAssetType.enumValues,
 } as const;
 
-export const generationAssetConfig = {
+export const musicGenerationAssetConfig = {
+    maxFileSizeBytes: 1024 * 1024 * 50, // 50 MB
+    allowedMimeTypes: [
+        'audio/mp3',
+        'audio/mpeg',
+        'audio/ogg',
+        'audio/wav',
+        'audio/flac',
+        'audio/m4a',
+    ],
+    allowedFileTypes: ['mp3', 'ogg', 'wav', 'flac', 'm4a'],
+} as const;
+
+export const styleRemixAssetConfig = {
     maxFileSizeBytes: 1024 * 1024 * 50, // 50 MB
     allowedMimeTypes: [
         'audio/mp3',

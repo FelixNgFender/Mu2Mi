@@ -1,5 +1,4 @@
 import { trackSeparationAssetConfig } from '@/config/asset';
-import { zodEnum } from '@/lib/utils';
 import { z } from 'zod';
 
 export const trackSeparationModels = [
@@ -71,11 +70,16 @@ export const separationFormSchema = z.object({
         )
         .transform((files) => files?.[0]),
     model_name: z
-        .enum(
-            zodEnum<TrackSeparationModelName>(
-                trackSeparationModels.map((m) => m.name),
-            ),
-        )
+        .enum([
+            'htdemucs',
+            'htdemucs_ft',
+            'htdemucs_6s',
+            'hdemucs_mmi',
+            'mdx',
+            'mdx_extra',
+            'mdx_q',
+            'mdx_extra_q',
+        ])
         .default('htdemucs'),
     stem: z
         .enum(['vocals', 'bass', 'drums', 'guitar', 'piano', 'other'])

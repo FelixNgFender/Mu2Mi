@@ -1,9 +1,16 @@
-// TODO: Implement
+import { FeatureHeader } from '../feature-header';
+import { TrackTable } from '../track-table';
+
 const RemixPage = async () => {
     return (
-        <div>
-            <h1>Remix</h1>
-        </div>
+        <>
+            <FeatureHeader
+                title="Style Remix"
+                href="remix/new"
+                ctaLabel="Upload Track"
+            />
+            <TrackTable filter="styleRemixStatus" />
+        </>
     );
 };
 

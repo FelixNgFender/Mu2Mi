@@ -1,6 +1,7 @@
-import { generationFormSchema } from '@/app/studio/(generation)/new/schemas';
+import { musicGenerationFormSchema } from '@/app/studio/(generation)/new/schemas';
 import { analysisFormSchema } from '@/app/studio/analysis/new/schemas';
 import { lyricsFormSchema } from '@/app/studio/lyrics/new/schemas';
+import { styleRemixFormSchema } from '@/app/studio/remix/new/schemas';
 import { separationFormSchema } from '@/app/studio/separation/new/schemas';
 import { z } from 'zod';
 
@@ -9,7 +10,7 @@ export const webhookMetadataSchema = z.object({
     userId: z.string().min(15).max(15),
 });
 
-export const musicGenerationInputSchema = generationFormSchema
+export const musicGenerationInputSchema = musicGenerationFormSchema
     .omit({
         file: true,
     })
@@ -22,6 +23,18 @@ const musicGenerationSchema = musicGenerationInputSchema.merge(
 );
 
 export type MusicGenerationSchemaType = z.infer<typeof musicGenerationSchema>;
+
+export const styleRemixInputSchema = styleRemixFormSchema
+    .omit({
+        file: true,
+    })
+    .extend({
+        music_input: z.string().url(),
+    });
+
+const styleRemixSchema = styleRemixInputSchema.merge(webhookMetadataSchema);
+
+export type StyleRemixSchemaType = z.infer<typeof styleRemixSchema>;
 
 export const trackSeparationInputSchema = separationFormSchema
     .omit({
@@ -89,6 +102,10 @@ export interface MusicGenerationWebhookBody extends ReplicateWebhookBody {
     output: string | null;
 }
 
+export interface StyleRemixWebhookBody extends ReplicateWebhookBody {
+    output: (string | null) | Array<string | null>;
+}
+
 export interface TrackSeparationWebhookBody extends ReplicateWebhookBody {
     output: {
         bass: string | null;
@@ -120,6 +137,7 @@ export interface LyricsTranscriptionWebhookBody extends ReplicateWebhookBody {
 
 export type ReplicateWebhookBodyTypes =
     | MusicGenerationWebhookBody
+    | StyleRemixWebhookBody
     | TrackSeparationWebhookBody
     | TrackAnalysisWebhookBody
     | MidiTranscriptionWebhookBody

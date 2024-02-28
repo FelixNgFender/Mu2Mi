@@ -1,7 +1,7 @@
-import { generationAssetConfig } from '@/config/asset';
+import { musicGenerationAssetConfig } from '@/config/asset';
 import { z } from 'zod';
 
-export const generationModels = [
+export const musicGenerationModels = [
     {
         name: 'large',
         description: '3.3B model, text to music only.',
@@ -26,7 +26,7 @@ export const generationModels = [
     },
 ];
 
-export const generationFormSchema = z.object({
+export const musicGenerationFormSchema = z.object({
     file: z
         .any()
         .optional()
@@ -34,21 +34,22 @@ export const generationFormSchema = z.object({
             (files) => {
                 if (!files?.[0]) return true;
                 return (
-                    files?.[0]?.size <= generationAssetConfig.maxFileSizeBytes
+                    files?.[0]?.size <=
+                    musicGenerationAssetConfig.maxFileSizeBytes
                 );
             },
             `Max file size is ${
-                generationAssetConfig.maxFileSizeBytes / 1024 / 1024
+                musicGenerationAssetConfig.maxFileSizeBytes / 1024 / 1024
             } MB.`,
         )
         .refine(
             (files) => {
                 if (!files?.[0]) return true;
-                return generationAssetConfig.allowedMimeTypes.includes(
+                return musicGenerationAssetConfig.allowedMimeTypes.includes(
                     files?.[0]?.type,
                 );
             },
-            `Only ${generationAssetConfig.allowedFileTypes
+            `Only ${musicGenerationAssetConfig.allowedFileTypes
                 .map((type) => type.toUpperCase())
                 .join(', ')} files are allowed.`,
         )
@@ -82,4 +83,4 @@ export const generationFormSchema = z.object({
     seed: z.number().int().optional(),
 });
 
-export type GenerationFormType = z.infer<typeof generationFormSchema>;
+export type MusicGenerationFormType = z.infer<typeof musicGenerationFormSchema>;

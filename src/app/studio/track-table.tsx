@@ -2,7 +2,7 @@
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DataTable } from '@/components/ui/data-table';
-import { TrackStatusColumn } from '@/config/studio';
+import { TrackStatusColumn } from '@/types/studio';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -47,31 +47,27 @@ export const TrackTable = ({ filter }: TrackTableProps) => {
         );
     }
 
-    const previewPath =
-        pathname === '/studio'
-            ? '/studio/track'
-            : pathname.includes('separation')
-              ? '/studio/track'
-              : pathname.includes('analysis')
-                ? '/studio/track'
-                : pathname.includes('midi')
-                  ? '/studio/track/midi'
-                  : pathname.includes('lyrics')
-                    ? '/studio/track/karaoke'
-                    : undefined;
+    const previewPathMap: Record<string, string> = {
+        '/studio': '/studio/track',
+        '/studio/remix': '/studio/track',
+        '/studio/separation': '/studio/track',
+        '/studio/analysis': '/studio/track',
+        '/studio/midi': '/studio/track/midi',
+        '/studio/lyrics': '/studio/track/karaoke',
+    };
 
-    const callback =
-        pathname === '/studio'
-            ? '/studio'
-            : pathname.includes('separation')
-              ? '/studio/separation'
-              : pathname.includes('analysis')
-                ? '/studio/analysis'
-                : pathname.includes('midi')
-                  ? '/studio/midi'
-                  : pathname.includes('lyrics')
-                    ? '/studio/lyrics'
-                    : undefined;
+    const previewPath = previewPathMap[pathname];
+
+    const callbackMap: Record<string, string> = {
+        '/studio': '/studio',
+        '/studio/remix': '/studio/remix',
+        '/studio/separation': '/studio/separation',
+        '/studio/analysis': '/studio/analysis',
+        '/studio/midi': '/studio/midi',
+        '/studio/lyrics': '/studio/lyrics',
+    };
+
+    const callback = callbackMap[pathname];
 
     return (
         <DataTable

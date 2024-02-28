@@ -1,4 +1,4 @@
-import { Preset } from '@/config/studio';
+import { Preset } from '@/types/studio';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 

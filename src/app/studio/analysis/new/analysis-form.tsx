@@ -29,8 +29,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { trackAnalysisAssetConfig } from '@/config/asset';
-import { Preset } from '@/config/studio';
 import { cn } from '@/lib/utils';
+import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';

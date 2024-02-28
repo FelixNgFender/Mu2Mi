@@ -3,6 +3,7 @@ import {
     LyricsTranscriptionSchemaType,
     MidiTranscriptionSchemaType,
     MusicGenerationSchemaType,
+    StyleRemixSchemaType,
     TrackAnalysisSchemaType,
     TrackSeparationSchemaType,
 } from '@/types/replicate';
@@ -38,6 +39,18 @@ class ReplicateClient {
         });
     }
 
+    async styleRemix({ taskId, userId, ...data }: StyleRemixSchemaType) {
+        const webhook = new URL(`${env.ORIGIN}/api/webhook/remix`);
+        webhook.searchParams.set('taskId', taskId);
+        webhook.searchParams.set('userId', userId);
+        return this.replicate.predictions.create({
+            version: env.STYLE_REMIX_MODEL_VERSION,
+            input: data,
+            webhook: webhook.toString(),
+            webhook_events_filter: ['completed'],
+        });
+    }
+
     async separateTrack({
         taskId,
         userId,
@@ -50,8 +63,6 @@ class ReplicateClient {
             version: env.TRACK_SEPARATION_MODEL_VERSION,
             input: data,
             webhook: webhook.toString(),
-            // start: immmediately on prediction start
-            // completed: when the prediction reaches a terminal state (succeeded/canceled/failed)
             webhook_events_filter: ['completed'],
         });
     }

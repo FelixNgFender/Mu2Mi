@@ -11,7 +11,6 @@ import {
     Mic2,
     Split,
 } from 'lucide-react';
-import { StaticImageData } from 'next/image';
 
 import { siteConfig } from './site';
 
@@ -131,19 +130,3 @@ export const studioConfig: StudioConfig = {
         },
     ],
 };
-
-export type Preset = {
-    id: string;
-    icon: StaticImageData;
-    name: string;
-    description: string;
-    labels: string[];
-    onClick: () => void;
-};
-
-export type TrackStatusColumn =
-    | 'musicGenerationStatus'
-    | 'trackSeparationStatus'
-    | 'trackAnalysisStatus'
-    | 'midiTranscriptionStatus'
-    | 'lyricsTranscriptionStatus';
