@@ -2,6 +2,7 @@
 
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
+import { CaptchaWidget } from '@/components/ui/captcha';
 import {
     Form,
     FormControl,
@@ -14,10 +15,12 @@ import { Input } from '@/components/ui/input';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
 import { siteConfig } from '@/config/site';
+import { httpStatus } from '@/lib/http';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { requestPasswordReset } from './actions';
@@ -25,6 +28,7 @@ import { PasswordResetFormType, passwordResetFormSchema } from './schemas';
 
 export const PasswordResetForm = () => {
     const { toast } = useToast();
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
     const router = useRouter();
     const form = useForm<PasswordResetFormType>({
         resolver: zodResolver(passwordResetFormSchema),
@@ -33,9 +37,36 @@ export const PasswordResetForm = () => {
         },
     });
 
+    useEffect(() => {
+        if (process.env.NEXT_PUBLIC_ENABLE_CAPTCHA !== 'true') {
+            setCaptchaToken('just so it is not null');
+        }
+    }, []);
+
     type FieldName = keyof PasswordResetFormType;
 
     const onSubmit: SubmitHandler<PasswordResetFormType> = async (data) => {
+        if (process.env.NEXT_PUBLIC_ENABLE_CAPTCHA === 'true') {
+            if (!captchaToken) return;
+            const verificationResult = await fetch('/api/captcha', {
+                method: 'POST',
+                body: JSON.stringify({ token: captchaToken }),
+                headers: {
+                    'content-type': 'application/json',
+                },
+            });
+
+            if (verificationResult.status !== httpStatus.success.ok.code) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Uh oh! Something went wrong.',
+                    description:
+                        'The captcha failed to verify. Please refresh the page and try again.',
+                });
+                return;
+            }
+        }
+
         const result = await requestPasswordReset(data);
         if (result.validationErrors) {
             for (const [path, value] of Object.entries(
@@ -100,12 +131,34 @@ export const PasswordResetForm = () => {
                     )}
                 />
                 <div className="inline-flex w-full flex-col space-y-2 overflow-hidden md:space-y-4">
+                    <CaptchaWidget
+                        action="password-reset"
+                        size="invisible"
+                        className="!m-0"
+                        onScriptLoadError={() => {
+                            toast({
+                                variant: 'destructive',
+                                title: 'Uh oh! Something went wrong.',
+                                description:
+                                    'The captcha failed to load. Please refresh the page and try again.',
+                            });
+                        }}
+                        onError={() => {
+                            toast({
+                                variant: 'destructive',
+                                title: 'Uh oh! Something went wrong.',
+                                description:
+                                    'The captcha failed to load. Please refresh the page and try again.',
+                            });
+                        }}
+                        onSuccess={setCaptchaToken}
+                    />
                     <Button
-                        disabled={form.formState.isSubmitting}
+                        disabled={form.formState.isSubmitting || !captchaToken}
                         className="w-full"
                         type="submit"
                     >
-                        {form.formState.isSubmitting ? (
+                        {form.formState.isSubmitting || !captchaToken ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         ) : (
                             'Send reset link'

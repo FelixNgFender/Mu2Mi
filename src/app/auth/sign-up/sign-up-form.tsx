@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { CaptchaWidget } from '@/components/ui/captcha';
 import {
     Form,
     FormControl,
@@ -12,9 +13,11 @@ import {
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { useToast } from '@/components/ui/use-toast';
+import { httpStatus } from '@/lib/http';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { signUp } from './actions';
@@ -22,6 +25,7 @@ import { SignUpFormType, signUpFormSchema } from './schemas';
 
 export const SignUpForm = () => {
     const { toast } = useToast();
+    const [captchaToken, setCaptchaToken] = useState<string | null>(null);
     const form = useForm<SignUpFormType>({
         resolver: zodResolver(signUpFormSchema),
         defaultValues: {
@@ -31,9 +35,36 @@ export const SignUpForm = () => {
         },
     });
 
+    useEffect(() => {
+        if (process.env.NEXT_PUBLIC_ENABLE_CAPTCHA !== 'true') {
+            setCaptchaToken('just so it is not null');
+        }
+    }, []);
+
     type FieldName = keyof SignUpFormType;
 
     const onSubmit: SubmitHandler<SignUpFormType> = async (data) => {
+        if (process.env.NEXT_PUBLIC_ENABLE_CAPTCHA === 'true') {
+            if (!captchaToken) return;
+            const verificationResult = await fetch('/api/captcha', {
+                method: 'POST',
+                body: JSON.stringify({ token: captchaToken }),
+                headers: {
+                    'content-type': 'application/json',
+                },
+            });
+
+            if (verificationResult.status !== httpStatus.success.ok.code) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Uh oh! Something went wrong.',
+                    description:
+                        'The captcha failed to verify. Please refresh the page and try again.',
+                });
+                return;
+            }
+        }
+
         const result = await signUp(data);
         if (!result) return;
         if (result.validationErrors) {
@@ -133,12 +164,34 @@ export const SignUpForm = () => {
                     </Link>
                     .
                 </p>
+                <CaptchaWidget
+                    action="sign-up"
+                    size="invisible"
+                    className="!m-0"
+                    onScriptLoadError={() => {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Uh oh! Something went wrong.',
+                            description:
+                                'The captcha failed to load. Please refresh the page and try again.',
+                        });
+                    }}
+                    onError={() => {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Uh oh! Something went wrong.',
+                            description:
+                                'The captcha failed to load. Please refresh the page and try again.',
+                        });
+                    }}
+                    onSuccess={setCaptchaToken}
+                />
                 <Button
-                    disabled={form.formState.isSubmitting}
+                    disabled={form.formState.isSubmitting || !captchaToken}
                     className="w-full"
                     type="submit"
                 >
-                    {form.formState.isSubmitting ? (
+                    {form.formState.isSubmitting || !captchaToken ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
                         'Sign up'

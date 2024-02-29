@@ -27,6 +27,7 @@ const envSchema = z.object({
     ]),
     ENABLE_EMAIL: isBoolean,
     AUTH_COOKIE_DURATION_S: isNumber,
+    CAPTCHA_SECRET_KEY: isString.optional(),
 
     // Database
     DATABASE_LOGGING: isBoolean,
