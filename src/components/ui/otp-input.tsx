@@ -1,194 +1,93 @@
 'use client';
 
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import * as React from 'react';
+import { OTPInput as ExternalOTPInput, SlotProps } from 'input-otp';
 
-interface OTPInputProps
-    extends Omit<
-        React.InputHTMLAttributes<HTMLInputElement>,
-        | 'ref'
-        | 'value'
-        | 'onFocus'
-        | 'onBlur'
-        | 'onKeyDown'
-        | 'onPaste'
-        | 'autoComplete'
-        | 'maxLength'
-    > {
-    /** Value of the OTP input */
+type OTPInputProps = {
     value?: string;
-    /** Callback to be called when the OTP value changes */
-    onOtpChange?: (otp: string) => void;
-    /** Number of OTP inputs to be rendered */
-    numInputs?: number;
-}
+    onChange?: (newValue: string) => unknown;
+    maxLength: number;
+    allowNavigation?: boolean;
+    inputMode?: 'numeric' | 'text';
+    onComplete?: (...args: any[]) => unknown;
+    containerClassName?: string;
+} & React.InputHTMLAttributes<HTMLInputElement>;
 
 export const OTPInput = ({
-    value = '',
-    numInputs = 6,
-    onOtpChange,
-    type = 'text',
-    placeholder = '_',
-    pattern = '[0-9]',
-    autoFocus = true,
-    className,
-    id,
-    name,
-    ...rest
+    value,
+    onChange,
+    maxLength,
+    allowNavigation,
+    inputMode,
+    onComplete,
+    containerClassName,
+    disabled,
+    required,
 }: OTPInputProps) => {
-    const [otpValue, setOTPValue] = React.useState(value);
-    const [activeInput, setActiveInput] = React.useState(0);
-    const inputRefs = React.useRef<Array<HTMLInputElement | null>>([]);
-
-    const getOTPValue = () => (otpValue ? otpValue.toString().split('') : []);
-
-    const isInputNum = type === 'number' || type === 'tel';
-
-    React.useEffect(() => {
-        inputRefs.current = inputRefs.current.slice(0, numInputs);
-    }, [numInputs]);
-
-    React.useEffect(() => {
-        if (autoFocus) {
-            inputRefs.current[0]?.focus();
-        }
-    }, [autoFocus]);
-
-    const isInputValueValid = (value: string) => {
-        const isTypeValid = isInputNum
-            ? !isNaN(Number(value))
-            : typeof value === 'string';
-        return isTypeValid && value.trim().length === 1;
-    };
-
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-
-        if (isInputValueValid(value)) {
-            changeCodeAtFocus(value);
-            focusInput(activeInput + 1);
-        }
-    };
-
-    const handleFocus =
-        (event: React.FocusEvent<HTMLInputElement>) => (index: number) => {
-            setActiveInput(index);
-            event.target.select();
-        };
-
-    const handleBlur = () => {
-        setActiveInput(activeInput - 1);
-    };
-
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        const otp = getOTPValue();
-        if ([event.code, event.key].includes('Backspace')) {
-            event.preventDefault();
-            changeCodeAtFocus('');
-            focusInput(activeInput - 1);
-        } else if (event.code === 'Delete') {
-            event.preventDefault();
-            changeCodeAtFocus('');
-        } else if (event.code === 'ArrowLeft') {
-            event.preventDefault();
-            focusInput(activeInput - 1);
-        } else if (event.code === 'ArrowRight') {
-            event.preventDefault();
-            focusInput(activeInput + 1);
-        }
-        // React does not trigger onChange when the same value is entered
-        // again. So we need to focus the next input manually in this case.
-        else if (event.key === otp[activeInput]) {
-            event.preventDefault();
-            focusInput(activeInput + 1);
-        } else if (
-            event.code === 'Spacebar' ||
-            event.code === 'Space' ||
-            event.code === 'ArrowUp' ||
-            event.code === 'ArrowDown'
-        ) {
-            event.preventDefault();
-        } else if (isInputNum && !isInputValueValid(event.key)) {
-            event.preventDefault();
-        }
-    };
-
-    const focusInput = (index: number) => {
-        const activeInput = Math.max(Math.min(numInputs - 1, index), 0);
-
-        if (inputRefs.current[activeInput]) {
-            inputRefs.current[activeInput]?.focus();
-            inputRefs.current[activeInput]?.select();
-            setActiveInput(activeInput);
-        }
-    };
-
-    const changeCodeAtFocus = (value: string) => {
-        const otp = getOTPValue();
-        otp[activeInput] = value[0] as string;
-        handleOTPChange(otp);
-    };
-
-    const handleOTPChange = (otp: Array<string>) => {
-        const otpValue = otp.join('');
-        setOTPValue(otpValue);
-        onOtpChange?.(otpValue);
-    };
-
-    const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
-        event.preventDefault();
-
-        const otp = getOTPValue();
-        let nextActiveInput = activeInput;
-
-        // Get pastedData in an array of max size (num of inputs - current position)
-        const pastedData = event.clipboardData
-            .getData('text/plain')
-            .slice(0, numInputs - activeInput)
-            .split('');
-
-        // Prevent pasting if the clipboard data contains non-numeric values for number inputs
-        if (isInputNum && pastedData.some((value) => isNaN(Number(value)))) {
-            return;
-        }
-
-        // Paste data from focused input onwards
-        for (let pos = 0; pos < numInputs; ++pos) {
-            if (pos >= activeInput && pastedData.length > 0) {
-                otp[pos] = pastedData.shift() ?? '';
-                nextActiveInput++;
-            }
-        }
-
-        focusInput(nextActiveInput);
-        handleOTPChange(otp);
-    };
-
     return (
-        <div className="flex gap-2">
-            {Array.from({ length: numInputs }, (_, index) => index).map((i) => (
-                <Input
-                    key={i}
-                    id={`${id}-${i}`}
-                    name={`${name}-${i}`}
-                    value={getOTPValue()[i] ?? ''}
-                    placeholder={placeholder}
-                    ref={(element) => (inputRefs.current[i] = element)}
-                    onChange={handleChange}
-                    onFocus={(event) => handleFocus(event)(i)}
-                    onBlur={handleBlur}
-                    onKeyDown={handleKeyDown}
-                    onPaste={handlePaste}
-                    autoComplete="off"
-                    maxLength={1}
-                    size={1}
-                    className={cn('text-center font-bold', className)}
-                    pattern={pattern}
-                    {...rest}
-                />
-            ))}
-            <input type="hidden" id={id} name={name} value={otpValue} />
-        </div>
+        <ExternalOTPInput
+            value={value}
+            onChange={onChange}
+            maxLength={maxLength}
+            allowNavigation={allowNavigation}
+            inputMode={inputMode}
+            onComplete={onComplete}
+            containerClassName={containerClassName}
+            disabled={disabled}
+            required={required}
+            // containerClassName="group flex items-center has-[:disabled]:opacity-30"
+            render={({ slots }) => (
+                <>
+                    <div className="flex">
+                        {slots.slice(0, 3).map((slot, idx) => (
+                            <Slot key={idx} {...slot} />
+                        ))}
+                    </div>
+
+                    <FakeDash />
+
+                    <div className="flex">
+                        {slots.slice(3).map((slot, idx) => (
+                            <Slot key={idx} {...slot} />
+                        ))}
+                    </div>
+                </>
+            )}
+        />
     );
 };
+
+function Slot(props: SlotProps) {
+    return (
+        <div
+            className={cn(
+                'relative h-14 w-10 text-[2rem]',
+                'flex items-center justify-center',
+                'transition-all duration-300',
+                'border-y border-r border-border first:rounded-l-md first:border-l last:rounded-r-md',
+                'group-focus-within:border-accent-foreground/20 group-hover:border-accent-foreground/20',
+                'outline outline-0 outline-accent-foreground/20',
+                { 'outline-4 outline-accent-foreground': props.isActive },
+            )}
+        >
+            {props.char !== null && <div>{props.char}</div>}
+            {props.hasFakeCaret && <FakeCaret />}
+        </div>
+    );
+}
+
+function FakeCaret() {
+    return (
+        <div className="animate-caret-blink pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="h-8 w-px bg-white" />
+        </div>
+    );
+}
+
+function FakeDash() {
+    return (
+        <div className="flex w-10 items-center justify-center">
+            <div className="h-1 w-3 rounded-full bg-border" />
+        </div>
+    );
+}

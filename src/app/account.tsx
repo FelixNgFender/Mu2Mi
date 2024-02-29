@@ -60,7 +60,7 @@ export const Account = async ({
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                     <form action={signOut} className="flex flex-1">
-                        <button type="submit" className="flex flex-1">
+                        <button className="flex flex-1">
                             <LogOut className="mr-2 h-5 w-5" />
                             Sign out
                         </button>

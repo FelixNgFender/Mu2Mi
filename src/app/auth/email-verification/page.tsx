@@ -20,9 +20,7 @@ const EmailVerificationPage = async () => {
                     Verify your email
                 </CardTitle>
                 <CardDescription>
-                    <p className="text-sm text-muted-foreground">
-                        We have sent a code to your email address
-                    </p>
+                    We have sent a code to your email address
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">

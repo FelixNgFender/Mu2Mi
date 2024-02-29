@@ -21,8 +21,7 @@ export const EmailVerificationForm = () => {
     const [_, setError] = useState<string | undefined>(undefined);
     const [code, setCode] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleComplete = async () => {
         setIsSubmitting(true);
 
         const parsed = verifyCodeFormSchema.safeParse({
@@ -56,17 +55,25 @@ export const EmailVerificationForm = () => {
         }
     };
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        handleComplete();
+    };
+
     return (
         <form
             onSubmit={handleSubmit}
-            className="flex flex-col items-center space-y-4"
+            className="flex flex-col items-center space-y-8"
         >
             <OTPInput
                 value={code}
-                onOtpChange={(otp) => setCode(otp)}
-                placeholder=""
-                autoFocus={false}
-                className="px-auto w-10"
+                // @ts-expect-error - TS is dumb
+                onChange={(newValue: string) => setCode(newValue)}
+                maxLength={6}
+                allowNavigation
+                inputMode="numeric"
+                onComplete={handleComplete}
+                containerClassName="group flex items-center has-[:disabled]:opacity-30"
                 disabled={isSubmitting}
                 required
             />
