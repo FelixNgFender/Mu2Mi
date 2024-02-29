@@ -2,7 +2,7 @@ import { env } from '@/config/env';
 import { errorHandler } from '@/lib/error';
 import { logger } from '@/lib/logger';
 import { DrizzleLogger } from 'drizzle-orm/logger';
-import { drizzle } from 'drizzle-orm/postgres-js';
+import { PostgresJsDatabase, drizzle } from 'drizzle-orm/postgres-js';
 import { Client as MinioClient } from 'minio';
 import postgres from 'postgres';
 import { type RedisClientType, createClient } from 'redis';
@@ -16,20 +16,33 @@ class DatabaseLogger implements DrizzleLogger {
     }
 }
 
-// TODO: PostgresError: sorry, too many clients already
-const queryClient = postgres(env.DATABASE_URL);
-const db = drizzle(queryClient, {
-    logger: env.DATABASE_LOGGING && new DatabaseLogger(),
-    schema,
-});
+declare global {
+    var db: PostgresJsDatabase<typeof schema> | undefined;
+    var redisClient: RedisClientType | undefined;
+}
 
-const globalForRedis = global as unknown as { redisClient: RedisClientType };
+let db: PostgresJsDatabase<typeof schema>;
+let redisClient: RedisClientType;
 
-const redisClient =
-    globalForRedis.redisClient ?? createClient({ url: env.REDIS_URL });
+if (env.NODE_ENV === 'production') {
+    db = drizzle(postgres(env.DATABASE_URL), {
+        logger: env.DATABASE_LOGGING && new DatabaseLogger(),
+        schema,
+    });
+    redisClient = createClient({ url: env.REDIS_URL });
+} else {
+    if (!global.db) {
+        global.db = drizzle(postgres(env.DATABASE_URL), {
+            logger: env.DATABASE_LOGGING && new DatabaseLogger(),
+            schema,
+        });
+    }
+    if (!global.redisClient) {
+        global.redisClient = createClient({ url: env.REDIS_URL });
+    }
 
-if (env.NODE_ENV === 'development') {
-    globalForRedis.redisClient = redisClient;
+    db = global.db;
+    redisClient = global.redisClient;
 }
 
 if (!redisClient.isOpen) {
@@ -49,4 +62,4 @@ const fileStorageClient = new MinioClient({
     secretKey: env.S3_SECRET_KEY,
 });
 
-export { queryClient, db, redisClient, fileStorageClient };
+export { db, redisClient, fileStorageClient };

@@ -11,14 +11,14 @@ export const register = async () => {
 
         const { errorHandler } = await import('@/lib/error');
         const { logger } = await import('@/lib/logger');
-        const { queryClient } = await import('@/db');
+        // const { queryClient } = await import('@/db');
 
         /**
          * Tear down resources and gracefully exit the process.
          * @param exitCode Non-zero exit code indicates an error.
          */
         const cleanup = async (exitCode: number) => {
-            await queryClient.end();
+            // await queryClient.end();
             // Redis and Minio clients are already closed by the time this function is called.
             logger.info('Gracefully shutting down...');
             process.exit(exitCode);

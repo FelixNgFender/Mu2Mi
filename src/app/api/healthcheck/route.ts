@@ -1,13 +1,14 @@
-import { fileStorageClient, queryClient, redisClient } from '@/db';
+import { db, fileStorageClient, redisClient } from '@/db';
 import { errorHandler } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
+import { sql } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
 
 export const GET = async () => {
     try {
         const start = performance.now();
-        await queryClient`SELECT 1`;
+        await db.execute(sql`SELECT 1`);
         const databaseLatency = (performance.now() - start).toFixed(2);
         await redisClient.ping();
         const redisLatency = (
