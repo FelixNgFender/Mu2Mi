@@ -3,7 +3,7 @@ import { env } from '@/config/env';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
 import { Metadata } from 'next';
-import { Inter as FontSans } from 'next/font/google';
+import { Open_Sans as FontSans } from 'next/font/google';
 
 // import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
