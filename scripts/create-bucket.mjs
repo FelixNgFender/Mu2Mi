@@ -13,7 +13,7 @@ if (
 }
 
 const main = async () => {
-    const fileStorageClient = new Minio.Client({
+    const fileStorage = new Minio.Client({
         endPoint: process.env.S3_ENDPOINT,
         port: process.env.S3_PORT * 1,
         useSSL: 'true' === process.env.MINIO_USE_SSL,
@@ -21,7 +21,7 @@ const main = async () => {
         secretKey: process.env.S3_SECRET_KEY,
     });
 
-    const exists = await fileStorageClient.bucketExists(
+    const exists = await fileStorage.bucketExists(
         process.env.S3_BUCKET_NAME,
     );
     if (exists) {
@@ -29,7 +29,7 @@ const main = async () => {
     } else {
         console.info(`Bucket ${process.env.S3_BUCKET_NAME} does not exist.`);
         console.info(`Creating bucket ${process.env.S3_BUCKET_NAME}...`);
-        await fileStorageClient.makeBucket(
+        await fileStorage.makeBucket(
             process.env.S3_BUCKET_NAME,
             process.env.S3_BUCKET_REGION,
         );

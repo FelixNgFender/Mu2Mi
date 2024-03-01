@@ -1,5 +1,5 @@
-import { db } from '@/db';
-import { assetTable } from '@/db/schema';
+import { db } from '@/infra';
+import { assetTable } from '@/infra/schema';
 import { eq } from 'drizzle-orm';
 import 'server-only';
 

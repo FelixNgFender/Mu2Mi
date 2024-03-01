@@ -112,6 +112,8 @@ class ReplicateClient {
     }
 }
 
-export const replicateClient = new ReplicateClient({
+const replicate = new ReplicateClient({
     auth: env.REPLICATE_API_TOKEN,
 });
+
+export { replicate };

@@ -2,7 +2,7 @@
 
 import { assetConfig } from '@/config/asset';
 import { env } from '@/config/env';
-import { fileStorageClient } from '@/db';
+import { fileStorage } from '@/infra';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { authAction } from '@/lib/safe-action';
@@ -21,7 +21,7 @@ export const downloadTrack = authAction(
     async ({ trackId }) => {
         const trackAssets = await assetModel.findManyByTrackId(trackId);
         const promises = trackAssets.map(async (asset) => {
-            const url = await fileStorageClient
+            const url = await fileStorage
                 .presignedGetObject(
                     env.S3_BUCKET_NAME,
                     asset.name,
@@ -45,7 +45,7 @@ export const deleteTrack = authAction(
     deleteTrackSchema,
     async ({ trackId }) => {
         const assets = await assetModel.findManyByTrackId(trackId);
-        await fileStorageClient.removeObjects(
+        await fileStorage.removeObjects(
             env.S3_BUCKET_NAME,
             assets.map((asset) => asset.name),
         );
@@ -71,7 +71,7 @@ export const getPresignedUrl = authAction(
     getPresignedUrlSchema,
     async ({ type, extension }, { user }) => {
         const objectName = generateObjectKey(extension);
-        const url = await fileStorageClient.presignedPutObject(
+        const url = await fileStorage.presignedPutObject(
             env.S3_BUCKET_NAME,
             objectName,
             env.S3_PRESIGNED_URL_EXPIRATION_S,

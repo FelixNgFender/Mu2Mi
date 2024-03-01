@@ -1,10 +1,10 @@
 'use server';
 
 import { env } from '@/config/env';
-import { fileStorageClient } from '@/db';
+import { fileStorage } from '@/infra';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
-import { replicateClient } from '@/lib/replicate';
+import { replicate } from '@/infra';
 import { authAction } from '@/lib/safe-action';
 import { trackModel } from '@/models/track';
 import { styleRemixInputSchema } from '@/types/replicate';
@@ -39,13 +39,13 @@ export const remixTrack = authAction(schema, async (data, { user }) => {
         );
     }
 
-    const url = await fileStorageClient.presignedGetObject(
+    const url = await fileStorage.presignedGetObject(
         env.S3_BUCKET_NAME,
         newTrack.assetName,
         env.S3_PRESIGNED_URL_EXPIRATION_S,
     );
 
-    await replicateClient.styleRemix({
+    await replicate.styleRemix({
         ...data,
         taskId: newTrack.trackId,
         userId: user.id,

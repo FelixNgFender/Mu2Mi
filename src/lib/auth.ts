@@ -1,7 +1,7 @@
 import { env } from '@/config/env';
-import { db } from '@/db';
-import { sessionTable, userTable } from '@/db/schema';
-import type { DatabaseUser } from '@/db/schema';
+import { db } from '@/infra';
+import { sessionTable, userTable } from '@/infra/schema';
+import type { DatabaseUser } from '@/infra/schema';
 import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 import { Facebook, GitHub, Google } from 'arctic';
 import { Lucia, TimeSpan } from 'lucia';

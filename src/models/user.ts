@@ -1,5 +1,5 @@
-import { db } from '@/db';
-import { oauthAccountTable, userTable } from '@/db/schema';
+import { db } from '@/infra';
+import { oauthAccountTable, userTable } from '@/infra/schema';
 import { eq } from 'drizzle-orm';
 import 'server-only';
 

@@ -1,4 +1,4 @@
-import { db, fileStorageClient, redisClient } from '@/db';
+import { cache, db, fileStorage } from '@/infra';
 import { errorHandler } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
 import { sql } from 'drizzle-orm';
@@ -10,24 +10,22 @@ export const GET = async () => {
         const start = performance.now();
         await db.execute(sql`SELECT 1`);
         const databaseLatency = (performance.now() - start).toFixed(2);
-        await redisClient.ping();
-        const redisLatency = (
+        await cache.ping();
+        const cacheLatency = (
             performance.now() -
             start -
             Number(databaseLatency)
         ).toFixed(2);
-        await fileStorageClient.bucketExists(
-            'bucket-name-of-a-non-existent-bucket',
-        );
+        await fileStorage.bucketExists('bucket-name-of-a-non-existent-bucket');
         const fileStorageLatency = (
             performance.now() -
             start -
             Number(databaseLatency) -
-            Number(redisLatency)
+            Number(cacheLatency)
         ).toFixed(2);
         return HttpResponse.success({
             databaseLatency: databaseLatency + 'ms',
-            redisLatency: redisLatency + 'ms',
+            cacheLatency: cacheLatency + 'ms',
             fileStorageLatency: fileStorageLatency + 'ms',
         });
     } catch (err) {

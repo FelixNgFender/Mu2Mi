@@ -1,5 +1,5 @@
 import { env } from '@/config/env';
-import { fileStorageClient } from '@/db';
+import { fileStorage } from '@/infra';
 import { AppError } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
 import { generateObjectKey } from '@/lib/utils';
@@ -219,14 +219,9 @@ const saveTrackAssetAndMetadata = async (
         fileData = Buffer.from(JSON.stringify(data));
     }
 
-    await fileStorageClient.putObject(
-        env.S3_BUCKET_NAME,
-        objectName,
-        fileData,
-        {
-            'Content-Type': mimeType,
-        },
-    );
+    await fileStorage.putObject(env.S3_BUCKET_NAME, objectName, fileData, {
+        'Content-Type': mimeType,
+    });
     const newAsset = await assetModel.createOne({
         userId,
         name: objectName,

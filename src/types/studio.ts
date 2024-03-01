@@ -2,7 +2,7 @@ import {
     TrackTableStatusColumn as TrackTableStatusColumnDatabase,
     trackAssetType,
     trackStatusEnum,
-} from '@/db/schema';
+} from '@/infra/schema';
 import { StaticImageData } from 'next/image';
 
 export interface NavItem {

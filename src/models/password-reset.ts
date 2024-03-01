@@ -1,5 +1,5 @@
-import { db } from '@/db';
-import { passwordResetTable } from '@/db/schema';
+import { db } from '@/infra';
+import { passwordResetTable } from '@/infra/schema';
 import { eq } from 'drizzle-orm';
 import 'server-only';
 

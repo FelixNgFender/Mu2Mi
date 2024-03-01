@@ -11,7 +11,7 @@ export const register = async () => {
 
         const { errorHandler } = await import('@/lib/error');
         const { logger } = await import('@/lib/logger');
-        // const { queryClient } = await import('@/db');
+        // const { queryClient } = await import('@/infra');
 
         /**
          * Tear down resources and gracefully exit the process.

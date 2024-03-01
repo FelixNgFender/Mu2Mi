@@ -1,5 +1,5 @@
-import { db } from '@/db';
-import { emailVerificationTable } from '@/db/schema';
+import { db } from '@/infra';
+import { emailVerificationTable } from '@/infra/schema';
 import { eq } from 'drizzle-orm';
 import 'server-only';
 
