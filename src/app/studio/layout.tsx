@@ -12,10 +12,15 @@ import {
     QueryClient,
     dehydrate,
 } from '@tanstack/react-query';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { getTracks } from './actions';
 import { StudioSidebar } from './studio-sidebar';
+
+export const metadata: Metadata = {
+    title: 'Studio',
+};
 
 interface StudioLayoutProps {
     children: React.ReactNode;

@@ -1,25 +1,17 @@
 'use client';
 
+import { Icons } from '@/components/icons';
 import { siteConfig } from '@/config/site';
 import { baseStudioPath } from '@/config/studio';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
 import Link from 'next/link';
 
 export function MainNav() {
     return (
         <div className="mr-4 hidden md:flex">
-            <Link href="/" className="mr-6 flex items-center space-x-2">
-                <Image
-                    width={24}
-                    height={24}
-                    className="mr-2"
-                    src="/icons/favicon-32x32.png"
-                    alt="logo"
-                />
-                <span className="hidden font-bold sm:inline-block">
-                    {siteConfig.name}
-                </span>
+            <Link href="/" className="mr-4 flex items-center">
+                <Icons.mu2mi.dark.large className="hidden h-8 w-24 dark:block" />
+                <Icons.mu2mi.light.large className="block h-8 w-24 dark:hidden" />
             </Link>
             <nav className="flex items-center gap-6 text-sm">
                 <Link

@@ -8,7 +8,6 @@
        Author: Ilias Ism
        URL: https://gradient.page */
 
-        /* CSS: .bg-gradient { background: var(--gradient) } */
         --gradient: linear-gradient(to top left, #231557, #44107a, #ff1361);
         --background: 269 98.05% 98.42%;
         --foreground: 269 6.1% 0.84%;
@@ -42,11 +41,6 @@
     }
 
     .dark {
-        /* Name: custom color palette
-       Author: Ilias Ism
-       URL: https://gradient.page */
-
-        /* CSS: .bg-gradient { background: var(--gradient) } */
         --gradient: linear-gradient(to top left, #f7ff00, #db36a4);
 
         --background: 66 65% 4%;
@@ -88,15 +82,15 @@
     }
 }
 
-.bg-gradient {
-    background: var(--gradient);
-}
-
 /*
     https://github.com/tailwindlabs/tailwindcss/discussions/2394
     https://github.com/tailwindlabs/tailwindcss/pull/5732
 */
 @layer utilities {
+    .bg-gradient {
+        background: var(--gradient);
+    }
+
     /* Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
         display: none;

@@ -8,9 +8,14 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Metadata } from 'next';
 import Link from 'next/link';
 
 import { SignInForm } from './sign-in-form';
+
+export const metadata: Metadata = {
+    title: 'Sign In',
+};
 
 const SignInPage = async () => {
     return (

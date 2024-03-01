@@ -1,12 +1,11 @@
 'use client';
 
+import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { siteConfig } from '@/config/site';
 import { studioConfig } from '@/config/studio';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
 import Link, { LinkProps } from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -59,14 +58,8 @@ export function MobileNav() {
                     className="flex items-center"
                     onOpenChange={setOpen}
                 >
-                    <Image
-                        width={16}
-                        height={16}
-                        className="mr-2"
-                        src="/icons/favicon-32x32.png"
-                        alt="logo"
-                    />
-                    <span className="font-bold">{siteConfig.name}</span>
+                    <Icons.mu2mi.dark.large className="hidden h-8 w-24 dark:block" />
+                    <Icons.mu2mi.light.large className="block h-8 w-24 dark:hidden" />
                 </MobileLink>
                 <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
                     <div className="flex flex-col space-y-3">

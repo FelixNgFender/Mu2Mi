@@ -1,7 +1,7 @@
 {
-    "name": "Mu2Mi - Music to MIDI",
+    "name": "Mu2Mi - AI Music Toolkit",
     "short_name": "Mu2Mi",
-    "description": "Mu2Mi is a web app that converts music to MIDI.",
+    "description": "Mu2Mi is the open-source musical toolkit for AI musicians.",
     "start_url": "/",
     "icons": [
         {
@@ -15,7 +15,7 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
+    "theme_color": "#333333",
+    "background_color": "#333333",
     "display": "standalone"
 }

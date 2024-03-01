@@ -1,6 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Metadata } from 'next';
 
 import { NewPasswordForm } from './new-password-form';
+
+export const metadata: Metadata = {
+    title: 'New Password',
+};
 
 const SignUpPage = async ({
     params,

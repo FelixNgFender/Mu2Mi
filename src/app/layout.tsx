@@ -18,16 +18,40 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-    title: {
-        default: siteConfig.name,
-        template: `%s - ${siteConfig.name}`,
-    },
     metadataBase:
         env.NODE_ENV === 'development'
             ? new URL(env.ORIGIN)
             : new URL(siteConfig.url),
+    title: {
+        default: siteConfig.title,
+        template: `%s | ${siteConfig.name}`,
+    },
     description: siteConfig.description,
-    // TODO: fill
+    applicationName: siteConfig.name,
+    authors: siteConfig.authors,
+    generator: 'Next.js',
+    keywords: siteConfig.keywords,
+    referrer: 'origin',
+    creator: siteConfig.authors[0]?.name,
+    publisher: siteConfig.authors[0]?.name,
+    alternates: {
+        canonical: siteConfig.url,
+    },
+    twitter: {
+        card: 'summary_large_image',
+        site: siteConfig.twitter.site,
+        creator: siteConfig.twitter.creator,
+        title: siteConfig.title,
+        description: siteConfig.description,
+        images: siteConfig.ogImage,
+    },
+    // TODO: finish this https://support.google.com/webmasters/answer/9008080#meta_tag_verification&zippy=%2Chtml-tag
+    // verification: {
+    //     google: '',
+    //     yandex: '',
+    //     me: '',
+    // },
+    category: siteConfig.category,
 };
 
 interface RootLayoutProps {

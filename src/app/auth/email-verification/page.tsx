@@ -6,11 +6,16 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { Metadata } from 'next';
 
 import {
     EmailVerificationForm,
     ResendVerificationCodeButton,
 } from './email-verification-form';
+
+export const metadata: Metadata = {
+    title: 'Email Verification',
+};
 
 const EmailVerificationPage = async () => {
     return (

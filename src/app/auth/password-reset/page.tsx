@@ -5,8 +5,13 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { Metadata } from 'next';
 
 import { PasswordResetForm } from './password-reset-form';
+
+export const metadata: Metadata = {
+    title: 'Password Reset',
+};
 
 const PasswordResetPage = async () => {
     return (

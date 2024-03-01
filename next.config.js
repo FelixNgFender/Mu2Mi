@@ -7,6 +7,11 @@ const nextConfig = {
         config.externals.push('@node-rs/argon2', '@node-rs/bcrypt');
         return config;
     },
+    logging: {
+        fetches: {
+            fullUrl: true,
+        },
+    },
 };
 
 module.exports = nextConfig;

@@ -8,9 +8,14 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Metadata } from 'next';
 import Link from 'next/link';
 
 import { SignUpForm } from './sign-up-form';
+
+export const metadata: Metadata = {
+    title: 'Sign Up',
+};
 
 const SignUpPage = async () => {
     return (
@@ -21,7 +26,7 @@ const SignUpPage = async () => {
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 md:space-y-6">
-                <div className="inline-flex w-full flex-col space-y-2 overflow-hidden md:space-y-4 p-1">
+                <div className="inline-flex w-full flex-col space-y-2 overflow-hidden p-1 md:space-y-4">
                     <Link
                         href="/auth/sign-in/google"
                         className={buttonVariants({ variant: 'secondary' })}

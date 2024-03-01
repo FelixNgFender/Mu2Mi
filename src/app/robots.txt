@@ -1,6 +1,4 @@
-# TODO: add robots.txt
 User-Agent: *
 Allow: /
-Disallow: /private/
-
-Sitemap: https://acme.com/sitemap.xml
+Disallow: /studio/
+Sitemap: https://mu2mi.com/sitemap.xml
