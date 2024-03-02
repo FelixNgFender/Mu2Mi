@@ -258,7 +258,11 @@ export const trackTable = pgTable(
     },
 );
 
-const { id, userId, name, updatedAt, createdAt, ...rest } =
-    getTableColumns(trackTable);
-
-export type TrackTableStatusColumn = keyof typeof rest;
+export const trackStatusColumns = [
+    'musicGenerationStatus',
+    'styleRemixStatus',
+    'trackSeparationStatus',
+    'trackAnalysisStatus',
+    'midiTranscriptionStatus',
+    'lyricsTranscriptionStatus',
+] as const;

@@ -1,6 +1,6 @@
 import {
-    TrackTableStatusColumn as TrackTableStatusColumnDatabase,
     trackAssetType,
+    trackStatusColumns as trackStatusColumnsDatabase,
     trackStatusEnum,
 } from '@/infra/schema';
 import { StaticImageData } from 'next/image';
@@ -30,7 +30,9 @@ export type Preset = {
     onClick: () => void;
 };
 
-export type TrackStatusColumn = TrackTableStatusColumnDatabase;
+export const trackStatusColumns = trackStatusColumnsDatabase;
+
+export type TrackStatusColumn = (typeof trackStatusColumns)[number];
 
 export const trackStatuses = trackStatusEnum.enumValues;
 
