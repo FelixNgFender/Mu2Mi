@@ -13,7 +13,7 @@ import { passwordResetFormSchema } from './schemas';
  * For **server-side** validation. If you use async refinements, you must use the
  * `parseAsync` method to parse data! Otherwise Zod will throw an error.
  */
-const passwordResetSchemaServer = passwordResetFormSchema.refine(
+const passwordResetSchema = passwordResetFormSchema.refine(
     async ({ email }) => {
         const user = await userModel.findOneByEmail(email);
         return !!user;
@@ -25,7 +25,7 @@ const passwordResetSchemaServer = passwordResetFormSchema.refine(
 );
 
 export const requestPasswordReset = action(
-    passwordResetSchemaServer,
+    passwordResetSchema,
     async ({ email }) => {
         const user = await userModel.findOneByEmail(email.toLowerCase());
         if (!user || !user.emailVerified) {

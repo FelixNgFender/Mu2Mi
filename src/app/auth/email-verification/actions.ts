@@ -16,7 +16,9 @@ import { z } from 'zod';
 
 import { verifyCodeFormSchema } from './schemas';
 
-export const verifyCode = action(verifyCodeFormSchema, async ({ code }) => {
+const verifyCodeSchema = verifyCodeFormSchema;
+
+export const verifyCode = action(verifyCodeSchema, async ({ code }) => {
     const { user } = await getUserSession();
     if (!user) {
         throw new AppError(

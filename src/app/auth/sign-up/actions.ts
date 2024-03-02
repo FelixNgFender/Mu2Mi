@@ -16,7 +16,7 @@ import { signUpFormSchema } from './schemas';
  * For **server-side** validation. If you use async refinements, you must use the
  * `parseAsync` method to parse data! Otherwise Zod will throw an error.
  */
-const signUpSchemaServer = signUpFormSchema.refine(
+const signUpSchema = signUpFormSchema.refine(
     async ({ email }) => {
         const user = await userModel.findOneByEmail(email);
         return !user;
@@ -27,34 +27,28 @@ const signUpSchemaServer = signUpFormSchema.refine(
     },
 );
 
-export const signUp = action(
-    signUpSchemaServer,
-    async ({ email, password }) => {
-        const hashedPassword = await new Argon2id().hash(password);
-        const userId = generateId(15);
+export const signUp = action(signUpSchema, async ({ email, password }) => {
+    const hashedPassword = await new Argon2id().hash(password);
+    const userId = generateId(15);
 
-        await userModel.createOne({
-            id: userId,
-            email,
-            emailVerified: false,
-            hashedPassword,
-            username: email,
-            usernameLower: email.toLowerCase(),
-        });
+    await userModel.createOne({
+        id: userId,
+        email,
+        emailVerified: false,
+        hashedPassword,
+        username: email,
+        usernameLower: email.toLowerCase(),
+    });
 
-        const verificationCode = await generateEmailVerificationCode(
-            userId,
-            email,
-        );
-        await sendEmailVerificationCode(email, verificationCode);
+    const verificationCode = await generateEmailVerificationCode(userId, email);
+    await sendEmailVerificationCode(email, verificationCode);
 
-        const session = await auth.createSession(userId, {});
-        const sessionCookie = auth.createSessionCookie(session.id);
-        cookies().set(
-            sessionCookie.name,
-            sessionCookie.value,
-            sessionCookie.attributes,
-        );
-        redirect('/auth/email-verification');
-    },
-);
+    const session = await auth.createSession(userId, {});
+    const sessionCookie = auth.createSessionCookie(session.id);
+    cookies().set(
+        sessionCookie.name,
+        sessionCookie.value,
+        sessionCookie.attributes,
+    );
+    redirect('/auth/email-verification');
+});
