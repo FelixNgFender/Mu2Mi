@@ -1,10 +1,11 @@
 import { env } from '@/config/env';
 import { googleAuth } from '@/lib/auth';
+import { withErrorHandling } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
 import { generateCodeVerifier, generateState } from 'arctic';
 import { cookies } from 'next/headers';
 
-export const GET = async () => {
+export const GET = withErrorHandling(async () => {
     const state = generateState();
     const codeVerifier = generateCodeVerifier();
     const url = await googleAuth.createAuthorizationURL(state, codeVerifier, {
@@ -27,4 +28,4 @@ export const GET = async () => {
     return HttpResponse.redirect(undefined, {
         Location: url.toString(),
     });
-};
+});

@@ -1,10 +1,11 @@
 import { env } from '@/config/env';
 import { githubAuth } from '@/lib/auth';
+import { withErrorHandling } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
 import { generateState } from 'arctic';
 import { cookies } from 'next/headers';
 
-export const GET = async () => {
+export const GET = withErrorHandling(async () => {
     const state = generateState();
     const url = await githubAuth.createAuthorizationURL(state, {
         scopes: ['user:email'],
@@ -19,4 +20,4 @@ export const GET = async () => {
     return HttpResponse.redirect(undefined, {
         Location: url.toString(),
     });
-};
+});

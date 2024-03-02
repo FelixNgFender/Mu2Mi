@@ -1,6 +1,8 @@
-import { HttpErrorCodes, httpStatus } from '@/lib/http';
+import { HttpErrorCodes } from '@/lib/http';
 import { logger } from '@/lib/logger';
 import 'server-only';
+
+import { HttpResponse } from './response';
 
 export class AppError extends Error {
     public readonly name:
@@ -58,3 +60,29 @@ class ErrorHandler {
  * Centralized error handler
  */
 export const errorHandler = new ErrorHandler();
+
+/**
+ * For wrapping a Route Handler with error handling.
+ *
+ * @param handler The route handler
+ * @param customErrorHandler A custom error handler, should return `undefined` if it doesn't handle the error.
+ */
+export const withErrorHandling = (
+    handler: Function,
+    customErrorHandler?: Function,
+) => {
+    return async (...args: any[]) => {
+        try {
+            return await handler(...args);
+        } catch (err) {
+            if (customErrorHandler) {
+                const customResponse = customErrorHandler(err);
+                if (customResponse) {
+                    return customResponse;
+                }
+            }
+            await errorHandler.handleError(err as Error);
+            return HttpResponse.internalServerError();
+        }
+    };
+};

@@ -1,4 +1,5 @@
 import { env } from '@/config/env';
+import { withErrorHandling } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import type { TurnstileServerValidationResponse } from '@marsidev/react-turnstile';
 
@@ -12,7 +13,7 @@ const verifyEndpoint =
 
 const secret = env.CAPTCHA_SECRET_KEY || '1x0000000000000000000000000000000AA';
 
-export const POST = async (request: Request) => {
+export const POST = withErrorHandling(async (request: Request) => {
     const { token } = (await request.json()) as { token: string };
 
     const res = await fetch(verifyEndpoint, {
@@ -35,4 +36,4 @@ export const POST = async (request: Request) => {
             'content-type': 'application/json',
         },
     });
-};
+});

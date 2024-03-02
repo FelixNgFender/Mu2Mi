@@ -1,5 +1,5 @@
 import { auth, githubAuth } from '@/lib/auth';
-import { AppError, errorHandler } from '@/lib/error';
+import { AppError, withErrorHandling } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
 import { oAuthAccountModel } from '@/models/oauth-account';
 import { userModel } from '@/models/user';
@@ -8,15 +8,15 @@ import { generateId } from 'lucia';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
-export const GET = async (request: NextRequest) => {
-    const url = new URL(request.url);
-    const code = url.searchParams.get('code');
-    const state = url.searchParams.get('state');
-    const storedState = cookies().get('github_oauth_state')?.value ?? null;
-    if (!code || !state || !storedState || state !== storedState) {
-        return HttpResponse.badRequest();
-    }
-    try {
+export const GET = withErrorHandling(
+    async (request: NextRequest) => {
+        const url = new URL(request.url);
+        const code = url.searchParams.get('code');
+        const state = url.searchParams.get('state');
+        const storedState = cookies().get('github_oauth_state')?.value ?? null;
+        if (!code || !state || !storedState || state !== storedState) {
+            return HttpResponse.badRequest();
+        }
         const tokens = await githubAuth.validateAuthorizationCode(code);
         const githubUserResponse = await fetch('https://api.github.com/user', {
             headers: {
@@ -83,17 +83,16 @@ export const GET = async (request: NextRequest) => {
         return HttpResponse.redirect(undefined, {
             Location: '/',
         });
-    } catch (err) {
+    },
+    (err: Error) => {
         if (err instanceof AppError) {
             return HttpResponse.unprocessableEntity(err.message);
         }
         if (err instanceof OAuth2RequestError) {
             return HttpResponse.badRequest();
         }
-        await errorHandler.handleError(err as Error);
-        return HttpResponse.internalServerError();
-    }
-};
+    },
+);
 
 interface GitHubUser {
     id: number;
