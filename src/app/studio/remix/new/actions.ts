@@ -6,7 +6,7 @@ import { replicate } from '@/infra';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { authAction } from '@/lib/safe-action';
-import { trackModel } from '@/models/track';
+import { createOneAndUpdateAsset } from '@/models/track';
 import { styleRemixInputSchema } from '@/types/replicate';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -21,7 +21,7 @@ const schema = styleRemixInputSchema
     });
 
 export const remixTrack = authAction(schema, async (data, { user }) => {
-    const newTrack = await trackModel.createOneAndUpdateAsset(
+    const newTrack = await createOneAndUpdateAsset(
         {
             userId: user.id,
             styleRemixStatus: 'processing',

@@ -7,10 +7,7 @@ import { cookies } from 'next/headers';
 import { cache } from 'react';
 import 'server-only';
 
-export type NewUser = Omit<
-    typeof userTable.$inferInsert,
-    'createdAt' | 'updatedAt'
->;
+type NewUser = Omit<typeof userTable.$inferInsert, 'createdAt' | 'updatedAt'>;
 
 /**
  * Can be used in Server Components and Server Actions to get the current session and user.
@@ -18,7 +15,7 @@ export type NewUser = Omit<
  * CSRF protection should be implemented but Next.js handles it when using
  * Server Actions (but not for Route Handlers).
  */
-export const getUserSession = cache(
+const getUserSession = cache(
     async (): Promise<
         { user: User; session: Session } | { user: null; session: null }
     > => {
@@ -56,59 +53,69 @@ export const getUserSession = cache(
     },
 );
 
-export const userModel = {
-    async findOne(id: string) {
-        return await db.query.userTable.findFirst({
-            where: eq(userTable.id, id),
+const createOne = async (user: NewUser) => {
+    await db.insert(userTable).values({
+        ...user,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    });
+};
+
+const createOneWithOAuthAccount = async (
+    user: NewUser,
+    providerId: 'github' | 'google' | 'facebook',
+    providerUserId: string,
+) => {
+    await db.transaction(async (tx) => {
+        await tx.insert(userTable).values({
+            ...user,
+            createdAt: new Date(),
+            updatedAt: new Date(),
         });
-    },
-
-    async createOne(user: NewUser) {
-        return await db
-            .insert(userTable)
-            .values({
-                ...user,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            })
-            .returning()
-            .then((users) => users[0]);
-    },
-
-    /**
-     * Will lowercase the email address before searching.
-     */
-    async findOneByEmail(email: string) {
-        return await db.query.userTable.findFirst({
-            where: eq(userTable.email, email.toLowerCase()),
+        await tx.insert(oauthAccountTable).values({
+            providerId,
+            providerUserId,
+            userId: user.id,
         });
-    },
+    });
+};
 
-    async createOneWithOAuthAccount(
-        user: NewUser,
-        providerId: 'github' | 'google' | 'facebook',
-        providerUserId: string,
-    ) {
-        await db.transaction(async (tx) => {
-            await tx.insert(userTable).values({
-                ...user,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            });
-            await tx.insert(oauthAccountTable).values({
-                providerId,
-                providerUserId,
-                userId: user.id,
-            });
-        });
-    },
+const findOne = async (id: string) => {
+    return await db.query.userTable.findFirst({
+        where: eq(userTable.id, id),
+        columns: {
+            id: true,
+        },
+    });
+};
 
-    async updateOne(id: string, user: Partial<NewUser>) {
-        return await db
-            .update(userTable)
-            .set({ ...user, updatedAt: new Date() })
-            .where(eq(userTable.id, id))
-            .returning()
-            .then((users) => users[0]);
-    },
+/**
+ * Will lowercase the email address before searching.
+ */
+const findOneByEmail = async (email: string) => {
+    return await db.query.userTable.findFirst({
+        where: eq(userTable.email, email.toLowerCase()),
+        columns: {
+            id: true,
+            email: true,
+            emailVerified: true,
+            hashedPassword: true,
+        },
+    });
+};
+
+const updateOne = async (id: string, user: Partial<NewUser>) => {
+    await db
+        .update(userTable)
+        .set({ ...user, updatedAt: new Date() })
+        .where(eq(userTable.id, id));
+};
+
+export {
+    getUserSession,
+    createOne,
+    createOneWithOAuthAccount,
+    findOne,
+    findOneByEmail,
+    updateOne,
 };

@@ -1,48 +1,29 @@
 import { db } from '@/infra';
 import { assetTable, trackTable } from '@/infra/schema';
-import { eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import 'server-only';
 
-export type Track = typeof trackTable.$inferSelect;
+type NewTrack = Omit<typeof trackTable.$inferInsert, 'createdAt' | 'updatedAt'>;
 
-export type NewTrack = Omit<
-    typeof trackTable.$inferInsert,
-    'createdAt' | 'updatedAt'
->;
+type UpdateTrack = Partial<Omit<typeof trackTable.$inferInsert, 'updatedAt'>>;
 
-export type UpdateTrack = Partial<
-    Omit<typeof trackTable.$inferInsert, 'updatedAt'>
->;
+const createOne = async (track: NewTrack) => {
+    return await db
+        .insert(trackTable)
+        .values({
+            ...track,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        })
+        .returning({
+            id: trackTable.id,
+        })
+        .then((tracks) => tracks[0]);
+};
 
-export const trackModel = {
-    // TODO: Select queries should be paginated and should not overfetch
-    async findOne(id: string) {
-        return await db.query.trackTable.findFirst({
-            where: eq(trackTable.id, id),
-        });
-    },
-
-    async findManyByUserId(userId: string) {
-        return await db.query.trackTable.findMany({
-            where: eq(trackTable.userId, userId),
-        });
-    },
-
-    async deleteOne(id: string) {
-        return await db.delete(trackTable).where(eq(trackTable.id, id));
-    },
-
-    async updateOne(id: string, track: UpdateTrack) {
-        return await db
-            .update(trackTable)
-            .set({ ...track, updatedAt: new Date() })
-            .where(eq(trackTable.id, id))
-            .returning()
-            .then((tracks) => tracks[0]);
-    },
-
-    async createOne(track: NewTrack) {
-        return await db
+const createOneAndUpdateAsset = async (track: NewTrack, assetId: string) => {
+    return await db.transaction(async (tx) => {
+        const newTrack = await tx
             .insert(trackTable)
             .values({
                 ...track,
@@ -53,41 +34,80 @@ export const trackModel = {
                 id: trackTable.id,
             })
             .then((tracks) => tracks[0]);
-    },
 
-    async createOneAndUpdateAsset(track: NewTrack, assetId: string) {
-        return await db.transaction(async (tx) => {
-            const newTrack = await tx
-                .insert(trackTable)
-                .values({
-                    ...track,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                })
-                .returning({
-                    id: trackTable.id,
-                })
-                .then((tracks) => tracks[0]);
+        if (!newTrack) {
+            return;
+        }
 
-            if (!newTrack) {
-                return;
-            }
+        const newAsset = await tx
+            .update(assetTable)
+            .set({ trackId: newTrack.id })
+            .where(eq(assetTable.id, assetId))
+            .returning({ name: assetTable.name })
+            .then((assets) => assets[0]);
 
-            const newAsset = await tx
-                .update(assetTable)
-                .set({ trackId: newTrack.id })
-                .where(eq(assetTable.id, assetId))
-                .returning({ name: assetTable.name })
-                .then((assets) => assets[0]);
+        if (!newAsset) {
+            return;
+        }
 
-            if (!newAsset) {
-                return;
-            }
+        return {
+            trackId: newTrack.id,
+            assetName: newAsset.name,
+        };
+    });
+};
 
-            return {
-                trackId: newTrack.id,
-                assetName: newAsset.name,
-            };
-        });
-    },
+const findOne = async (id: string) => {
+    return await db.query.trackTable.findFirst({
+        where: eq(trackTable.id, id),
+        columns: {
+            musicGenerationStatus: true,
+            styleRemixStatus: true,
+            trackSeparationStatus: true,
+            trackAnalysisStatus: true,
+            midiTranscriptionStatus: true,
+            lyricsTranscriptionStatus: true,
+        },
+    });
+};
+
+const findManyByUserId = async (userId: string) => {
+    return await db.query.trackTable.findMany({
+        where: eq(trackTable.userId, userId),
+        columns: {
+            id: true,
+            name: true,
+            musicGenerationStatus: true,
+            styleRemixStatus: true,
+            trackSeparationStatus: true,
+            trackAnalysisStatus: true,
+            midiTranscriptionStatus: true,
+            lyricsTranscriptionStatus: true,
+        },
+        orderBy: [desc(trackTable.createdAt)],
+    });
+};
+
+type ReturnedTrack = Awaited<ReturnType<typeof findManyByUserId>>[number];
+
+const updateOne = async (id: string, track: UpdateTrack) => {
+    await db
+        .update(trackTable)
+        .set({ ...track, updatedAt: new Date() })
+        .where(eq(trackTable.id, id));
+};
+
+const deleteOne = async (id: string) => {
+    await db.delete(trackTable).where(eq(trackTable.id, id));
+};
+
+export type { ReturnedTrack };
+
+export {
+    createOne,
+    createOneAndUpdateAsset,
+    findOne,
+    findManyByUserId,
+    updateOne,
+    deleteOne,
 };

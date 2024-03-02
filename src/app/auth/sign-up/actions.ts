@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
 import { sendEmailVerificationCode } from '@/lib/email';
 import { action } from '@/lib/safe-action';
 import { generateEmailVerificationCode } from '@/lib/token';
-import { userModel } from '@/models/user';
+import { createOne, findOneByEmail } from '@/models/user';
 import { generateId } from 'lucia';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -18,7 +18,7 @@ import { signUpFormSchema } from './schemas';
  */
 const signUpSchema = signUpFormSchema.refine(
     async ({ email }) => {
-        const user = await userModel.findOneByEmail(email);
+        const user = await findOneByEmail(email);
         return !user;
     },
     {
@@ -31,7 +31,7 @@ export const signUp = action(signUpSchema, async ({ email, password }) => {
     const hashedPassword = await new Argon2id().hash(password);
     const userId = generateId(15);
 
-    await userModel.createOne({
+    await createOne({
         id: userId,
         email,
         emailVerified: false,

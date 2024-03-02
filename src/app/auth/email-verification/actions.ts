@@ -6,9 +6,11 @@ import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { action } from '@/lib/safe-action';
 import { generateEmailVerificationCode } from '@/lib/token';
-import { emailVerificationModel } from '@/models/email-verification';
-import { getUserSession } from '@/models/user';
-import { userModel } from '@/models/user';
+import {
+    deleteAllByUserId,
+    validateAndDelete,
+} from '@/models/email-verification';
+import { getUserSession, updateOne } from '@/models/user';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { isWithinExpirationDate } from 'oslo';
@@ -38,9 +40,7 @@ export const verifyCode = action(verifyCodeSchema, async ({ code }) => {
         );
     }
 
-    const databaseCode = await emailVerificationModel.validateAndDelete(
-        user.id,
-    );
+    const databaseCode = await validateAndDelete(user.id);
 
     if (!databaseCode || databaseCode.code !== code) {
         throw new AppError(
@@ -68,7 +68,7 @@ export const verifyCode = action(verifyCodeSchema, async ({ code }) => {
     }
 
     await auth.invalidateUserSessions(user.id);
-    await userModel.updateOne(user.id, {
+    await updateOne(user.id, {
         emailVerified: true,
     });
 
@@ -103,7 +103,7 @@ export const resendCode = action(resendCodeSchema, async () => {
         );
     }
 
-    await emailVerificationModel.deleteAllByUserId(user.id);
+    await deleteAllByUserId(user.id);
     const code = await generateEmailVerificationCode(user.id, user.email);
     await sendEmailVerificationCode(user.email, code);
     return {

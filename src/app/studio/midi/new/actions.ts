@@ -6,7 +6,7 @@ import { replicate } from '@/infra';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { authAction } from '@/lib/safe-action';
-import { trackModel } from '@/models/track';
+import { createOneAndUpdateAsset } from '@/models/track';
 import { midiTranscriptionInputSchema } from '@/types/replicate';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -21,7 +21,7 @@ const schema = midiTranscriptionInputSchema
     });
 
 export const transcribeMidi = authAction(schema, async (data, { user }) => {
-    const newTrack = await trackModel.createOneAndUpdateAsset(
+    const newTrack = await createOneAndUpdateAsset(
         {
             userId: user.id,
             midiTranscriptionStatus: 'processing',

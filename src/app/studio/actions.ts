@@ -7,8 +7,14 @@ import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { authAction } from '@/lib/safe-action';
 import { generateObjectKey } from '@/lib/utils';
-import { assetModel } from '@/models/asset';
-import { trackModel } from '@/models/track';
+import {
+    createOne as createOneAsset,
+    findManyByTrackId as findManyAssetsByTrackId,
+} from '@/models/asset';
+import {
+    deleteOne as deleteOneTrack,
+    findManyByUserId as findManyTracksByUserId,
+} from '@/models/track';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -19,7 +25,7 @@ const downloadTrackSchema = z.object({
 export const downloadTrack = authAction(
     downloadTrackSchema,
     async ({ trackId }) => {
-        const trackAssets = await assetModel.findManyByTrackId(trackId);
+        const trackAssets = await findManyAssetsByTrackId(trackId);
         const promises = trackAssets.map(async (asset) => {
             const url = await fileStorage
                 .presignedGetObject(
@@ -44,12 +50,12 @@ const deleteTrackSchema = z.object({
 export const deleteTrack = authAction(
     deleteTrackSchema,
     async ({ trackId }) => {
-        const assets = await assetModel.findManyByTrackId(trackId);
+        const assets = await findManyAssetsByTrackId(trackId);
         await fileStorage.removeObjects(
             env.S3_BUCKET_NAME,
             assets.map((asset) => asset.name),
         );
-        await trackModel.deleteOne(trackId); // cascades to asset table
+        await deleteOneTrack(trackId); // cascades to asset table
         revalidatePath('/studio');
     },
 );
@@ -57,7 +63,7 @@ export const deleteTrack = authAction(
 const getTracksSchema = z.object({});
 
 export const getTracks = authAction(getTracksSchema, async ({}, { user }) => {
-    return await trackModel.findManyByUserId(user.id);
+    return await findManyTracksByUserId(user.id);
 });
 
 const getPresignedUrlSchema = z.object({
@@ -77,7 +83,7 @@ export const getPresignedUrl = authAction(
             env.S3_PRESIGNED_URL_EXPIRATION_S,
         );
 
-        const newAsset = await assetModel.createOne({
+        const newAsset = await createOneAsset({
             userId: user.id,
             // we will put faith in the client to actually upload the file to S3
             // better solution would be set up a trigger on the S3 bucket to create the asset

@@ -10,7 +10,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import type { Track } from '@/models/track';
+import type { ReturnedTrack } from '@/models/track';
 import { TrackStatus, TrackStatusColumn } from '@/types/studio';
 import { ColumnDef } from '@tanstack/react-table';
 import JSZip from 'jszip';
@@ -82,7 +82,7 @@ export const trackTableColumnsBuiler = (
     basePreviewPath?: string,
     callback?: string,
 ) => {
-    const trackTableColumns: ColumnDef<Track>[] = [
+    const trackTableColumns: ColumnDef<ReturnedTrack>[] = [
         // {
         //     id: 'select',
         //     header: ({ table }) => (

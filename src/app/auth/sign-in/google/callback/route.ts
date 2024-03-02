@@ -1,8 +1,14 @@
 import { auth, googleAuth } from '@/lib/auth';
 import { AppError, withErrorHandling } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
-import { oAuthAccountModel } from '@/models/oauth-account';
-import { userModel } from '@/models/user';
+import {
+    createOne as createOneOAuthAccount,
+    findOneByProvider as findOneOAuthAccountByProvider,
+} from '@/models/oauth-account';
+import {
+    createOneWithOAuthAccount as createOneUserWithOAuthAccount,
+    findOneByEmail as findOneUserByEmail,
+} from '@/models/user';
 import { OAuth2RequestError } from 'arctic';
 import { generateId } from 'lucia';
 import { cookies } from 'next/headers';
@@ -47,17 +53,16 @@ export const GET = withErrorHandling(
             throw new AppError('ValidationError', 'Email not verified', true);
         }
 
-        const existingUserWithEmail = await userModel.findOneByEmail(
+        const existingUserWithEmail = await findOneUserByEmail(
             googleUser.email,
         );
         if (existingUserWithEmail) {
-            const existingOAuthAccount =
-                await oAuthAccountModel.findOneByProviderIdAndProviderUserId(
-                    'facebook',
-                    googleUser.sub,
-                );
+            const existingOAuthAccount = await findOneOAuthAccountByProvider(
+                'facebook',
+                googleUser.sub,
+            );
             if (!existingOAuthAccount) {
-                await oAuthAccountModel.createOne({
+                await createOneOAuthAccount({
                     providerId: 'facebook',
                     providerUserId: googleUser.sub,
                     userId: existingUserWithEmail.id,
@@ -80,7 +85,7 @@ export const GET = withErrorHandling(
 
         const userId = generateId(15);
 
-        await userModel.createOneWithOAuthAccount(
+        await createOneUserWithOAuthAccount(
             {
                 id: userId,
                 email: googleUser.email.toLowerCase(),

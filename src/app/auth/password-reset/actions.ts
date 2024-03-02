@@ -5,7 +5,7 @@ import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { action } from '@/lib/safe-action';
 import { generatePasswordResetToken } from '@/lib/token';
-import { userModel } from '@/models/user';
+import { findOneByEmail } from '@/models/user';
 
 import { passwordResetFormSchema } from './schemas';
 
@@ -15,7 +15,7 @@ import { passwordResetFormSchema } from './schemas';
  */
 const passwordResetSchema = passwordResetFormSchema.refine(
     async ({ email }) => {
-        const user = await userModel.findOneByEmail(email);
+        const user = await findOneByEmail(email);
         return !!user;
     },
     {
@@ -27,7 +27,7 @@ const passwordResetSchema = passwordResetFormSchema.refine(
 export const requestPasswordReset = action(
     passwordResetSchema,
     async ({ email }) => {
-        const user = await userModel.findOneByEmail(email.toLowerCase());
+        const user = await findOneByEmail(email.toLowerCase());
         if (!user || !user.emailVerified) {
             throw new AppError(
                 'HttpError',

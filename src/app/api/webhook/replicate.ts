@@ -3,8 +3,11 @@ import { fileStorage } from '@/infra';
 import { AppError } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
 import { generateObjectKey } from '@/lib/utils';
-import { assetModel } from '@/models/asset';
-import { trackModel } from '@/models/track';
+import { createOne as createOneAsset } from '@/models/asset';
+import {
+    findOne as findOneTrack,
+    updateOne as updateOneTrack,
+} from '@/models/track';
 import {
     ReplicateWebhookBodyTypes,
     webhookMetadataSchema,
@@ -81,13 +84,13 @@ export const replicateWebhookHandler = async <
     const { status, output, error } = body as T;
 
     if (error) {
-        await trackModel.updateOne(taskId, {
+        await updateOneTrack(taskId, {
             [statusField]: 'failed',
         });
         return HttpResponse.success();
     }
 
-    const track = await trackModel.findOne(taskId);
+    const track = await findOneTrack(taskId);
     if (!track) {
         throw new AppError('FatalError', 'Failed to find track', true);
     }
@@ -100,7 +103,7 @@ export const replicateWebhookHandler = async <
         track[statusField] === 'processing' &&
         (status === 'failed' || status === 'canceled')
     ) {
-        await trackModel.updateOne(taskId, {
+        await updateOneTrack(taskId, {
             [statusField]: status,
         });
         return HttpResponse.success();
@@ -191,7 +194,7 @@ export const replicateWebhookHandler = async <
         ) {
             await saveTrackAssetAndMetadata(taskId, userId, output, 'lyrics');
         }
-        await trackModel.updateOne(taskId, {
+        await updateOneTrack(taskId, {
             [statusField]: status,
         });
     }
@@ -222,7 +225,7 @@ const saveTrackAssetAndMetadata = async (
     await fileStorage.putObject(env.S3_BUCKET_NAME, objectName, fileData, {
         'Content-Type': mimeType,
     });
-    const newAsset = await assetModel.createOne({
+    const newAsset = await createOneAsset({
         userId,
         name: objectName,
         mimeType: mimeType as any,

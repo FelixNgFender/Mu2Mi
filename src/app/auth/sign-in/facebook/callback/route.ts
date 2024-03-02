@@ -1,8 +1,14 @@
 import { auth, facebookAuth } from '@/lib/auth';
 import { AppError, withErrorHandling } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
-import { oAuthAccountModel } from '@/models/oauth-account';
-import { userModel } from '@/models/user';
+import {
+    createOne as createOneOAuthAccount,
+    findOneByProvider as findOneOAuthAccountByProvider,
+} from '@/models/oauth-account';
+import {
+    createOneWithOAuthAccount as createOneUserWithOAuthAccount,
+    findOneByEmail as findOneUserByEmail,
+} from '@/models/user';
 import { OAuth2RequestError } from 'arctic';
 import { generateId } from 'lucia';
 import { cookies } from 'next/headers';
@@ -31,17 +37,16 @@ export const GET = withErrorHandling(
         if (!facebookUser.email) {
             throw new AppError('ValidationError', 'Email not provided', true);
         }
-        const existingUserWithEmail = await userModel.findOneByEmail(
+        const existingUserWithEmail = await findOneUserByEmail(
             facebookUser.email,
         );
         if (existingUserWithEmail) {
-            const existingOAuthAccount =
-                await oAuthAccountModel.findOneByProviderIdAndProviderUserId(
-                    'facebook',
-                    facebookUser.id,
-                );
+            const existingOAuthAccount = await findOneOAuthAccountByProvider(
+                'facebook',
+                facebookUser.id,
+            );
             if (!existingOAuthAccount) {
-                await oAuthAccountModel.createOne({
+                await createOneOAuthAccount({
                     providerId: 'facebook',
                     providerUserId: facebookUser.id,
                     userId: existingUserWithEmail.id,
@@ -64,7 +69,7 @@ export const GET = withErrorHandling(
 
         const userId = generateId(15);
 
-        await userModel.createOneWithOAuthAccount(
+        await createOneUserWithOAuthAccount(
             {
                 id: userId,
                 email: facebookUser.email.toLowerCase(),

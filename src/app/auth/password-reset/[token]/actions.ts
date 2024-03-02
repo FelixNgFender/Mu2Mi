@@ -4,8 +4,8 @@ import { auth } from '@/lib/auth';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { action } from '@/lib/safe-action';
-import { passwordResetModel } from '@/models/password-reset';
-import { userModel } from '@/models/user';
+import { validateAndDelete } from '@/models/password-reset';
+import { findOne, updateOne } from '@/models/user';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { isWithinExpirationDate } from 'oslo';
@@ -16,7 +16,7 @@ import { newPasswordFormSchema } from './schemas';
 export const setNewPassword = action(
     newPasswordFormSchema,
     async ({ password, token }) => {
-        const storedToken = await passwordResetModel.validateAndDelete(token);
+        const storedToken = await validateAndDelete(token);
 
         if (!storedToken || !isWithinExpirationDate(storedToken.expiresAt)) {
             throw new AppError(
@@ -26,7 +26,7 @@ export const setNewPassword = action(
                 httpStatus.clientError.badRequest.code,
             );
         }
-        const user = await userModel.findOne(storedToken.userId);
+        const user = await findOne(storedToken.userId);
         if (!user) {
             throw new AppError(
                 'HttpError',
@@ -37,7 +37,7 @@ export const setNewPassword = action(
         }
         await auth.invalidateUserSessions(user.id);
         const hashedPassword = await new Argon2id().hash(password);
-        await userModel.updateOne(user.id, {
+        await updateOne(user.id, {
             hashedPassword,
         });
 

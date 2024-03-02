@@ -5,38 +5,33 @@ import 'server-only';
 
 type NewPasswordResetToken = typeof passwordResetTable.$inferInsert;
 
-export const passwordResetModel = {
-    async findManyByUserId(userId: string) {
-        return await db.query.passwordResetTable.findMany({
-            where: eq(passwordResetTable.userId, userId),
-        });
-    },
-
-    async createOne(token: NewPasswordResetToken) {
-        return await db
-            .insert(passwordResetTable)
-            .values(token)
-            .returning()
-            .then((tokens) => tokens[0]);
-    },
-
-    async deleteAllByUserId(userId: string) {
-        return await db
-            .delete(passwordResetTable)
-            .where(eq(passwordResetTable.userId, userId));
-    },
-
-    async validateAndDelete(token: string) {
-        return await db.transaction(async (tx) => {
-            const storedToken = await tx.query.passwordResetTable.findFirst({
-                where: eq(passwordResetTable.id, token),
-            });
-            if (storedToken) {
-                await tx
-                    .delete(passwordResetTable)
-                    .where(eq(passwordResetTable.id, storedToken.id));
-            }
-            return storedToken;
-        });
-    },
+const createOne = async (token: NewPasswordResetToken) => {
+    await db.insert(passwordResetTable).values(token);
 };
+
+const validateAndDelete = async (token: string) => {
+    return await db.transaction(async (tx) => {
+        const storedToken = await tx.query.passwordResetTable.findFirst({
+            where: eq(passwordResetTable.id, token),
+            columns: {
+                id: true,
+                userId: true,
+                expiresAt: true,
+            },
+        });
+        if (storedToken) {
+            await tx
+                .delete(passwordResetTable)
+                .where(eq(passwordResetTable.id, storedToken.id));
+        }
+        return storedToken;
+    });
+};
+
+const deleteAllByUserId = async (userId: string) => {
+    await db
+        .delete(passwordResetTable)
+        .where(eq(passwordResetTable.userId, userId));
+};
+
+export { createOne, validateAndDelete, deleteAllByUserId };

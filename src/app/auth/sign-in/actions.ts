@@ -2,7 +2,7 @@
 
 import { auth } from '@/lib/auth';
 import { action } from '@/lib/safe-action';
-import { userModel } from '@/models/user';
+import { findOneByEmail } from '@/models/user';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Argon2id } from 'oslo/password';
@@ -17,9 +17,7 @@ import { signInFormSchema } from './schemas';
 const signInSchema = signInFormSchema.superRefine(
     async ({ email, password }, ctx) => {
         try {
-            const existingUser = await userModel.findOneByEmail(
-                email.toLowerCase(),
-            );
+            const existingUser = await findOneByEmail(email.toLowerCase());
             // in the case of null hashedPassword, it means the user signed
             // up with a social account
             if (!existingUser || !existingUser.hashedPassword) {
@@ -48,7 +46,7 @@ const signInSchema = signInFormSchema.superRefine(
 );
 
 export const signIn = action(signInSchema, async ({ email, rememberMe }) => {
-    const existingUser = await userModel.findOneByEmail(email.toLowerCase());
+    const existingUser = await findOneByEmail(email.toLowerCase());
     // We know it's not null because of the validation above
     const session = await auth.createSession(existingUser!.id, {});
     const sessionCookie = auth.createSessionCookie(session.id);

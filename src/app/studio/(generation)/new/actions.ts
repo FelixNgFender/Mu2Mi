@@ -6,7 +6,7 @@ import { replicate } from '@/infra';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { authAction } from '@/lib/safe-action';
-import { trackModel } from '@/models/track';
+import { createOne, createOneAndUpdateAsset } from '@/models/track';
 import { musicGenerationInputSchema } from '@/types/replicate';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -22,7 +22,7 @@ const schema = musicGenerationInputSchema
 
 export const generateMusic = authAction(schema, async (data, { user }) => {
     if (data.assetId) {
-        const newTrack = await trackModel.createOneAndUpdateAsset(
+        const newTrack = await createOneAndUpdateAsset(
             {
                 userId: user.id,
                 musicGenerationStatus: 'processing',
@@ -53,7 +53,7 @@ export const generateMusic = authAction(schema, async (data, { user }) => {
             input_audio: url,
         });
     } else {
-        const newTrack = await trackModel.createOne({
+        const newTrack = await createOne({
             userId: user.id,
             musicGenerationStatus: 'processing',
             name: data.name,

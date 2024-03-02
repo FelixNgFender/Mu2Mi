@@ -1,5 +1,11 @@
-import { emailVerificationModel } from '@/models/email-verification';
-import { passwordResetModel } from '@/models/password-reset';
+import {
+    createOne as createOneEmailVerificationToken,
+    deleteAllByUserId as deleteAllEmailVerificationTokensByUserId,
+} from '@/models/email-verification';
+import {
+    createOne as createOnePasswordResetToken,
+    deleteAllByUserId as deleteAllPasswordResetTokensByUserId,
+} from '@/models/password-reset';
 import { generateId } from 'lucia';
 import { TimeSpan, createDate } from 'oslo';
 import { alphabet, generateRandomString } from 'oslo/crypto';
@@ -9,9 +15,9 @@ export const generateEmailVerificationCode = async (
     userId: string,
     email: string,
 ): Promise<string> => {
-    await emailVerificationModel.deleteAllByUserId(userId);
+    await deleteAllEmailVerificationTokensByUserId(userId);
     const code = generateRandomString(6, alphabet('0-9'));
-    await emailVerificationModel.createOne({
+    await createOneEmailVerificationToken({
         userId,
         email,
         code,
@@ -23,9 +29,9 @@ export const generateEmailVerificationCode = async (
 export const generatePasswordResetToken = async (
     userId: string,
 ): Promise<string> => {
-    await passwordResetModel.deleteAllByUserId(userId);
+    await deleteAllPasswordResetTokensByUserId(userId);
     const tokenId = generateId(40);
-    await passwordResetModel.createOne({
+    await createOnePasswordResetToken({
         id: tokenId,
         userId: userId,
         expiresAt: createDate(new TimeSpan(2, 'h')),

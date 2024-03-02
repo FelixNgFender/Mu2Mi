@@ -5,7 +5,7 @@ import {
 } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { studioConfig } from '@/config/studio';
-import { trackModel } from '@/models/track';
+import { findManyByUserId } from '@/models/track';
 import { getUserSession } from '@/models/user';
 import {
     HydrationBoundary,
@@ -42,7 +42,7 @@ const StudioLayout = async ({ children }: StudioLayoutProps) => {
             const { data } = await getTracks({});
             return data;
         },
-        initialData: await trackModel.findManyByUserId(user.id),
+        initialData: await findManyByUserId(user.id),
     });
 
     return (
