@@ -21,9 +21,7 @@ const main = async () => {
         secretKey: process.env.S3_SECRET_KEY,
     });
 
-    const exists = await fileStorage.bucketExists(
-        process.env.S3_BUCKET_NAME,
-    );
+    const exists = await fileStorage.bucketExists(process.env.S3_BUCKET_NAME);
     if (exists) {
         console.info(`Bucket ${process.env.S3_BUCKET_NAME} exists.`);
     } else {

@@ -2,9 +2,9 @@
 
 import { env } from '@/config/env';
 import { fileStorage } from '@/infra';
+import { replicate } from '@/infra';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
-import { replicate } from '@/infra';
 import { authAction } from '@/lib/safe-action';
 import { trackModel } from '@/models/track';
 import { trackSeparationInputSchema } from '@/types/replicate';

@@ -1,5 +1,5 @@
-import { Preset } from '@/types/studio';
 import { cn } from '@/lib/utils';
+import { Preset } from '@/types/studio';
 import Image from 'next/image';
 
 import { BackgroundGradient } from './background-gradient';

@@ -164,7 +164,7 @@ export const KaraokePlayer = ({
                                 index === currentLine ? 'default' : 'ghost'
                             }
                             size="lg"
-                            className="w-full justify-start text-left whitespace-normal rounded-none px-4 py-2 font-semibold transition-colors duration-200"
+                            className="w-full justify-start whitespace-normal rounded-none px-4 py-2 text-left font-semibold transition-colors duration-200"
                             onClick={() => {
                                 if (audioRef.current) {
                                     audioRef.current.currentTime =

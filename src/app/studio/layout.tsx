@@ -5,8 +5,8 @@ import {
 } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { studioConfig } from '@/config/studio';
-import { getUserSession } from '@/models/user';
 import { trackModel } from '@/models/track';
+import { getUserSession } from '@/models/user';
 import {
     HydrationBoundary,
     QueryClient,
