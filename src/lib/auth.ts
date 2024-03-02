@@ -5,9 +5,6 @@ import type { DatabaseUser } from '@/infra/schema';
 import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 import { Facebook, GitHub, Google } from 'arctic';
 import { Lucia, TimeSpan } from 'lucia';
-import type { Session, User } from 'lucia';
-import { cookies } from 'next/headers';
-import { cache } from 'react';
 import 'server-only';
 
 const adapter = new DrizzlePostgreSQLAdapter(db, sessionTable, userTable);
@@ -31,50 +28,6 @@ export const auth = new Lucia(adapter, {
     },
     sessionExpiresIn: new TimeSpan(30, 'd'),
 });
-
-/**
- * Can be used in Server Components and Server Actions to get the current session and user.
- *
- * CSRF protection should be implemented but Next.js handles it when using
- * Server Actions (but not for Route Handlers).
- */
-export const getUserSession = cache(
-    async (): Promise<
-        { user: User; session: Session } | { user: null; session: null }
-    > => {
-        const sessionId = cookies().get(auth.sessionCookieName)?.value ?? null;
-        if (!sessionId) {
-            return {
-                user: null,
-                session: null,
-            };
-        }
-
-        const result = await auth.validateSession(sessionId);
-        // next.js throws when you attempt to set cookie when rendering page
-        try {
-            if (result.session && result.session.fresh) {
-                const sessionCookie = auth.createSessionCookie(
-                    result.session.id,
-                );
-                cookies().set(
-                    sessionCookie.name,
-                    sessionCookie.value,
-                    sessionCookie.attributes,
-                );
-            }
-            if (!result.session) {
-                const sessionCookie = auth.createBlankSessionCookie();
-                cookies().set(
-                    sessionCookie.name,
-                    sessionCookie.value,
-                    sessionCookie.attributes,
-                );
-            }
-        } catch {}
-        return result;
-    },
-);
 
 declare module 'lucia' {
     interface Register {

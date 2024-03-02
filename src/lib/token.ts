@@ -1,4 +1,3 @@
-import { AppError } from '@/lib/error';
 import { emailVerificationModel } from '@/models/email-verification';
 import { passwordResetModel } from '@/models/password-reset';
 import { generateId } from 'lucia';

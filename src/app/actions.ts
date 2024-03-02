@@ -1,9 +1,10 @@
 'use server';
 
-import { auth, getUserSession } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { action } from '@/lib/safe-action';
+import { getUserSession } from '@/models/user';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';

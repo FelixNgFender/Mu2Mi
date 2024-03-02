@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { getUserSession } from '@/lib/auth';
+import { getUserSession } from '@/models/user';
 
 const ProfilePage = async () => {
     const { user } = await getUserSession();

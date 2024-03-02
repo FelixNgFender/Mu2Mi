@@ -1,6 +1,6 @@
+import { getUserSession } from '@/models/user';
 import { createSafeActionClient } from 'next-safe-action';
 
-import { getUserSession } from './auth';
 import { AppError, errorHandler } from './error';
 import { httpStatus } from './http';
 

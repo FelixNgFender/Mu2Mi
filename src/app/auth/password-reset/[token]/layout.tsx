@@ -1,4 +1,4 @@
-import { getUserSession } from '@/lib/auth';
+import { getUserSession } from '@/models/user';
 import { redirect } from 'next/navigation';
 
 interface NewPasswordLayoutProps {

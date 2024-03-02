@@ -1,12 +1,13 @@
 'use server';
 
-import { auth, getUserSession } from '@/lib/auth';
+import { auth } from '@/lib/auth';
 import { sendEmailVerificationCode } from '@/lib/email';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { action } from '@/lib/safe-action';
 import { generateEmailVerificationCode } from '@/lib/token';
 import { emailVerificationModel } from '@/models/email-verification';
+import { getUserSession } from '@/models/user';
 import { userModel } from '@/models/user';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
