@@ -18,6 +18,19 @@ import {
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
+const pollTracksSchema = z.object({});
+
+/**
+ * Server Action for this query because I don't want to write Route Handler. And
+ * it's needed for real-time updates.
+ */
+export const pollUserTracks = authAction(
+    pollTracksSchema,
+    async ({}, { user }) => {
+        return await findManyTracksByUserId(user.id);
+    },
+);
+
 const downloadTrackSchema = z.object({
     trackId: z.string(),
 });
@@ -59,12 +72,6 @@ export const deleteTrack = authAction(
         revalidatePath('/studio');
     },
 );
-
-const getTracksSchema = z.object({});
-
-export const getTracks = authAction(getTracksSchema, async ({}, { user }) => {
-    return await findManyTracksByUserId(user.id);
-});
 
 const getPresignedUrlSchema = z.object({
     type: z.enum(assetConfig.allowedMimeTypes),

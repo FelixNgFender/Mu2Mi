@@ -8,8 +8,10 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { getUserSession } from '@/models/user';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import { SignInForm } from './sign-in-form';
 
@@ -18,6 +20,15 @@ export const metadata: Metadata = {
 };
 
 const SignInPage = async () => {
+    const { user } = await getUserSession();
+
+    if (user) {
+        if (!user.emailVerified) {
+            return redirect('/auth/email-verification');
+        }
+        return redirect('/');
+    }
+
     return (
         <Card>
             <CardHeader>

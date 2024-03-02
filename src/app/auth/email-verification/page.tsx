@@ -6,7 +6,9 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { getUserSession } from '@/models/user';
 import { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 import {
     EmailVerificationForm,
@@ -18,6 +20,16 @@ export const metadata: Metadata = {
 };
 
 const EmailVerificationPage = async () => {
+    const { user } = await getUserSession();
+
+    if (!user) {
+        return redirect('/auth/sign-in');
+    }
+
+    if (user.emailVerified) {
+        return redirect('/');
+    }
+
     return (
         <Card className="max-w-md">
             <CardHeader>
