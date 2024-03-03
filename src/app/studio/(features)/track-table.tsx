@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
-import { pollUserTracks } from './actions';
+import { pollUserTracks } from '../actions';
 import { trackTableColumnsBuiler } from './track-table-columns';
 
 const previewPathMap: Record<string, string> = {

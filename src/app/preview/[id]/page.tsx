@@ -1,26 +1,25 @@
 import { downloadPublicTrackAssets } from '@/app/studio/queries';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatValidationErrors } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
 const AudioPlayer = dynamic(() => import('@/app/audio-player'), {
     ssr: false,
-    // TODO: replace this
-    loading: () => <p>Loading...</p>,
+    loading: () => (
+        <div className="flex flex-col space-y-4">
+            <div className="my-1 flex justify-between space-x-2">
+                <div />
+                <Skeleton className="h-10 w-72" />
+                <Skeleton className="h-10 w-40" />
+            </div>
+            <div className="flex-1">
+                <Skeleton className="mt-12 h-[480px] w-full" />
+            </div>
+        </div>
+    ),
 });
-
-const imageLoader = ({
-    src,
-    width,
-    quality,
-}: {
-    src: string;
-    width: number;
-    quality?: number;
-}) => {
-    return `${src}`;
-};
 
 type TrackPageProps = {
     params: {
@@ -61,7 +60,6 @@ const TrackPage = async ({ params }: TrackPageProps) => {
                 <ScrollArea className="w-full whitespace-nowrap rounded-md border px-4 py-2 sm:border-0">
                     <div className="relative mx-auto min-h-96 w-[1024px]">
                         <Image
-                            loader={imageLoader}
                             src={
                                 assetLinks.find(
                                     (link) => link.type === 'analysis_viz',

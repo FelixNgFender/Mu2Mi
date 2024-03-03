@@ -51,7 +51,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { getPresignedUrl } from '../../actions';
+import { getPresignedUrl } from '../../../actions';
 import { transcribeLyrics } from './actions';
 import transcribeEnglishImage from './assets/transcribe-english.jpg';
 import transcribeJapaneseImage from './assets/transcribe-japanese.jpg';

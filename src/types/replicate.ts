@@ -1,8 +1,8 @@
-import { musicGenerationFormSchema } from '@/app/studio/(generation)/new/schemas';
-import { analysisFormSchema } from '@/app/studio/analysis/new/schemas';
-import { lyricsFormSchema } from '@/app/studio/lyrics/new/schemas';
-import { styleRemixFormSchema } from '@/app/studio/remix/new/schemas';
-import { separationFormSchema } from '@/app/studio/separation/new/schemas';
+import { musicGenerationFormSchema } from '@/app/studio/(features)/(generation)/new/schemas';
+import { analysisFormSchema } from '@/app/studio/(features)/analysis/new/schemas';
+import { lyricsFormSchema } from '@/app/studio/(features)/lyrics/new/schemas';
+import { styleRemixFormSchema } from '@/app/studio/(features)/remix/new/schemas';
+import { separationFormSchema } from '@/app/studio/(features)/separation/new/schemas';
 import { z } from 'zod';
 
 export const webhookMetadataSchema = z.object({

@@ -6,15 +6,9 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { studioConfig } from '@/config/studio';
 import { getUserSession } from '@/models/user';
-import {
-    HydrationBoundary,
-    QueryClient,
-    dehydrate,
-} from '@tanstack/react-query';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { getUserTracks } from './queries';
 import { StudioSidebar } from './studio-sidebar';
 
 export const metadata: Metadata = {
@@ -36,15 +30,6 @@ const StudioLayout = async ({ children }: StudioLayoutProps) => {
         return redirect('/auth/email-verification');
     }
 
-    const queryClient = new QueryClient();
-    await queryClient.prefetchQuery({
-        queryKey: ['polling-tracks'],
-        queryFn: async () => {
-            const { data } = await getUserTracks({});
-            return data;
-        },
-    });
-
     return (
         <ResizablePanelGroup direction="horizontal" className="flex-1">
             <ResizablePanel
@@ -60,11 +45,7 @@ const StudioLayout = async ({ children }: StudioLayoutProps) => {
                 </aside>
             </ResizablePanel>
             <ResizableHandle className="hidden opacity-30 hover:opacity-100 md:flex" />
-            <ResizablePanel defaultSize={80}>
-                <HydrationBoundary state={dehydrate(queryClient)}>
-                    {children}
-                </HydrationBoundary>
-            </ResizablePanel>
+            <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
         </ResizablePanelGroup>
     );
 };

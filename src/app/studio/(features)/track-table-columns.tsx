@@ -55,7 +55,7 @@ import {
 import Link from 'next/link';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { EditTrackFormType, editTrackFormSchema } from './schemas';
+import { EditTrackFormType, editTrackFormSchema } from '../schemas';
 
 const getStatusIndicator = (status: TrackStatus) => {
     switch (status) {

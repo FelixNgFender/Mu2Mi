@@ -11,7 +11,8 @@ export default function Error({
     reset: () => void;
 }) {
     useEffect(() => {
-        // TODO: Optionally log the error to an error reporting service
+        // The `digest` property is a unique identifier for the error
+        // that can be used to look up the error in the server-side logs.
         console.error(error);
     }, [error]);
 

@@ -18,9 +18,7 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { PresetCard } from '@/components/ui/preset-card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
     Select,
     SelectContent,
@@ -28,11 +26,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { styleRemixAssetConfig } from '@/config/asset';
+import { trackAnalysisAssetConfig } from '@/config/asset';
 import { cn } from '@/lib/utils';
 import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,14 +38,16 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { getPresignedUrl } from '../../actions';
-import { remixTrack } from './actions';
-import chordLargeImage from './assets/chord-large.jpg';
-import chordImage from './assets/chord.jpg';
+import { getPresignedUrl } from '../../../actions';
+import { analyzeTrack } from './actions';
+import allImage from './assets/all.jpg';
+import defaultPresetImage from './assets/default.jpg';
+import withSonificationImage from './assets/with-sonification.jpg';
+import withVisualizationImage from './assets/with-visualization.jpg';
 import {
-    StyleRemixFormType,
-    styleRemixFormSchema,
-    styleRemixModels,
+    AnalysisFormType,
+    analysisFormSchema,
+    trackAnalysisModels,
 } from './schemas';
 
 const steps = [
@@ -62,58 +60,44 @@ const steps = [
         id: 'Step 2',
         name: 'Preferences',
         fields: [
-            'model_version',
-            'prompt',
-            'multi_band_diffusion',
-            'normalization_strategy',
-            'beat_sync_threshold',
-            'large_chord_voca',
-            'chroma_coefficient',
-            'top_k',
-            'top_p',
-            'temperature',
-            'classifier_free_guidance',
-            'output_format',
-            'return_instrumental',
-            'seed',
+            'visualize',
+            'sonify',
+            'activ',
+            'embed',
+            'model',
+            'include_activations',
+            'include_embeddings',
         ],
     },
     { id: 'Step 3', name: 'Upload file' },
 ];
 
-export const RemixForm = () => {
+export const AnalysisForm = () => {
     const { toast } = useToast();
 
     const [file, setFile] = useState<File | null>(null);
     const [selectedPreset, setSelectedPreset] = useState<
-        (typeof remixPresets)[number]['id'] | null
+        (typeof analysisPresets)[number]['id'] | null
     >(null);
     const [previousStep, setPreviousStep] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
     const delta = currentStep - previousStep;
 
-    const form = useForm<StyleRemixFormType>({
-        resolver: zodResolver(styleRemixFormSchema),
+    const form = useForm<AnalysisFormType>({
+        resolver: zodResolver(analysisFormSchema),
         defaultValues: {
             file: null,
-            model_version: 'chord',
-            prompt: '',
-            multi_band_diffusion: false,
-            normalization_strategy: 'loudness',
-            beat_sync_threshold: 0.75,
-            large_chord_voca: true,
-            chroma_coefficient: 1,
-            top_k: 250,
-            top_p: 0,
-            temperature: 1,
-            classifier_free_guidance: 3,
-            output_format: 'mp3',
-            return_instrumental: true,
-            seed: undefined,
+            visualize: false,
+            sonify: false,
+            activ: false,
+            embed: false,
+            model: 'harmonix-all',
+            include_activations: false,
+            include_embeddings: false,
         },
     });
 
-    type FieldName = keyof StyleRemixFormType;
+    type FieldName = keyof AnalysisFormType;
 
     const next = async () => {
         const fields = steps[currentStep]?.fields;
@@ -174,7 +158,7 @@ export const RemixForm = () => {
 
     const handleFileUpload = async (file: File) => {
         const result = await getPresignedUrl({
-            type: file.type as (typeof styleRemixAssetConfig.allowedMimeTypes)[number],
+            type: file.type as (typeof trackAnalysisAssetConfig.allowedMimeTypes)[number],
             extension: file.name.split('.').pop() || '',
             size: file.size,
             checksum: await computeSHA256(file),
@@ -206,7 +190,7 @@ export const RemixForm = () => {
         }
     };
 
-    const onSubmit: SubmitHandler<StyleRemixFormType> = async (data) => {
+    const onSubmit: SubmitHandler<AnalysisFormType> = async (data) => {
         toast({
             description: 'Your file is being uploaded.',
         });
@@ -217,24 +201,17 @@ export const RemixForm = () => {
             return;
         }
 
-        const result = await remixTrack({
+        const result = await analyzeTrack({
             name: data.file.name,
             assetId: assetId,
 
-            model_version: data.model_version,
-            prompt: data.prompt,
-            multi_band_diffusion: data.multi_band_diffusion,
-            normalization_strategy: data.normalization_strategy,
-            beat_sync_threshold: data.beat_sync_threshold,
-            large_chord_voca: data.large_chord_voca,
-            chroma_coefficient: data.chroma_coefficient,
-            top_k: data.top_k,
-            top_p: data.top_p,
-            temperature: data.temperature,
-            classifier_free_guidance: data.classifier_free_guidance,
-            output_format: data.output_format,
-            return_instrumental: data.return_instrumental,
-            seed: data.seed,
+            visualize: data.visualize,
+            sonify: data.sonify,
+            activ: data.activ,
+            embed: data.embed,
+            model: data.model,
+            include_activations: data.include_activations,
+            include_embeddings: data.include_embeddings,
         });
 
         if (result.validationErrors) {
@@ -272,31 +249,64 @@ export const RemixForm = () => {
         });
     };
 
-    const remixPresets: Preset[] = [
+    const analysisPresets: Preset[] = [
         {
-            id: 'chord',
-            icon: chordImage,
+            id: 'default',
+            icon: defaultPresetImage,
             name: 'Default',
             description:
-                "Remixes your track to another style. Uses the 'chord' model.",
-            labels: ['remix', 'chord'],
+                "Analyzes the track's musical structure (tempo, beats, downbeats, section boundaries, and segment labels).",
+            labels: ['analysis'],
             onClick: () => {
                 resetAllButFile();
-                setSelectedPreset('chord');
+                setSelectedPreset('default');
             },
         },
         {
-            id: 'chord-large',
-            icon: chordLargeImage,
-            name: 'High quality',
-            description: 'Takes longer than default, but higher quality.',
-            labels: ['remix', 'chord-large'],
+            id: 'with-visualization',
+            icon: withVisualizationImage,
+            name: 'With visualization',
+            description:
+                "Same as default. Also includes a visualization of the track's musical structure.",
+            labels: ['analysis', 'visualization'],
             onClick: () => {
                 resetAllButFile();
-                form.setValue('model_version', 'chord-large', {
+                form.setValue('visualize', true, {
                     shouldValidate: true,
                 });
-                setSelectedPreset('chord-large');
+                setSelectedPreset('with-visualization');
+            },
+        },
+        {
+            id: 'with-sonification',
+            icon: withSonificationImage,
+            name: 'With sonification',
+            description:
+                'Same as default. Also includes a mix of a click track with section callouts and the original audio.',
+            labels: ['analysis', 'sonification'],
+            onClick: () => {
+                resetAllButFile();
+                form.setValue('sonify', true, {
+                    shouldValidate: true,
+                });
+                setSelectedPreset('with-sonification');
+            },
+        },
+        {
+            id: 'all',
+            icon: allImage,
+            name: 'All',
+            description: 'Includes all available data.',
+            labels: ['analysis', 'sonification', 'visualization'],
+            onClick: () => {
+                resetAllButFile();
+                form.setValue('sonify', true, {
+                    shouldValidate: true,
+                });
+                form.setValue('visualize', true, {
+                    shouldValidate: true,
+                });
+                setSelectedPreset('all');
             },
         },
     ];
@@ -404,7 +414,7 @@ export const RemixForm = () => {
                                                             form.formState
                                                                 .isSubmitting
                                                         }
-                                                        accept={styleRemixAssetConfig.allowedMimeTypes.join(
+                                                        accept={trackAnalysisAssetConfig.allowedMimeTypes.join(
                                                             ', ',
                                                         )}
                                                         dropMessage={
@@ -428,7 +438,7 @@ export const RemixForm = () => {
                                                 </FormControl>
                                                 <FormDescription>
                                                     Supports:{' '}
-                                                    {` ${styleRemixAssetConfig.allowedFileTypes
+                                                    {` ${trackAnalysisAssetConfig.allowedFileTypes
                                                         .map((type) =>
                                                             type.toUpperCase(),
                                                         )
@@ -478,7 +488,7 @@ export const RemixForm = () => {
                                 Choose a preset
                             </h2>
                             <div className="flex flex-col space-y-4 p-4 pt-0">
-                                {remixPresets.map((item) => (
+                                {analysisPresets.map((item) => (
                                     <PresetCard
                                         key={item.id}
                                         item={item}
@@ -486,26 +496,6 @@ export const RemixForm = () => {
                                     />
                                 ))}
                             </div>
-                            <FormField
-                                control={form.control}
-                                name="prompt"
-                                render={({ field }) => (
-                                    <FormItem className="space-y-3">
-                                        <FormLabel>Prompt</FormLabel>
-                                        <FormControl>
-                                            <Textarea
-                                                placeholder="country style"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormDescription>
-                                            A description of the music you want
-                                            to generate.
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
                             <Accordion type="single" collapsible>
                                 <AccordionItem value="item-1">
                                     <AccordionTrigger>
@@ -514,421 +504,15 @@ export const RemixForm = () => {
                                     <AccordionContent className="flex flex-1 flex-col space-y-8 p-4">
                                         <FormField
                                             control={form.control}
-                                            name="model_version"
+                                            name="model"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-3">
                                                     <FormLabel>
-                                                        Model version
+                                                        Model name
                                                     </FormLabel>
                                                     <FormDescription>
-                                                        Choose a model version
-                                                        to remix your track.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <RadioGroup
-                                                            onValueChange={
-                                                                field.onChange
-                                                            }
-                                                            value={field.value}
-                                                            className="flex flex-col space-y-1"
-                                                        >
-                                                            {styleRemixModels.map(
-                                                                (model) => (
-                                                                    <FormItem
-                                                                        key={
-                                                                            model.name
-                                                                        }
-                                                                        className="flex items-center space-x-3 space-y-0"
-                                                                    >
-                                                                        <FormControl>
-                                                                            <RadioGroupItem
-                                                                                value={
-                                                                                    model.name
-                                                                                }
-                                                                            />
-                                                                        </FormControl>
-                                                                        <FormLabel className="font-normal">
-                                                                            {
-                                                                                model.name
-                                                                            }
-                                                                        </FormLabel>
-                                                                    </FormItem>
-                                                                ),
-                                                            )}
-                                                        </RadioGroup>
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="multi_band_diffusion"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
-                                                                field.onChange
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Multi-band diffusion
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            If checked, the
-                                                            EnCodec tokens will
-                                                            be decoded with
-                                                            MultiBand Diffusion.
-                                                            Only works with
-                                                            non-stereo models.
-                                                        </FormDescription>
-                                                    </div>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="normalization_strategy"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <FormLabel>
-                                                        Clip mode
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Strategy for normalizing
-                                                        audio.
-                                                    </FormDescription>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        defaultValue={
-                                                            field.value
-                                                        }
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Choose normalization strategy" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {[
-                                                                'loudness',
-                                                                'clip',
-                                                                'peak',
-                                                                'rms',
-                                                            ].map(
-                                                                (normStrat) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            normStrat
-                                                                        }
-                                                                        value={
-                                                                            normStrat
-                                                                        }
-                                                                    >
-                                                                        {normStrat[0]?.toUpperCase() +
-                                                                            normStrat.slice(
-                                                                                1,
-                                                                            )}
-                                                                    </SelectItem>
-                                                                ),
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="beat_sync_threshold"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Beat sync threshold
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        When beat syncing, if
-                                                        the gap between
-                                                        generated downbeat
-                                                        timing and input audio
-                                                        downbeat timing is
-                                                        larger than this,
-                                                        consider the beats are
-                                                        not corresponding. If
-                                                        empty or -1,
-                                                        &apos;1.1/(bpm/60)&apos;
-                                                        will be used as the
-                                                        value. 0.75 is a good
-                                                        value to set.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="large_chord_voca"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
-                                                                field.onChange
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Multi-band diffusion
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            If checked, more
-                                                            chords like 7th,
-                                                            diminished are used.
-                                                            Else, only the 12
-                                                            major and 12 minor
-                                                            chords are used.
-                                                        </FormDescription>
-                                                    </div>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="chroma_coefficient"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Chroma coefficient:{' '}
-                                                            {field.value}
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            Coefficient value
-                                                            multiplied to
-                                                            multi-hot chord
-                                                            chroma.
-                                                        </FormDescription>
-                                                    </div>
-                                                    <FormControl>
-                                                        <Slider
-                                                            {...field}
-                                                            onValueChange={(
-                                                                v,
-                                                            ) =>
-                                                                field.onChange(
-                                                                    v[0],
-                                                                )
-                                                            }
-                                                            value={[
-                                                                field.value,
-                                                            ]}
-                                                            min={0.5}
-                                                            max={2}
-                                                            step={0.01}
-                                                            className="max-w-64"
-                                                        />
-                                                    </FormControl>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="top_k"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Top k</FormLabel>
-                                                    <FormDescription>
-                                                        Reduces sampling to the
-                                                        k most likely tokens.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="top_p"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Top p</FormLabel>
-                                                    <FormDescription>
-                                                        Reduces sampling to
-                                                        tokens with cumulative
-                                                        probability of p. When
-                                                        set to `0` (default),
-                                                        top_k sampling is used.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="temperature"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Continuation start
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Controls the
-                                                        &apos;conservativeness&apos;
-                                                        of the sampling process.
-                                                        Higher temperature means
-                                                        more diversity.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="classifier_free_guidance"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Classifier-free guidance
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Increases the influence
-                                                        of inputs on the output.
-                                                        Higher values produce
-                                                        lower-varience outputs
-                                                        that adhere more closely
-                                                        to inputs.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="seed"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>Seed</FormLabel>
-                                                    <FormDescription>
-                                                        Seed for random number
-                                                        generator. If empty or
-                                                        -1, a random seed will
-                                                        be used.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="return_instrumental"
-                                            render={({ field }) => (
-                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                                    <FormControl>
-                                                        <Checkbox
-                                                            checked={
-                                                                field.value
-                                                            }
-                                                            onCheckedChange={
-                                                                field.onChange
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <div className="space-y-1 leading-none">
-                                                        <FormLabel>
-                                                            Return instrumental
-                                                        </FormLabel>
-                                                        <FormDescription>
-                                                            If checked, the
-                                                            instrumental audio
-                                                            will also be
-                                                            returned.
-                                                        </FormDescription>
-                                                    </div>
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="output_format"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <FormLabel>
-                                                        Output format
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Output format for
-                                                        generated audio.
+                                                        Choose a model to
+                                                        analyze your track with.
                                                     </FormDescription>
                                                     <Select
                                                         onValueChange={
@@ -938,27 +522,174 @@ export const RemixForm = () => {
                                                     >
                                                         <FormControl>
                                                             <SelectTrigger>
-                                                                <SelectValue placeholder="Choose output format" />
+                                                                <SelectValue placeholder="Choose a model" />
                                                             </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
-                                                            {['mp3', 'wav'].map(
-                                                                (format) => (
+                                                            {trackAnalysisModels.map(
+                                                                (model) => (
                                                                     <SelectItem
                                                                         key={
-                                                                            format
+                                                                            model
                                                                         }
                                                                         value={
-                                                                            format
+                                                                            model
                                                                         }
                                                                     >
-                                                                        {format.toUpperCase()}
+                                                                        {model}
                                                                     </SelectItem>
                                                                 ),
                                                             )}
                                                         </SelectContent>
                                                     </Select>
                                                     <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="visualize"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Visualize track
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Save track
+                                                            analysis&apos;s
+                                                            visualization.
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="sonify"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Sonify track
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Save track
+                                                            analysis&apos;s
+                                                            sonification. This
+                                                            will include a mix
+                                                            of a click track
+                                                            with section
+                                                            callouts and the
+                                                            original audio.
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="activ"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Save activations
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Save frame-level raw
+                                                            activations from
+                                                            sigmoid and softmax
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="include_activations"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Include activations
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Whether to include
+                                                            activations in the
+                                                            analysis results or
+                                                            not.
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="include_embeddings"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Include embeddings
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Whether to include
+                                                            embeddings in the
+                                                            analysis results or
+                                                            not.
+                                                        </FormDescription>
+                                                    </div>
                                                 </FormItem>
                                             )}
                                         />
@@ -984,7 +715,7 @@ export const RemixForm = () => {
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
                                 Your track has been submitted for processing.{' '}
                                 <a
-                                    href="/studio/remix/new"
+                                    href="/studio/analysis/new"
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -992,11 +723,11 @@ export const RemixForm = () => {
                                         'p-0',
                                     )}
                                 >
-                                    Remix a new track
+                                    Analyze a new track
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio/remix"
+                                    href="/studio/analysis"
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -1049,15 +780,15 @@ export const RemixForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/remix/new"
+                            href="/studio/analysis/new"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
                         >
-                            Remix new track
+                            Analyze new track
                         </a>
                         <Link
-                            href="/studio/remix"
+                            href="/studio/analysis"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

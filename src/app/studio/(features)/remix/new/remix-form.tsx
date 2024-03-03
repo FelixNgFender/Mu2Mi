@@ -28,9 +28,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { trackSeparationAssetConfig } from '@/config/asset';
+import { styleRemixAssetConfig } from '@/config/asset';
 import { cn } from '@/lib/utils';
 import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -40,15 +42,14 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { getPresignedUrl } from '../../actions';
-import { separateTrack } from './actions';
-import fourStemsImage from './assets/four-stems.jpg';
-import sixStemsImage from './assets/six-stems.jpg';
-import twoStemsImage from './assets/two-stems.jpg';
+import { getPresignedUrl } from '../../../actions';
+import { remixTrack } from './actions';
+import chordLargeImage from './assets/chord-large.jpg';
+import chordImage from './assets/chord.jpg';
 import {
-    SeparationFormType,
-    separationFormSchema,
-    trackSeparationModels,
+    StyleRemixFormType,
+    styleRemixFormSchema,
+    styleRemixModels,
 } from './schemas';
 
 const steps = [
@@ -61,46 +62,58 @@ const steps = [
         id: 'Step 2',
         name: 'Preferences',
         fields: [
-            'model_name',
-            'stem',
-            'clip_mode',
-            'shifts',
-            'overlap',
-            'mp3_bitrate',
-            'float32',
+            'model_version',
+            'prompt',
+            'multi_band_diffusion',
+            'normalization_strategy',
+            'beat_sync_threshold',
+            'large_chord_voca',
+            'chroma_coefficient',
+            'top_k',
+            'top_p',
+            'temperature',
+            'classifier_free_guidance',
             'output_format',
+            'return_instrumental',
+            'seed',
         ],
     },
     { id: 'Step 3', name: 'Upload file' },
 ];
 
-export const SeparationForm = () => {
+export const RemixForm = () => {
     const { toast } = useToast();
 
     const [file, setFile] = useState<File | null>(null);
     const [selectedPreset, setSelectedPreset] = useState<
-        (typeof separationPresets)[number]['id'] | null
+        (typeof remixPresets)[number]['id'] | null
     >(null);
     const [previousStep, setPreviousStep] = useState(0);
     const [currentStep, setCurrentStep] = useState(0);
     const delta = currentStep - previousStep;
 
-    const form = useForm<SeparationFormType>({
-        resolver: zodResolver(separationFormSchema),
+    const form = useForm<StyleRemixFormType>({
+        resolver: zodResolver(styleRemixFormSchema),
         defaultValues: {
             file: null,
-            model_name: 'htdemucs',
-            stem: undefined,
-            clip_mode: 'rescale',
-            shifts: 1,
-            overlap: 0.25,
-            mp3_bitrate: 320,
-            float32: false,
+            model_version: 'chord',
+            prompt: '',
+            multi_band_diffusion: false,
+            normalization_strategy: 'loudness',
+            beat_sync_threshold: 0.75,
+            large_chord_voca: true,
+            chroma_coefficient: 1,
+            top_k: 250,
+            top_p: 0,
+            temperature: 1,
+            classifier_free_guidance: 3,
             output_format: 'mp3',
+            return_instrumental: true,
+            seed: undefined,
         },
     });
 
-    type FieldName = keyof SeparationFormType;
+    type FieldName = keyof StyleRemixFormType;
 
     const next = async () => {
         const fields = steps[currentStep]?.fields;
@@ -161,7 +174,7 @@ export const SeparationForm = () => {
 
     const handleFileUpload = async (file: File) => {
         const result = await getPresignedUrl({
-            type: file.type as (typeof trackSeparationAssetConfig.allowedMimeTypes)[number],
+            type: file.type as (typeof styleRemixAssetConfig.allowedMimeTypes)[number],
             extension: file.name.split('.').pop() || '',
             size: file.size,
             checksum: await computeSHA256(file),
@@ -193,7 +206,7 @@ export const SeparationForm = () => {
         }
     };
 
-    const onSubmit: SubmitHandler<SeparationFormType> = async (data) => {
+    const onSubmit: SubmitHandler<StyleRemixFormType> = async (data) => {
         toast({
             description: 'Your file is being uploaded.',
         });
@@ -204,18 +217,24 @@ export const SeparationForm = () => {
             return;
         }
 
-        const result = await separateTrack({
+        const result = await remixTrack({
             name: data.file.name,
             assetId: assetId,
 
-            model_name: data.model_name,
-            stem: data.stem,
-            clip_mode: data.clip_mode,
-            shifts: data.shifts,
-            overlap: data.overlap,
-            mp3_bitrate: data.mp3_bitrate,
-            float32: data.float32,
+            model_version: data.model_version,
+            prompt: data.prompt,
+            multi_band_diffusion: data.multi_band_diffusion,
+            normalization_strategy: data.normalization_strategy,
+            beat_sync_threshold: data.beat_sync_threshold,
+            large_chord_voca: data.large_chord_voca,
+            chroma_coefficient: data.chroma_coefficient,
+            top_k: data.top_k,
+            top_p: data.top_p,
+            temperature: data.temperature,
+            classifier_free_guidance: data.classifier_free_guidance,
             output_format: data.output_format,
+            return_instrumental: data.return_instrumental,
+            seed: data.seed,
         });
 
         if (result.validationErrors) {
@@ -253,92 +272,31 @@ export const SeparationForm = () => {
         });
     };
 
-    const separationPresets: Preset[] = [
+    const remixPresets: Preset[] = [
         {
-            id: 'two-stems',
-            icon: twoStemsImage,
-            name: 'Two stems',
-            description: 'Separate your track into vocals and accompaniment.',
-            labels: ['vocals', 'accompaniment'],
+            id: 'chord',
+            icon: chordImage,
+            name: 'Default',
+            description:
+                "Remixes your track to another style. Uses the 'chord' model.",
+            labels: ['remix', 'chord'],
             onClick: () => {
                 resetAllButFile();
-                form.setValue('model_name', 'htdemucs', {
-                    shouldValidate: true,
-                });
-                form.setValue('stem', 'vocals', {
-                    shouldValidate: true,
-                });
-                setSelectedPreset('two-stems');
+                setSelectedPreset('chord');
             },
         },
         {
-            id: 'two-stems-finetuned',
-            icon: twoStemsImage,
-            name: 'Two stems (finetuned)',
-            description:
-                'Same as two stems. Takes longer but improves quality.',
-            labels: ['vocals', 'accompaniment'],
+            id: 'chord-large',
+            icon: chordLargeImage,
+            name: 'High quality',
+            description: 'Takes longer than default, but higher quality.',
+            labels: ['remix', 'chord-large'],
             onClick: () => {
                 resetAllButFile();
-                form.setValue('model_name', 'htdemucs_ft', {
+                form.setValue('model_version', 'chord-large', {
                     shouldValidate: true,
                 });
-                form.setValue('stem', 'vocals', {
-                    shouldValidate: true,
-                });
-                setSelectedPreset('two-stems-finetuned');
-            },
-        },
-        {
-            id: 'four-stems',
-            icon: fourStemsImage,
-            name: 'Four stems',
-            description:
-                'Separate your track into vocals, accompaniment, bass, and drums.',
-            labels: ['vocals', 'accompaniment', 'bass', 'drums'],
-            onClick: () => {
-                resetAllButFile();
-                form.setValue('model_name', 'htdemucs', {
-                    shouldValidate: true,
-                });
-                setSelectedPreset('four-stems');
-            },
-        },
-        {
-            id: 'four-stems-finetuned',
-            icon: fourStemsImage,
-            name: 'Four stems (finetuned)',
-            description:
-                'Same as four stems. Takes longer but improves quality.',
-            labels: ['vocals', 'accompaniment', 'bass', 'drums'],
-            onClick: () => {
-                resetAllButFile();
-                form.setValue('model_name', 'htdemucs_ft', {
-                    shouldValidate: true,
-                });
-                setSelectedPreset('four-stems-finetuned');
-            },
-        },
-        {
-            id: 'six-stems',
-            icon: sixStemsImage,
-            name: 'Six stems',
-            description:
-                'Separate your track into vocals, accompaniment, bass, drums, guitar, and piano.',
-            labels: [
-                'vocals',
-                'accompaniment',
-                'bass',
-                'drums',
-                'guitar',
-                'piano',
-            ],
-            onClick: () => {
-                resetAllButFile();
-                form.setValue('model_name', 'htdemucs_6s', {
-                    shouldValidate: true,
-                });
-                setSelectedPreset('six-stems');
+                setSelectedPreset('chord-large');
             },
         },
     ];
@@ -446,7 +404,7 @@ export const SeparationForm = () => {
                                                             form.formState
                                                                 .isSubmitting
                                                         }
-                                                        accept={trackSeparationAssetConfig.allowedMimeTypes.join(
+                                                        accept={styleRemixAssetConfig.allowedMimeTypes.join(
                                                             ', ',
                                                         )}
                                                         dropMessage={
@@ -470,7 +428,7 @@ export const SeparationForm = () => {
                                                 </FormControl>
                                                 <FormDescription>
                                                     Supports:{' '}
-                                                    {` ${trackSeparationAssetConfig.allowedFileTypes
+                                                    {` ${styleRemixAssetConfig.allowedFileTypes
                                                         .map((type) =>
                                                             type.toUpperCase(),
                                                         )
@@ -520,7 +478,7 @@ export const SeparationForm = () => {
                                 Choose a preset
                             </h2>
                             <div className="flex flex-col space-y-4 p-4 pt-0">
-                                {separationPresets.map((item) => (
+                                {remixPresets.map((item) => (
                                     <PresetCard
                                         key={item.id}
                                         item={item}
@@ -528,6 +486,26 @@ export const SeparationForm = () => {
                                     />
                                 ))}
                             </div>
+                            <FormField
+                                control={form.control}
+                                name="prompt"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-3">
+                                        <FormLabel>Prompt</FormLabel>
+                                        <FormControl>
+                                            <Textarea
+                                                placeholder="country style"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormDescription>
+                                            A description of the music you want
+                                            to generate.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <Accordion type="single" collapsible>
                                 <AccordionItem value="item-1">
                                     <AccordionTrigger>
@@ -536,14 +514,15 @@ export const SeparationForm = () => {
                                     <AccordionContent className="flex flex-1 flex-col space-y-8 p-4">
                                         <FormField
                                             control={form.control}
-                                            name="model_name"
+                                            name="model_version"
                                             render={({ field }) => (
                                                 <FormItem className="space-y-3">
-                                                    <FormLabel>Model</FormLabel>
+                                                    <FormLabel>
+                                                        Model version
+                                                    </FormLabel>
                                                     <FormDescription>
-                                                        Choose a model to
-                                                        separate your track
-                                                        with.
+                                                        Choose a model version
+                                                        to remix your track.
                                                     </FormDescription>
                                                     <FormControl>
                                                         <RadioGroup
@@ -553,7 +532,7 @@ export const SeparationForm = () => {
                                                             value={field.value}
                                                             className="flex flex-col space-y-1"
                                                         >
-                                                            {trackSeparationModels.map(
+                                                            {styleRemixModels.map(
                                                                 (model) => (
                                                                     <FormItem
                                                                         key={
@@ -573,11 +552,6 @@ export const SeparationForm = () => {
                                                                                 model.name
                                                                             }
                                                                         </FormLabel>
-                                                                        <FormDescription className="no-scrollbar overflow-x-auto whitespace-nowrap text-sm">
-                                                                            {
-                                                                                model.description
-                                                                            }
-                                                                        </FormDescription>
                                                                     </FormItem>
                                                                 ),
                                                             )}
@@ -589,242 +563,7 @@ export const SeparationForm = () => {
                                         />
                                         <FormField
                                             control={form.control}
-                                            name="stem"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <FormLabel>
-                                                        Separate into stem
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Only separate audio into
-                                                        the chosen stem and
-                                                        others (no stem).
-                                                        Optional.
-                                                    </FormDescription>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        value={field.value}
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger>
-                                                                {field.value ? (
-                                                                    <SelectValue placeholder="Choose a stem" />
-                                                                ) : (
-                                                                    'Choose a stem'
-                                                                )}
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {[
-                                                                'vocals',
-                                                                'bass',
-                                                                'drums',
-                                                                'guitar',
-                                                                'piano',
-                                                                'other',
-                                                            ].map((stem) => (
-                                                                <SelectItem
-                                                                    key={stem}
-                                                                    value={stem}
-                                                                >
-                                                                    {stem[0]?.toUpperCase() +
-                                                                        stem.slice(
-                                                                            1,
-                                                                        )}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="clip_mode"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <FormLabel>
-                                                        Clip mode
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Strategy for avoiding
-                                                        clipping: rescaling
-                                                        entire signal if
-                                                        necessary (rescale) or
-                                                        hard clipping (clamp).
-                                                    </FormDescription>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        defaultValue={
-                                                            field.value
-                                                        }
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Choose clip mode" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {[
-                                                                'rescale',
-                                                                'clamp',
-                                                            ].map(
-                                                                (clipMode) => (
-                                                                    <SelectItem
-                                                                        key={
-                                                                            clipMode
-                                                                        }
-                                                                        value={
-                                                                            clipMode
-                                                                        }
-                                                                    >
-                                                                        {clipMode[0]?.toUpperCase() +
-                                                                            clipMode.slice(
-                                                                                1,
-                                                                            )}
-                                                                    </SelectItem>
-                                                                ),
-                                                            )}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="shifts"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Shifts
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Number of random shifts
-                                                        for equivariant
-                                                        stabilization. Increase
-                                                        separation time but
-                                                        improves quality of
-                                                        track separation.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="overlap"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        Overlap
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Overlap between the
-                                                        splits.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="output_format"
-                                            render={({ field }) => (
-                                                <FormItem className="space-y-3">
-                                                    <FormLabel>
-                                                        Output format
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Format of the output
-                                                        file.
-                                                    </FormDescription>
-                                                    <Select
-                                                        onValueChange={
-                                                            field.onChange
-                                                        }
-                                                        value={field.value}
-                                                    >
-                                                        <FormControl>
-                                                            <SelectTrigger>
-                                                                <SelectValue placeholder="Choose output format" />
-                                                            </SelectTrigger>
-                                                        </FormControl>
-                                                        <SelectContent>
-                                                            {[
-                                                                'mp3',
-                                                                'wav',
-                                                                'flac',
-                                                            ].map((format) => (
-                                                                <SelectItem
-                                                                    key={format}
-                                                                    value={
-                                                                        format
-                                                                    }
-                                                                >
-                                                                    {format.toUpperCase()}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="mp3_bitrate"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>
-                                                        MP3 bitrate
-                                                    </FormLabel>
-                                                    <FormDescription>
-                                                        Bitrate of the converted
-                                                        MP3 track.
-                                                    </FormDescription>
-                                                    <FormControl>
-                                                        <Input
-                                                            type="number"
-                                                            {...field}
-                                                            disabled={
-                                                                form.formState
-                                                                    .isSubmitting
-                                                            }
-                                                        />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="float32"
+                                            name="multi_band_diffusion"
                                             render={({ field }) => (
                                                 <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                                                     <FormControl>
@@ -839,13 +578,387 @@ export const SeparationForm = () => {
                                                     </FormControl>
                                                     <div className="space-y-1 leading-none">
                                                         <FormLabel>
-                                                            Save as float32
+                                                            Multi-band diffusion
                                                         </FormLabel>
                                                         <FormDescription>
-                                                            Save WAV output as
-                                                            float32 (2x bigger).
+                                                            If checked, the
+                                                            EnCodec tokens will
+                                                            be decoded with
+                                                            MultiBand Diffusion.
+                                                            Only works with
+                                                            non-stereo models.
                                                         </FormDescription>
                                                     </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="normalization_strategy"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-3">
+                                                    <FormLabel>
+                                                        Clip mode
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        Strategy for normalizing
+                                                        audio.
+                                                    </FormDescription>
+                                                    <Select
+                                                        onValueChange={
+                                                            field.onChange
+                                                        }
+                                                        defaultValue={
+                                                            field.value
+                                                        }
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Choose normalization strategy" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {[
+                                                                'loudness',
+                                                                'clip',
+                                                                'peak',
+                                                                'rms',
+                                                            ].map(
+                                                                (normStrat) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            normStrat
+                                                                        }
+                                                                        value={
+                                                                            normStrat
+                                                                        }
+                                                                    >
+                                                                        {normStrat[0]?.toUpperCase() +
+                                                                            normStrat.slice(
+                                                                                1,
+                                                                            )}
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="beat_sync_threshold"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Beat sync threshold
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        When beat syncing, if
+                                                        the gap between
+                                                        generated downbeat
+                                                        timing and input audio
+                                                        downbeat timing is
+                                                        larger than this,
+                                                        consider the beats are
+                                                        not corresponding. If
+                                                        empty or -1,
+                                                        &apos;1.1/(bpm/60)&apos;
+                                                        will be used as the
+                                                        value. 0.75 is a good
+                                                        value to set.
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            {...field}
+                                                            disabled={
+                                                                form.formState
+                                                                    .isSubmitting
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="large_chord_voca"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Multi-band diffusion
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            If checked, more
+                                                            chords like 7th,
+                                                            diminished are used.
+                                                            Else, only the 12
+                                                            major and 12 minor
+                                                            chords are used.
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="chroma_coefficient"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-3">
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Chroma coefficient:{' '}
+                                                            {field.value}
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            Coefficient value
+                                                            multiplied to
+                                                            multi-hot chord
+                                                            chroma.
+                                                        </FormDescription>
+                                                    </div>
+                                                    <FormControl>
+                                                        <Slider
+                                                            {...field}
+                                                            onValueChange={(
+                                                                v,
+                                                            ) =>
+                                                                field.onChange(
+                                                                    v[0],
+                                                                )
+                                                            }
+                                                            value={[
+                                                                field.value,
+                                                            ]}
+                                                            min={0.5}
+                                                            max={2}
+                                                            step={0.01}
+                                                            className="max-w-64"
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="top_k"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Top k</FormLabel>
+                                                    <FormDescription>
+                                                        Reduces sampling to the
+                                                        k most likely tokens.
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            {...field}
+                                                            disabled={
+                                                                form.formState
+                                                                    .isSubmitting
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="top_p"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Top p</FormLabel>
+                                                    <FormDescription>
+                                                        Reduces sampling to
+                                                        tokens with cumulative
+                                                        probability of p. When
+                                                        set to `0` (default),
+                                                        top_k sampling is used.
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            {...field}
+                                                            disabled={
+                                                                form.formState
+                                                                    .isSubmitting
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="temperature"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Continuation start
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        Controls the
+                                                        &apos;conservativeness&apos;
+                                                        of the sampling process.
+                                                        Higher temperature means
+                                                        more diversity.
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            {...field}
+                                                            disabled={
+                                                                form.formState
+                                                                    .isSubmitting
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="classifier_free_guidance"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>
+                                                        Classifier-free guidance
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        Increases the influence
+                                                        of inputs on the output.
+                                                        Higher values produce
+                                                        lower-varience outputs
+                                                        that adhere more closely
+                                                        to inputs.
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            {...field}
+                                                            disabled={
+                                                                form.formState
+                                                                    .isSubmitting
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="seed"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>Seed</FormLabel>
+                                                    <FormDescription>
+                                                        Seed for random number
+                                                        generator. If empty or
+                                                        -1, a random seed will
+                                                        be used.
+                                                    </FormDescription>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            {...field}
+                                                            disabled={
+                                                                form.formState
+                                                                    .isSubmitting
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="return_instrumental"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={
+                                                                field.value
+                                                            }
+                                                            onCheckedChange={
+                                                                field.onChange
+                                                            }
+                                                        />
+                                                    </FormControl>
+                                                    <div className="space-y-1 leading-none">
+                                                        <FormLabel>
+                                                            Return instrumental
+                                                        </FormLabel>
+                                                        <FormDescription>
+                                                            If checked, the
+                                                            instrumental audio
+                                                            will also be
+                                                            returned.
+                                                        </FormDescription>
+                                                    </div>
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="output_format"
+                                            render={({ field }) => (
+                                                <FormItem className="space-y-3">
+                                                    <FormLabel>
+                                                        Output format
+                                                    </FormLabel>
+                                                    <FormDescription>
+                                                        Output format for
+                                                        generated audio.
+                                                    </FormDescription>
+                                                    <Select
+                                                        onValueChange={
+                                                            field.onChange
+                                                        }
+                                                        value={field.value}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger>
+                                                                <SelectValue placeholder="Choose output format" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {['mp3', 'wav'].map(
+                                                                (format) => (
+                                                                    <SelectItem
+                                                                        key={
+                                                                            format
+                                                                        }
+                                                                        value={
+                                                                            format
+                                                                        }
+                                                                    >
+                                                                        {format.toUpperCase()}
+                                                                    </SelectItem>
+                                                                ),
+                                                            )}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
@@ -871,7 +984,7 @@ export const SeparationForm = () => {
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
                                 Your track has been submitted for processing.{' '}
                                 <a
-                                    href="/studio/separation/new"
+                                    href="/studio/remix/new"
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -879,11 +992,11 @@ export const SeparationForm = () => {
                                         'p-0',
                                     )}
                                 >
-                                    Separate a new track
+                                    Remix a new track
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio/separation"
+                                    href="/studio/remix"
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -936,15 +1049,15 @@ export const SeparationForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/separation/new"
+                            href="/studio/remix/new"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
                         >
-                            Separate new track
+                            Remix new track
                         </a>
                         <Link
-                            href="/studio/separation"
+                            href="/studio/remix"
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

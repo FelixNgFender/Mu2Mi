@@ -1,5 +1,6 @@
 'use client';
 
+import { getPresignedUrl } from '@/app/studio/actions';
 import {
     Accordion,
     AccordionContent,
@@ -40,7 +41,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { getPresignedUrl } from '../../actions';
 import { generateMusic } from './actions';
 import melodyLargeImage from './assets/melody-large.jpg';
 import stereoMelodyImage from './assets/stereo-melody-large.jpg';
