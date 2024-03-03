@@ -1,4 +1,4 @@
-import { downloadUserTrackAssets } from '@/app/studio/queries';
+import { downloadPublicTrackAssets } from '@/app/studio/queries';
 import { formatValidationErrors } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 
@@ -12,18 +12,16 @@ type MidiTrackPageProps = {
     params: {
         id: string;
     };
-    searchParams: { callback?: string };
 };
 
-const MidiTrackPage = async ({ params, searchParams }: MidiTrackPageProps) => {
+const MidiTrackPage = async ({ params }: MidiTrackPageProps) => {
     const trackId = params.id;
-    const callback = searchParams.callback;
 
     const {
         data: assetLinks,
         validationErrors,
         serverError,
-    } = await downloadUserTrackAssets({
+    } = await downloadPublicTrackAssets({
         trackId,
     });
 
@@ -38,7 +36,7 @@ const MidiTrackPage = async ({ params, searchParams }: MidiTrackPageProps) => {
     return (
         <MidiPlayer
             initialURL={assetLinks.find((a) => a.type === 'midi')?.url}
-            callback={callback ? callback : undefined}
+            isPublic
         />
     );
 };

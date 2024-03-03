@@ -14,7 +14,7 @@ import {
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import { pollUserTracks } from './actions';
+import { getUserTracks } from './queries';
 import { StudioSidebar } from './studio-sidebar';
 
 export const metadata: Metadata = {
@@ -40,7 +40,7 @@ const StudioLayout = async ({ children }: StudioLayoutProps) => {
     await queryClient.prefetchQuery({
         queryKey: ['polling-tracks'],
         queryFn: async () => {
-            const { data } = await pollUserTracks({});
+            const { data } = await getUserTracks({});
             return data;
         },
     });

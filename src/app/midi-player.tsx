@@ -36,9 +36,14 @@ import './midi-player.css';
 type MidiPlayerProps = {
     initialURL?: string;
     callback?: string;
+    isPublic?: boolean;
 };
 
-const MidiPlayer = ({ initialURL, callback }: MidiPlayerProps) => {
+const MidiPlayer = ({
+    initialURL,
+    callback,
+    isPublic = false,
+}: MidiPlayerProps) => {
     const playerRef = useRef<SoundFontPlayer | null>(null);
     const svgRef = useRef<SVGSVGElement | null>(null);
     const waterfallRef = useRef<HTMLDivElement | null>(null);
@@ -256,55 +261,63 @@ const MidiPlayer = ({ initialURL, callback }: MidiPlayerProps) => {
                 </div>
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
-            {!callback && (
-                <Dropzone
-                    classNameWrapper="w-full flex-1 max-h-64"
-                    className="h-full w-full"
-                    name="midi"
-                    disabled={isPlaying}
-                    aria-disabled={isPlaying}
-                    accept="audio/midi"
-                    dropMessage={file ? file.name : "Drop like it's hot 🔥"}
-                    handleOnDrop={async (acceptedFiles: FileList | null) => {
-                        if (!acceptedFiles || !acceptedFiles[0]) {
-                            return;
-                        }
-                        setFile(acceptedFiles[0]);
-                        try {
-                            const ns = await blobToNoteSequence(
-                                acceptedFiles[0],
-                            );
-                            await initPlayerAndVisualizers(ns);
-                        } catch (error) {
-                            toast({
-                                variant: 'destructive',
-                                title: 'Uh oh! Something went wrong.',
-                                description: (error as Error).message || '',
-                            });
-                        }
-                    }}
-                />
+            {!callback && !isPublic && (
+                <>
+                    <Dropzone
+                        classNameWrapper="w-full flex-1 max-h-64"
+                        className="h-full w-full"
+                        name="midi"
+                        disabled={isPlaying}
+                        aria-disabled={isPlaying}
+                        accept="audio/midi"
+                        dropMessage={file ? file.name : "Drop like it's hot 🔥"}
+                        handleOnDrop={async (
+                            acceptedFiles: FileList | null,
+                        ) => {
+                            if (!acceptedFiles || !acceptedFiles[0]) {
+                                return;
+                            }
+                            setFile(acceptedFiles[0]);
+                            try {
+                                const ns = await blobToNoteSequence(
+                                    acceptedFiles[0],
+                                );
+                                await initPlayerAndVisualizers(ns);
+                            } catch (error) {
+                                toast({
+                                    variant: 'destructive',
+                                    title: 'Uh oh! Something went wrong.',
+                                    description: (error as Error).message || '',
+                                });
+                            }
+                        }}
+                    />
+                    <Input
+                        type="url"
+                        name="midiUrl"
+                        disabled={isPlaying}
+                        value={midiUrl || ''}
+                        placeholder="Enter a MIDI URL"
+                        onChange={async (
+                            e: React.ChangeEvent<HTMLInputElement>,
+                        ) => {
+                            try {
+                                setMidiUrl(e.target.value);
+                                const ns = await urlToNoteSequence(
+                                    e.target.value,
+                                );
+                                await initPlayerAndVisualizers(ns);
+                            } catch (error) {
+                                toast({
+                                    variant: 'destructive',
+                                    title: 'Uh oh! Something went wrong.',
+                                    description: (error as Error).message || '',
+                                });
+                            }
+                        }}
+                    />
+                </>
             )}
-            <Input
-                type="url"
-                name="midiUrl"
-                disabled={isPlaying}
-                value={midiUrl || ''}
-                placeholder="Enter a MIDI URL"
-                onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
-                    try {
-                        setMidiUrl(e.target.value);
-                        const ns = await urlToNoteSequence(e.target.value);
-                        await initPlayerAndVisualizers(ns);
-                    } catch (error) {
-                        toast({
-                            variant: 'destructive',
-                            title: 'Uh oh! Something went wrong.',
-                            description: (error as Error).message || '',
-                        });
-                    }
-                }}
-            />
             <Card className="w-full flex-1">
                 <CardContent className="flex h-full flex-col items-center justify-around space-y-8">
                     {!currentSequence && (

@@ -1,6 +1,6 @@
 import { env } from '@/config/env';
 import { logger } from '@/lib/logger';
-import { DrizzleLogger } from 'drizzle-orm/logger';
+import { Logger as DrizzleLogger } from 'drizzle-orm/logger';
 import { PostgresJsDatabase, drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import 'server-only';

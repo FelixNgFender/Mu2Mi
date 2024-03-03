@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Slider } from '@/components/ui/slider';
-import { cn } from '@/lib/utils';
 import { LyricsTranscriptionWebhookBody } from '@/types/replicate';
 import {
     FastForward,
@@ -26,8 +25,6 @@ export const KaraokePlayer = ({
     audioSrc,
     lyrics: fetchedLyrics,
 }: KaraokePageProps) => {
-    const lyricsContainerRef = useRef<HTMLDivElement>(null);
-    const [scrollAreaHeight, setScrollAreaHeight] = useState(0);
     const [currentLine, setCurrentLine] = useState(0);
     const [timeProgress, setTimeProgress] = useState(0);
     const [duration, setDuration] = useState(0);
@@ -90,12 +87,6 @@ export const KaraokePlayer = ({
         }
     }, [volume, audioRef]);
 
-    useEffect(() => {
-        if (lyricsContainerRef.current) {
-            setScrollAreaHeight(lyricsContainerRef.current.clientHeight);
-        }
-    }, [lyricsContainerRef.current?.clientHeight]);
-
     const handleSkipBack = () => {
         if (audioRef.current) {
             audioRef.current.currentTime = 0;
@@ -152,11 +143,8 @@ export const KaraokePlayer = ({
                 Your browser does not support the
                 <code>audio</code> element.
             </audio>
-            <div className="flex-1" ref={lyricsContainerRef}>
-                <ScrollArea
-                    className="mx-auto max-w-[512px] space-y-2"
-                    style={{ height: scrollAreaHeight }}
-                >
+            <div className="flex-1">
+                <ScrollArea className="m-auto h-[530px] max-w-[512px] space-y-2 sm:h-[720px]">
                     {lyrics.current.map((line, index) => (
                         <Button
                             key={index}
@@ -164,7 +152,7 @@ export const KaraokePlayer = ({
                                 index === currentLine ? 'default' : 'ghost'
                             }
                             size="lg"
-                            className="w-full justify-start whitespace-normal rounded-none px-4 py-2 text-left font-semibold transition-colors duration-200"
+                            className="m-2 block h-auto w-full justify-start whitespace-normal rounded-none px-4 py-2 text-left font-semibold transition-colors duration-200"
                             onClick={() => {
                                 if (audioRef.current) {
                                     audioRef.current.currentTime =

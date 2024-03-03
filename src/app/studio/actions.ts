@@ -13,57 +13,50 @@ import {
 } from '@/models/asset';
 import {
     deleteOne as deleteOneTrack,
-    findManyByUserId as findManyTracksByUserId,
+    findOne as findOneTrack,
+    updateOne as updateOneTrack,
 } from '@/models/track';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
-const pollTracksSchema = z.object({});
+import {
+    downloadUserTrackAssets as downloadUserTrackAssetsQuery,
+    getUserTracks as getUserTracksQuery,
+} from './queries';
 
-/**
- * Server Action for this query because I don't want to write Route Handler. And
- * it's needed for real-time updates.
+/*
+ * Here we are re-exporting the queries to make them Server Actions
+ * so they can be used in Client Components.
  */
-export const pollUserTracks = authAction(
-    pollTracksSchema,
-    async ({}, { user }) => {
-        return await findManyTracksByUserId(user.id);
-    },
-);
 
-const downloadTrackSchema = z.object({
-    trackId: z.string(),
-});
+export const pollUserTracks = getUserTracksQuery;
 
-export const downloadTrack = authAction(
-    downloadTrackSchema,
-    async ({ trackId }) => {
-        const trackAssets = await findManyAssetsByTrackId(trackId);
-        const promises = trackAssets.map(async (asset) => {
-            const url = await fileStorage
-                .presignedGetObject(
-                    env.S3_BUCKET_NAME,
-                    asset.name,
-                    env.S3_PRESIGNED_URL_EXPIRATION_S,
-                )
-                .catch((err) => {
-                    throw new AppError('FatalError', err.message, true);
-                });
-            return { id: asset.id, url, type: asset.type };
-        });
-        const assets = await Promise.all(promises);
-        return assets;
-    },
-);
+export const downloadUserTrackAssets = downloadUserTrackAssetsQuery;
 
 const deleteTrackSchema = z.object({
     trackId: z.string(),
 });
 
-export const deleteTrack = authAction(
+export const deleteUserTrack = authAction(
     deleteTrackSchema,
-    async ({ trackId }) => {
+    async ({ trackId }, { user }) => {
         const assets = await findManyAssetsByTrackId(trackId);
+        if (!assets.length) {
+            throw new AppError(
+                'HttpError',
+                httpStatus.clientError.notFound.humanMessage,
+                true,
+                httpStatus.clientError.notFound.code,
+            );
+        }
+        if (assets.some((asset) => asset.userId !== user.id)) {
+            throw new AppError(
+                'HttpError',
+                'Sorry, you are not allowed to delete this track',
+                true,
+                httpStatus.clientError.unauthorized.code,
+            );
+        }
         await fileStorage.removeObjects(
             env.S3_BUCKET_NAME,
             assets.map((asset) => asset.name),
@@ -111,5 +104,66 @@ export const getPresignedUrl = authAction(
             url,
             assetId: newAsset.id,
         };
+    },
+);
+
+const shareUserTrackSchema = z.object({
+    trackId: z.string(),
+    isPublic: z.boolean(),
+});
+
+export const shareUserTrack = authAction(
+    shareUserTrackSchema,
+    async ({ trackId, isPublic }, { user }) => {
+        const track = await findOneTrack(trackId);
+        if (!track) {
+            throw new AppError(
+                'HttpError',
+                httpStatus.clientError.notFound.humanMessage,
+                true,
+                httpStatus.clientError.notFound.code,
+            );
+        }
+        if (track.userId !== user.id) {
+            throw new AppError(
+                'HttpError',
+                'Sorry, you are not allowed to share this track',
+                true,
+                httpStatus.clientError.unauthorized.code,
+            );
+        }
+        await updateOneTrack(trackId, { public: isPublic });
+        revalidatePath('/studio');
+    },
+);
+
+const updateTrackSchema = z.object({
+    trackId: z.string(),
+    name: z.string(),
+    public: z.boolean().optional(),
+});
+
+export const updateTrack = authAction(
+    updateTrackSchema,
+    async ({ trackId, name, public: isPublic }, { user }) => {
+        const track = await findOneTrack(trackId);
+        if (!track) {
+            throw new AppError(
+                'HttpError',
+                httpStatus.clientError.notFound.humanMessage,
+                true,
+                httpStatus.clientError.notFound.code,
+            );
+        }
+        if (track.userId !== user.id) {
+            throw new AppError(
+                'HttpError',
+                'Sorry, you are not allowed to update this track',
+                true,
+                httpStatus.clientError.unauthorized.code,
+            );
+        }
+        await updateOneTrack(trackId, { name, public: isPublic });
+        revalidatePath('/studio');
     },
 );

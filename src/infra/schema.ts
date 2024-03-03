@@ -1,6 +1,5 @@
 // This file should not contain any runtime logic besides defining the schema.
 // See https://orm.drizzle.team/docs/migrations#quick-start
-import { getTableColumns } from 'drizzle-orm';
 import {
     boolean,
     index,
@@ -241,6 +240,7 @@ export const trackTable = pgTable(
             .notNull()
             .references(() => userTable.id, cascadingUpdateAndDelete),
         name: text('name').notNull(),
+        public: boolean('public').notNull().default(false),
         musicGenerationStatus: trackStatusEnum('music_generation_status'),
         styleRemixStatus: trackStatusEnum('style_remix_status'),
         trackSeparationStatus: trackStatusEnum('track_separation_status'),

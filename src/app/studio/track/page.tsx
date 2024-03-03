@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 
-const AudioPlayer = dynamic(() => import('./audio-player'), {
+const AudioPlayer = dynamic(() => import('@/app/audio-player'), {
     ssr: false,
     // TODO: replace this
     loading: () => <p>Loading...</p>,

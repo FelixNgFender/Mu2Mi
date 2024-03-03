@@ -46,7 +46,12 @@ export const Account = async ({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant={variant} className={className} size={size}>
+                <Button
+                    variant={variant}
+                    className={className}
+                    size={size}
+                    title="Account"
+                >
                     <User className="h-5 w-5" />
                     <span className="sr-only">Manage account</span>
                 </Button>

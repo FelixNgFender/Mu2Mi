@@ -20,15 +20,20 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import WaveformPlaylist from 'waveform-playlist';
 
-import { downloadTrack } from '../actions';
 import './audio-player.css';
+import { downloadUserTrackAssets } from './studio/actions';
 
 type TrackPageProps = {
-    assetLinks: Awaited<ReturnType<typeof downloadTrack>>['data'];
+    assetLinks: Awaited<ReturnType<typeof downloadUserTrackAssets>>['data'];
     callback?: string;
+    isPublic?: boolean;
 };
 
-const AudioPlayer = ({ assetLinks, callback }: TrackPageProps) => {
+const AudioPlayer = ({
+    assetLinks,
+    callback,
+    isPublic = false,
+}: TrackPageProps) => {
     const [hasDropped, setHasDropped] = useState(false);
     const [ee] = useState(new EventEmitter());
     const playlist = useRef<HTMLDivElement | null>(null);
@@ -214,7 +219,7 @@ const AudioPlayer = ({ assetLinks, callback }: TrackPageProps) => {
                 </div>
                 <ScrollBar orientation="horizontal" />
             </ScrollArea>
-            {!callback && !hasDropped && (
+            {!callback && !hasDropped && !isPublic && (
                 <Dropzone
                     classNameWrapper="w-full flex-1 max-h-64"
                     className="h-full w-full"

@@ -1,4 +1,4 @@
-import { downloadUserTrackAssets } from '@/app/studio/queries';
+import { downloadPublicTrackAssets } from '@/app/studio/queries';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { formatValidationErrors } from '@/lib/utils';
 import dynamic from 'next/dynamic';
@@ -26,18 +26,16 @@ type TrackPageProps = {
     params: {
         id: string;
     };
-    searchParams: { callback?: string };
 };
 
-const TrackPage = async ({ params, searchParams }: TrackPageProps) => {
+const TrackPage = async ({ params }: TrackPageProps) => {
     const trackId = params.id;
-    const callback = searchParams.callback;
 
     const {
         data: assetLinks,
         validationErrors,
         serverError,
-    } = await downloadUserTrackAssets({
+    } = await downloadPublicTrackAssets({
         trackId,
     });
 
@@ -57,7 +55,7 @@ const TrackPage = async ({ params, searchParams }: TrackPageProps) => {
                         link.type !== 'analysis_viz' &&
                         link.type !== 'analysis',
                 )}
-                callback={callback ? callback : undefined}
+                isPublic
             />
             {assetLinks.find((link) => link.type === 'analysis_viz') && (
                 <ScrollArea className="w-full whitespace-nowrap rounded-md border px-4 py-2 sm:border-0">

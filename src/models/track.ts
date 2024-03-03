@@ -61,6 +61,8 @@ const findOne = async (id: string) => {
     return await db.query.trackTable.findFirst({
         where: eq(trackTable.id, id),
         columns: {
+            userId: true,
+            public: true,
             musicGenerationStatus: true,
             styleRemixStatus: true,
             trackSeparationStatus: true,
@@ -77,6 +79,7 @@ const findManyByUserId = async (userId: string) => {
         columns: {
             id: true,
             name: true,
+            public: true,
             musicGenerationStatus: true,
             styleRemixStatus: true,
             trackSeparationStatus: true,

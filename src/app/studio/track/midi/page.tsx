@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 
-const MidiPlayer = dynamic(() => import('./midi-player'), {
+const MidiPlayer = dynamic(() => import('@/app/midi-player'), {
     ssr: false,
     // TODO: replace this
     loading: () => <p>Loading...</p>,

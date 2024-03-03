@@ -1,6 +1,6 @@
 import { db } from '@/infra';
 import { assetTable } from '@/infra/schema';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import 'server-only';
 
 type NewAsset = Omit<typeof assetTable.$inferInsert, 'createdAt' | 'updatedAt'>;
@@ -24,6 +24,7 @@ const findManyByTrackId = async (trackId: string) => {
             id: true,
             name: true,
             type: true,
+            userId: true,
         },
     });
 };
