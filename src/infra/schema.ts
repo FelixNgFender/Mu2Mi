@@ -179,7 +179,6 @@ export const trackAssetType = pgEnum('track_asset_type', [
     'lyrics',
 ]);
 
-// TODO: Opportunity to optimize: use DB as soft cache before hitting S3
 export const assetTable = pgTable(
     'asset',
     {
