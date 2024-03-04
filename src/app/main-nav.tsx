@@ -4,8 +4,11 @@ import { Icons } from '@/components/icons';
 import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function MainNav() {
+    const pathname = usePathname();
+
     return (
         <div className="mr-4 hidden md:flex">
             <Link
@@ -18,9 +21,25 @@ export function MainNav() {
             <nav className="flex items-center gap-6 text-sm">
                 <Link
                     href={siteConfig.paths.studio.home}
-                    className="transition-colors hover:text-foreground/80"
+                    className={cn(
+                        'transition-colors hover:text-foreground/80',
+                        pathname === siteConfig.paths.studio.home
+                            ? 'text-foreground'
+                            : 'text-foreground/60',
+                    )}
                 >
                     Studio
+                </Link>
+                <Link
+                    href={siteConfig.paths.pricing}
+                    className={cn(
+                        'transition-colors hover:text-foreground/80',
+                        pathname === siteConfig.paths.pricing
+                            ? 'text-foreground'
+                            : 'text-foreground/60',
+                    )}
+                >
+                    Pricing
                 </Link>
                 <Link
                     href={siteConfig.links.github}

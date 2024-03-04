@@ -2,6 +2,7 @@ import { Icons } from '@/components/icons';
 import { MainNavItem, SidebarNavItem } from '@/types/studio';
 import {
     Activity,
+    BadgeDollarSign,
     BrainCircuit,
     Disc3,
     FileAudio,
@@ -24,6 +25,11 @@ export const studioConfig: StudioConfig = {
             title: 'Studio',
             href: siteConfig.paths.studio.home,
             icon: <KeyboardMusic />,
+        },
+        {
+            title: 'Pricing',
+            href: siteConfig.paths.pricing,
+            icon: <BadgeDollarSign />,
         },
         {
             title: 'GitHub',

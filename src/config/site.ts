@@ -20,6 +20,7 @@ export const siteConfig = {
             terms: '/legal/terms',
             privacy: '/legal/privacy',
         },
+        pricing: '/pricing',
         studio: {
             home: '/studio',
             musicGeneration: '/studio',
