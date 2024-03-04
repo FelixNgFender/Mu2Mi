@@ -1,5 +1,6 @@
 'use client';
 
+import { getPresignedUrl } from '@/app/studio/actions';
 import {
     Accordion,
     AccordionContent,
@@ -36,6 +37,7 @@ import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { lyricsTranscriptionAssetConfig } from '@/config/asset';
+import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
 import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -51,7 +53,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { getPresignedUrl } from '../../../actions';
 import { transcribeLyrics } from './actions';
 import transcribeEnglishImage from './assets/transcribe-english.jpg';
 import transcribeJapaneseImage from './assets/transcribe-japanese.jpg';
@@ -726,7 +727,10 @@ export const LyricsForm = () => {
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
                                 Your track has been submitted for processing.{' '}
                                 <a
-                                    href="/studio/lyrics/new"
+                                    href={
+                                        siteConfig.paths.studio
+                                            .newLyricsTranscription
+                                    }
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -738,7 +742,10 @@ export const LyricsForm = () => {
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio/lyrics"
+                                    href={
+                                        siteConfig.paths.studio
+                                            .lyricsTranscription
+                                    }
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -791,7 +798,9 @@ export const LyricsForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/lyrics/new"
+                            href={
+                                siteConfig.paths.studio.newLyricsTranscription
+                            }
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
@@ -799,7 +808,7 @@ export const LyricsForm = () => {
                             Transcribe new track
                         </a>
                         <Link
-                            href="/studio/lyrics"
+                            href={siteConfig.paths.studio.lyricsTranscription}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

@@ -23,6 +23,7 @@
 // };
 // import { ServerClient } from 'postmark';
 import { env } from '@/config/env';
+import { siteConfig } from '@/config/site';
 import { logger } from '@/lib/logger';
 import 'server-only';
 
@@ -54,7 +55,7 @@ Your email verification code is: ${code}
 };
 
 export const sendPasswordResetLink = async (email: string, token: string) => {
-    const url = `${env.ORIGIN}/auth/password-reset/${token}`;
+    const url = `${env.ORIGIN}${siteConfig.paths.auth.passwordReset}/${token}`;
 
     if (!env.ENABLE_EMAIL) {
         logger.info(`

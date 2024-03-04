@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site';
 import { getUserSession } from '@/models/user';
 import { redirect } from 'next/navigation';
 
@@ -8,18 +9,18 @@ const GenerationPage = async () => {
     const { user } = await getUserSession();
 
     if (!user) {
-        return redirect('/auth/sign-in');
+        return redirect(siteConfig.paths.auth.signIn);
     }
 
     if (!user.emailVerified) {
-        return redirect('/auth/email-verification');
+        return redirect(siteConfig.paths.auth.emailVerification);
     }
 
     return (
         <>
             <FeatureHeader
                 title="Music Generation"
-                href="studio/new"
+                href={siteConfig.paths.studio.newMusicGeneration}
                 ctaLabel="Create Track"
             />
             <TrackTable filter="musicGenerationStatus" />

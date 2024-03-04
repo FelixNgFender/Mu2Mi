@@ -4,6 +4,7 @@ import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { siteConfig } from '@/config/site';
 import { studioConfig } from '@/config/studio';
 import { cn } from '@/lib/utils';
 import Link, { LinkProps } from 'next/link';
@@ -54,7 +55,7 @@ export function MobileNav() {
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
                 <MobileLink
-                    href="/"
+                    href={siteConfig.paths.home}
                     className="flex items-center"
                     onOpenChange={setOpen}
                 >

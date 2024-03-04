@@ -1,5 +1,6 @@
 'use server';
 
+import { siteConfig } from '@/config/site';
 import { auth } from '@/lib/auth';
 import { sendEmailVerificationCode } from '@/lib/email';
 import { action } from '@/lib/safe-action';
@@ -50,5 +51,5 @@ export const signUp = action(signUpSchema, async ({ email, password }) => {
         sessionCookie.value,
         sessionCookie.attributes,
     );
-    redirect('/auth/email-verification');
+    redirect(siteConfig.paths.auth.emailVerification);
 });

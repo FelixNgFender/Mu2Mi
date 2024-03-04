@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site';
 import { getUserSession } from '@/models/user';
 import { redirect } from 'next/navigation';
 
@@ -8,8 +9,9 @@ interface NewPasswordLayoutProps {
 const NewPasswordLayout = async ({ children }: NewPasswordLayoutProps) => {
     const { user } = await getUserSession();
     if (user) {
-        if (!user.emailVerified) return redirect('/auth/email-verification');
-        return redirect('/');
+        if (!user.emailVerified)
+            return redirect(siteConfig.paths.auth.emailVerification);
+        return redirect(siteConfig.paths.home);
     }
 
     return <>{children}</>;

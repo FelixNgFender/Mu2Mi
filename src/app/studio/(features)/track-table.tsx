@@ -2,6 +2,7 @@
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { DataTable } from '@/components/ui/data-table';
+import { siteConfig } from '@/config/site';
 import { TrackStatusColumn } from '@/types/studio';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle } from 'lucide-react';
@@ -11,21 +12,17 @@ import { pollUserTracks } from '../actions';
 import { trackTableColumnsBuiler } from './track-table-columns';
 
 const previewPathMap: Record<string, string> = {
-    '/studio': '/studio/track',
-    '/studio/remix': '/studio/track',
-    '/studio/separation': '/studio/track',
-    '/studio/analysis': '/studio/track',
-    '/studio/midi': '/studio/track/midi',
-    '/studio/lyrics': '/studio/track/karaoke',
-};
-
-const callbackMap: Record<string, string> = {
-    '/studio': '/studio',
-    '/studio/remix': '/studio/remix',
-    '/studio/separation': '/studio/separation',
-    '/studio/analysis': '/studio/analysis',
-    '/studio/midi': '/studio/midi',
-    '/studio/lyrics': '/studio/lyrics',
+    [siteConfig.paths.studio.musicGeneration]:
+        siteConfig.paths.studio.preview.track,
+    [siteConfig.paths.studio.styleRemix]: siteConfig.paths.studio.preview.track,
+    [siteConfig.paths.studio.trackSeparation]:
+        siteConfig.paths.studio.preview.track,
+    [siteConfig.paths.studio.trackAnalysis]:
+        siteConfig.paths.studio.preview.track,
+    [siteConfig.paths.studio.midiTranscription]:
+        siteConfig.paths.studio.preview.midi,
+    [siteConfig.paths.studio.lyricsTranscription]:
+        siteConfig.paths.studio.preview.karaoke,
 };
 
 type TrackTableProps = {
@@ -70,7 +67,7 @@ export const TrackTable = ({ filter }: TrackTableProps) => {
             columns={trackTableColumnsBuiler(
                 filter,
                 previewPathMap[pathname],
-                callbackMap[pathname],
+                pathname,
             )}
             data={tracks.filter((track) => track[filter])}
         />

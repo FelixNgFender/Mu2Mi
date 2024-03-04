@@ -31,6 +31,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
+import { siteConfig } from '@/config/site';
 import { cn, formatValidationErrors } from '@/lib/utils';
 import type { ReturnedTrack } from '@/models/track';
 import { TrackStatus, TrackStatusColumn } from '@/types/studio';
@@ -284,12 +285,12 @@ const ShareButton = ({ track }: { track: ReturnedTrack }) => {
             return '';
         }
         if (track.midiTranscriptionStatus) {
-            return `${window.location.origin}/preview/midi/${track.id}`;
+            return `${window.location.origin}${siteConfig.paths.preview.midi}/${track.id}`;
         }
         if (track.lyricsTranscriptionStatus) {
-            return `${window.location.origin}/preview/karaoke/${track.id}`;
+            return `${window.location.origin}${siteConfig.paths.preview.karaoke}/${track.id}`;
         }
-        return `${window.location.origin}/preview/${track.id}`;
+        return `${window.location.origin}${siteConfig.paths.preview.track}/${track.id}`;
     };
 
     const handleShare = async () => {

@@ -1,3 +1,5 @@
+import { siteConfig } from '@/config/site';
+
 import { FeatureHeader } from '../feature-header';
 import { TrackTable } from '../track-table';
 
@@ -6,7 +8,7 @@ const SeparationPage = async () => {
         <>
             <FeatureHeader
                 title="Track Separation"
-                href="separation/new"
+                href={siteConfig.paths.studio.newTrackSeparation}
                 ctaLabel="Upload Track"
             />
             <TrackTable filter="trackSeparationStatus" />

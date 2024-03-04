@@ -18,13 +18,11 @@ interface StudioConfig {
     sidebarNav: SidebarNavItem[];
 }
 
-export const baseStudioPath = '/studio';
-
 export const studioConfig: StudioConfig = {
     mainNav: [
         {
             title: 'Studio',
-            href: baseStudioPath,
+            href: siteConfig.paths.studio.home,
             icon: <KeyboardMusic />,
         },
         {
@@ -44,13 +42,13 @@ export const studioConfig: StudioConfig = {
             items: [
                 {
                     title: 'Music Generation',
-                    href: `${baseStudioPath}`,
+                    href: siteConfig.paths.studio.musicGeneration,
                     items: [],
                     icon: <BrainCircuit />,
                 },
                 {
                     title: 'Style Remix',
-                    href: `${baseStudioPath}/remix`,
+                    href: siteConfig.paths.studio.styleRemix,
                     items: [],
                     icon: <Disc3 />,
                 },
@@ -61,25 +59,25 @@ export const studioConfig: StudioConfig = {
             items: [
                 {
                     title: 'Track Separation',
-                    href: `${baseStudioPath}/separation`,
+                    href: siteConfig.paths.studio.trackSeparation,
                     items: [],
                     icon: <Split />,
                 },
                 {
                     title: 'Track Analysis',
-                    href: `${baseStudioPath}/analysis`,
+                    href: siteConfig.paths.studio.trackAnalysis,
                     items: [],
                     icon: <Activity />,
                 },
                 {
                     title: 'MIDI Transcription',
-                    href: `${baseStudioPath}/midi`,
+                    href: siteConfig.paths.studio.midiTranscription,
                     items: [],
                     icon: <FileMusic />,
                 },
                 {
                     title: 'Lyrics Transcription',
-                    href: `${baseStudioPath}/lyrics`,
+                    href: siteConfig.paths.studio.lyricsTranscription,
                     items: [],
                     icon: <Mic2 />,
                 },
@@ -90,13 +88,13 @@ export const studioConfig: StudioConfig = {
             items: [
                 {
                     title: 'Audio Preview',
-                    href: `${baseStudioPath}/track`,
+                    href: siteConfig.paths.studio.preview.track,
                     items: [],
                     icon: <Disc3 />,
                 },
                 {
                     title: 'MIDI Preview',
-                    href: `${baseStudioPath}/track/midi`,
+                    href: siteConfig.paths.studio.preview.midi,
                     items: [],
                     icon: <FileAudio />,
                 },

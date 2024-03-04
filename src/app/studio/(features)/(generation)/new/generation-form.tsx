@@ -32,6 +32,7 @@ import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { musicGenerationAssetConfig } from '@/config/asset';
+import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
 import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -934,7 +935,10 @@ export const GenerationForm = () => {
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
                                 Your track is generating.{' '}
                                 <a
-                                    href="/studio/new"
+                                    href={
+                                        siteConfig.paths.studio
+                                            .newMusicGeneration
+                                    }
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -946,7 +950,9 @@ export const GenerationForm = () => {
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio"
+                                    href={
+                                        siteConfig.paths.studio.musicGeneration
+                                    }
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -999,7 +1005,7 @@ export const GenerationForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/new"
+                            href={siteConfig.paths.studio.newMusicGeneration}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
@@ -1007,7 +1013,7 @@ export const GenerationForm = () => {
                             Generate new track
                         </a>
                         <Link
-                            href="/studio"
+                            href={siteConfig.paths.studio.musicGeneration}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

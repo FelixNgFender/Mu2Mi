@@ -6,6 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { siteConfig } from '@/config/site';
 import { getUserSession } from '@/models/user';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -23,11 +24,11 @@ const EmailVerificationPage = async () => {
     const { user } = await getUserSession();
 
     if (!user) {
-        return redirect('/auth/sign-in');
+        return redirect(siteConfig.paths.auth.signIn);
     }
 
     if (user.emailVerified) {
-        return redirect('/');
+        return redirect(siteConfig.paths.home);
     }
 
     return (

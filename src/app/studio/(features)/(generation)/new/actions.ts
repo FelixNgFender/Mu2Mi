@@ -1,6 +1,7 @@
 'use server';
 
 import { env } from '@/config/env';
+import { siteConfig } from '@/config/site';
 import { fileStorage } from '@/infra';
 import { replicate } from '@/infra';
 import { AppError } from '@/lib/error';
@@ -74,7 +75,7 @@ export const generateMusic = authAction(schema, async (data, { user }) => {
             userId: user.id,
         });
     }
-    revalidatePath('/studio'); // refresh track table on generation page
+    revalidatePath(siteConfig.paths.studio.musicGeneration); // refresh track table on generation page
     return {
         success: true,
     };

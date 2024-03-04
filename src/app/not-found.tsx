@@ -1,4 +1,5 @@
 import { buttonVariants } from '@/components/ui/button';
+import { siteConfig } from '@/config/site';
 import { httpStatus } from '@/lib/http';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -17,7 +18,7 @@ export default function NotFound() {
                     buttonVariants({ variant: 'outline', size: 'lg' }),
                     '!mt-6',
                 )}
-                href="/"
+                href={siteConfig.paths.home}
             >
                 Back to home
             </Link>

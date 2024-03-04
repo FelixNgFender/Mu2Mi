@@ -5,6 +5,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
 import { getUserSession } from '@/models/user';
 import { LogIn, LogOut, Settings, User } from 'lucide-react';
@@ -35,7 +36,7 @@ export const Account = async ({
     if (!session)
         return (
             <Link
-                href="/auth/sign-in"
+                href={siteConfig.paths.auth.signIn}
                 className={cn(buttonVariants({ variant: variant }), className)}
             >
                 <LogIn className="h-5 w-5" />
@@ -58,7 +59,10 @@ export const Account = async ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuItem>
-                    <Link href="/studio/settings" className="flex flex-1">
+                    <Link
+                        href={siteConfig.paths.studio.settings}
+                        className="flex flex-1"
+                    >
                         <Settings className="mr-2 h-5 w-5" />
                         Settings
                     </Link>

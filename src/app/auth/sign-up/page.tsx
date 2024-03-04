@@ -8,6 +8,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { siteConfig } from '@/config/site';
 import { getUserSession } from '@/models/user';
 import { Metadata } from 'next';
 import Link from 'next/link';
@@ -24,9 +25,9 @@ const SignUpPage = async () => {
 
     if (user) {
         if (!user.emailVerified) {
-            return redirect('/auth/email-verification');
+            return redirect(siteConfig.paths.auth.emailVerification);
         }
-        return redirect('/');
+        return redirect(siteConfig.paths.studio.home);
     }
 
     return (
@@ -39,7 +40,7 @@ const SignUpPage = async () => {
             <CardContent className="space-y-4 md:space-y-6">
                 <div className="inline-flex w-full flex-col space-y-2 overflow-hidden p-1 md:space-y-4">
                     <Link
-                        href="/auth/sign-in/google"
+                        href={siteConfig.paths.auth.googleOAuth}
                         className={buttonVariants({ variant: 'secondary' })}
                     >
                         <span>
@@ -48,7 +49,7 @@ const SignUpPage = async () => {
                         <span>Sign up with Google</span>
                     </Link>
                     <Link
-                        href="/auth/sign-in/facebook"
+                        href={siteConfig.paths.auth.facebookOAuth}
                         className={buttonVariants({ variant: 'secondary' })}
                     >
                         <span>
@@ -57,7 +58,7 @@ const SignUpPage = async () => {
                         <span>Sign up with Facebook</span>
                     </Link>
                     <Link
-                        href="/auth/sign-in/github"
+                        href={siteConfig.paths.auth.githubOAuth}
                         className={buttonVariants({ variant: 'secondary' })}
                     >
                         <span>
@@ -79,7 +80,7 @@ const SignUpPage = async () => {
                 <p className="text-sm text-muted-foreground">
                     Already have an account?{' '}
                     <Link
-                        href="/auth/sign-in"
+                        href={siteConfig.paths.auth.signIn}
                         className="underline underline-offset-2 hover:text-primary"
                     >
                         Sign in

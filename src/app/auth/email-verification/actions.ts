@@ -1,5 +1,6 @@
 'use server';
 
+import { siteConfig } from '@/config/site';
 import { auth } from '@/lib/auth';
 import { sendEmailVerificationCode } from '@/lib/email';
 import { AppError } from '@/lib/error';
@@ -79,7 +80,7 @@ export const verifyCode = action(verifyCodeSchema, async ({ code }) => {
         sessionCookie.value,
         sessionCookie.attributes,
     );
-    redirect('/');
+    redirect(siteConfig.paths.studio.home);
 });
 
 const resendCodeSchema = z.object({});

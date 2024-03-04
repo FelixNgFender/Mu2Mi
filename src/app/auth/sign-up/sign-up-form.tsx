@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { useToast } from '@/components/ui/use-toast';
+import { siteConfig } from '@/config/site';
 import { httpStatus } from '@/lib/http';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -150,14 +151,14 @@ export const SignUpForm = () => {
                 <p className="text-sm italic text-muted-foreground">
                     By signing up, you agree to our{' '}
                     <Link
-                        href="/legal/terms"
+                        href={siteConfig.paths.legal.terms}
                         className="underline underline-offset-2 hover:text-primary"
                     >
                         Terms of Service
                     </Link>{' '}
                     and{' '}
                     <Link
-                        href="/legal/privacy"
+                        href={siteConfig.paths.legal.privacy}
                         className="underline underline-offset-2 hover:text-primary"
                     >
                         Privacy Policy

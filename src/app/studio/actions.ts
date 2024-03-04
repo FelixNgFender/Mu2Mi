@@ -2,6 +2,7 @@
 
 import { assetConfig } from '@/config/asset';
 import { env } from '@/config/env';
+import { siteConfig } from '@/config/site';
 import { fileStorage } from '@/infra';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
@@ -62,7 +63,7 @@ export const deleteUserTrack = authAction(
             assets.map((asset) => asset.name),
         );
         await deleteOneTrack(trackId); // cascades to asset table
-        revalidatePath('/studio');
+        revalidatePath(siteConfig.paths.studio.home);
     },
 );
 
@@ -133,7 +134,7 @@ export const shareUserTrack = authAction(
             );
         }
         await updateOneTrack(trackId, { public: isPublic });
-        revalidatePath('/studio');
+        revalidatePath(siteConfig.paths.studio.home);
     },
 );
 
@@ -164,6 +165,6 @@ export const updateTrack = authAction(
             );
         }
         await updateOneTrack(trackId, { name, public: isPublic });
-        revalidatePath('/studio');
+        revalidatePath(siteConfig.paths.studio.home);
     },
 );

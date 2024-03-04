@@ -32,6 +32,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { trackSeparationAssetConfig } from '@/config/asset';
+import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
 import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -871,7 +872,10 @@ export const SeparationForm = () => {
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
                                 Your track has been submitted for processing.{' '}
                                 <a
-                                    href="/studio/separation/new"
+                                    href={
+                                        siteConfig.paths.studio
+                                            .newTrackSeparation
+                                    }
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -883,7 +887,9 @@ export const SeparationForm = () => {
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio/separation"
+                                    href={
+                                        siteConfig.paths.studio.trackSeparation
+                                    }
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -936,7 +942,7 @@ export const SeparationForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/separation/new"
+                            href={siteConfig.paths.studio.newTrackSeparation}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
@@ -944,7 +950,7 @@ export const SeparationForm = () => {
                             Separate new track
                         </a>
                         <Link
-                            href="/studio/separation"
+                            href={siteConfig.paths.studio.trackSeparation}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

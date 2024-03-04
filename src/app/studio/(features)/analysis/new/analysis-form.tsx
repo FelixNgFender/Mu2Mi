@@ -1,5 +1,6 @@
 'use client';
 
+import { getPresignedUrl } from '@/app/studio/actions';
 import {
     Accordion,
     AccordionContent,
@@ -29,6 +30,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { trackAnalysisAssetConfig } from '@/config/asset';
+import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
 import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,7 +40,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { getPresignedUrl } from '../../../actions';
 import { analyzeTrack } from './actions';
 import allImage from './assets/all.jpg';
 import defaultPresetImage from './assets/default.jpg';
@@ -715,7 +716,9 @@ export const AnalysisForm = () => {
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
                                 Your track has been submitted for processing.{' '}
                                 <a
-                                    href="/studio/analysis/new"
+                                    href={
+                                        siteConfig.paths.studio.newTrackAnalysis
+                                    }
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -727,7 +730,7 @@ export const AnalysisForm = () => {
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio/analysis"
+                                    href={siteConfig.paths.studio.trackAnalysis}
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -780,7 +783,7 @@ export const AnalysisForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/analysis/new"
+                            href={siteConfig.paths.studio.newTrackAnalysis}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
@@ -788,7 +791,7 @@ export const AnalysisForm = () => {
                             Analyze new track
                         </a>
                         <Link
-                            href="/studio/analysis"
+                            href={siteConfig.paths.studio.trackAnalysis}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

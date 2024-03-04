@@ -1,5 +1,7 @@
 'use server';
 
+import { siteConfig } from '@/config/site';
+import { studioConfig } from '@/config/studio';
 import { auth } from '@/lib/auth';
 import { action } from '@/lib/safe-action';
 import { findOneByEmail } from '@/models/user';
@@ -58,5 +60,5 @@ export const signIn = action(signInSchema, async ({ email, rememberMe }) => {
         sessionCookie.value,
         sessionCookie.attributes,
     );
-    redirect('/');
+    redirect(siteConfig.paths.studio.home);
 });

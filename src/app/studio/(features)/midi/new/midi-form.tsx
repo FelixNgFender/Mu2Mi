@@ -1,5 +1,6 @@
 'use client';
 
+import { getPresignedUrl } from '@/app/studio/actions';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Dropzone } from '@/components/ui/dropzone';
 import {
@@ -13,6 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { midiTranscriptionAssetConfig } from '@/config/asset';
+import { siteConfig } from '@/config/site';
 import { cn, formatValidationErrors } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
@@ -21,7 +23,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { getPresignedUrl } from '../../../actions';
 import { transcribeMidi } from './actions';
 import { MidiFormType, midiFormSchema } from './schemas';
 
@@ -394,7 +395,10 @@ export const MidiForm = () => {
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
                                 Your track has been submitted for processing.{' '}
                                 <a
-                                    href="/studio/midi/new"
+                                    href={
+                                        siteConfig.paths.studio
+                                            .newMidiTranscription
+                                    }
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -406,7 +410,10 @@ export const MidiForm = () => {
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio/midi"
+                                    href={
+                                        siteConfig.paths.studio
+                                            .midiTranscription
+                                    }
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -459,7 +466,7 @@ export const MidiForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/midi/new"
+                            href={siteConfig.paths.studio.newMidiTranscription}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
@@ -467,7 +474,7 @@ export const MidiForm = () => {
                             Transcribe new tracks
                         </a>
                         <Link
-                            href="/studio/midi"
+                            href={siteConfig.paths.studio.midiTranscription}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

@@ -1,3 +1,5 @@
+import { siteConfig } from '@/config/site';
+
 import { FeatureHeader } from '../feature-header';
 import { TrackTable } from '../track-table';
 
@@ -6,7 +8,7 @@ const AnalysisPage = async () => {
         <>
             <FeatureHeader
                 title="Track Analysis"
-                href="analysis/new"
+                href={siteConfig.paths.studio.newTrackAnalysis}
                 ctaLabel="Upload Track"
             />
             <TrackTable filter="trackAnalysisStatus" />

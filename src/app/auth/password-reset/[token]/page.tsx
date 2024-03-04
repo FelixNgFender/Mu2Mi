@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { siteConfig } from '@/config/site';
 import { getUserSession } from '@/models/user';
 import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -19,8 +20,9 @@ const SignUpPage = async ({
     const { user } = await getUserSession();
 
     if (user) {
-        if (!user.emailVerified) return redirect('/auth/email-verification');
-        return redirect('/');
+        if (!user.emailVerified)
+            return redirect(siteConfig.paths.auth.emailVerification);
+        return redirect(siteConfig.paths.studio.home);
     }
 
     return (

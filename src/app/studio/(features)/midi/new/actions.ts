@@ -1,6 +1,7 @@
 'use server';
 
 import { env } from '@/config/env';
+import { siteConfig } from '@/config/site';
 import { fileStorage } from '@/infra';
 import { replicate } from '@/infra';
 import { AppError } from '@/lib/error';
@@ -52,7 +53,7 @@ export const transcribeMidi = authAction(schema, async (data, { user }) => {
         audio_file: url,
     });
 
-    revalidatePath('/studio/midi'); // refresh track table on midi page
+    revalidatePath(siteConfig.paths.studio.midiTranscription); // refresh track table on midi page
     return {
         success: true,
     };

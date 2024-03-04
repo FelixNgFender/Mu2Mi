@@ -1,3 +1,5 @@
+import { siteConfig } from '@/config/site';
+
 import { FeatureHeader } from '../feature-header';
 import { TrackTable } from '../track-table';
 
@@ -6,7 +8,7 @@ const LyricsPage = async () => {
         <>
             <FeatureHeader
                 title="Lyrics Transcription"
-                href="lyrics/new"
+                href={siteConfig.paths.studio.newLyricsTranscription}
                 ctaLabel="Upload Track"
             />
             <TrackTable filter="lyricsTranscriptionStatus" />

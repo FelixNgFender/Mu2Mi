@@ -1,5 +1,6 @@
 'use server';
 
+import { siteConfig } from '@/config/site';
 import { auth } from '@/lib/auth';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
@@ -28,5 +29,5 @@ export const signOut = action(schema, async () => {
         sessionCookie.value,
         sessionCookie.attributes,
     );
-    return redirect('/auth/sign-in');
+    return redirect(siteConfig.paths.auth.signIn);
 });

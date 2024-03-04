@@ -1,3 +1,5 @@
+import { siteConfig } from '@/config/site';
+
 import { FeatureHeader } from '../feature-header';
 import { TrackTable } from '../track-table';
 
@@ -6,7 +8,7 @@ const RemixPage = async () => {
         <>
             <FeatureHeader
                 title="Style Remix"
-                href="remix/new"
+                href={siteConfig.paths.studio.newStyleRemix}
                 ctaLabel="Upload Track"
             />
             <TrackTable filter="styleRemixStatus" />

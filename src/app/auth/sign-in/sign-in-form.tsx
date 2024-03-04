@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
+import { siteConfig } from '@/config/site';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -121,7 +122,7 @@ export const SignInForm = () => {
                         )}
                     />
                     <Link
-                        href="/auth/password-reset"
+                        href={siteConfig.paths.auth.passwordReset}
                         className="text-sm text-muted-foreground underline underline-offset-2 hover:text-primary"
                     >
                         Forgot password?
@@ -141,14 +142,14 @@ export const SignInForm = () => {
                 <p className="text-sm italic text-muted-foreground">
                     By signing in, you agree to our{' '}
                     <Link
-                        href="/legal/terms"
+                        href={siteConfig.paths.legal.terms}
                         className="underline underline-offset-2 hover:text-primary"
                     >
                         Terms of Service
                     </Link>{' '}
                     and{' '}
                     <Link
-                        href="/legal/privacy"
+                        href={siteConfig.paths.legal.privacy}
                         className="underline underline-offset-2 hover:text-primary"
                     >
                         Privacy Policy

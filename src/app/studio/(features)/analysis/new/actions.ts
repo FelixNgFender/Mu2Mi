@@ -1,6 +1,7 @@
 'use server';
 
 import { env } from '@/config/env';
+import { siteConfig } from '@/config/site';
 import { fileStorage } from '@/infra';
 import { replicate } from '@/infra';
 import { AppError } from '@/lib/error';
@@ -52,7 +53,7 @@ export const analyzeTrack = authAction(schema, async (data, { user }) => {
         music_input: url,
     });
 
-    revalidatePath('/studio/analysis'); // refresh track table on studio page
+    revalidatePath(siteConfig.paths.studio.trackAnalysis); // refresh track table on studio page
     return {
         success: true,
     };

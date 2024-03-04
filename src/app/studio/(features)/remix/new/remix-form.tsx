@@ -1,5 +1,6 @@
 'use client';
 
+import { getPresignedUrl } from '@/app/studio/actions';
 import {
     Accordion,
     AccordionContent,
@@ -33,6 +34,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { styleRemixAssetConfig } from '@/config/asset';
+import { siteConfig } from '@/config/site';
 import { cn } from '@/lib/utils';
 import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,7 +44,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
-import { getPresignedUrl } from '../../../actions';
 import { remixTrack } from './actions';
 import chordLargeImage from './assets/chord-large.jpg';
 import chordImage from './assets/chord.jpg';
@@ -984,7 +985,7 @@ export const RemixForm = () => {
                             <p className="leading-7 text-muted-foreground [&:not(:first-child)]:mt-6">
                                 Your track has been submitted for processing.{' '}
                                 <a
-                                    href="/studio/remix/new"
+                                    href={siteConfig.paths.studio.newStyleRemix}
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -996,7 +997,7 @@ export const RemixForm = () => {
                                 </a>{' '}
                                 or{' '}
                                 <Link
-                                    href="/studio/remix"
+                                    href={siteConfig.paths.studio.styleRemix}
                                     className={cn(
                                         buttonVariants({
                                             variant: 'link',
@@ -1049,7 +1050,7 @@ export const RemixForm = () => {
                 {form.formState.isSubmitSuccessful && (
                     <>
                         <a
-                            href="/studio/remix/new"
+                            href={siteConfig.paths.studio.newStyleRemix}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}
@@ -1057,7 +1058,7 @@ export const RemixForm = () => {
                             Remix new track
                         </a>
                         <Link
-                            href="/studio/remix"
+                            href={siteConfig.paths.studio.styleRemix}
                             className={buttonVariants({
                                 variant: 'outline',
                             })}

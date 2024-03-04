@@ -1,5 +1,6 @@
 'use server';
 
+import { siteConfig } from '@/config/site';
 import { auth } from '@/lib/auth';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
@@ -48,6 +49,6 @@ export const setNewPassword = action(
             sessionCookie.value,
             sessionCookie.attributes,
         );
-        redirect('/');
+        redirect(siteConfig.paths.studio.home);
     },
 );

@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site';
 import { getUserSession } from '@/models/user';
 import { redirect } from 'next/navigation';
 
@@ -10,10 +11,10 @@ const EmailVerificationLayout = async ({
 }: EmailVerificationLayoutProps) => {
     const { user } = await getUserSession();
     if (!user) {
-        return redirect('/auth/sign-in');
+        return redirect(siteConfig.paths.auth.signIn);
     }
     if (user.emailVerified) {
-        return redirect('/');
+        return redirect(siteConfig.paths.home);
     }
     return <>{children}</>;
 };

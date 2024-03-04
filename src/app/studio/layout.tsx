@@ -4,6 +4,7 @@ import {
     ResizablePanelGroup,
 } from '@/components/ui/resizable';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { siteConfig } from '@/config/site';
 import { studioConfig } from '@/config/studio';
 import { getUserSession } from '@/models/user';
 import { Metadata } from 'next';
@@ -23,11 +24,11 @@ const StudioLayout = async ({ children }: StudioLayoutProps) => {
     const { user } = await getUserSession();
 
     if (!user) {
-        return redirect('/auth/sign-in');
+        return redirect(siteConfig.paths.auth.signIn);
     }
 
     if (!user.emailVerified) {
-        return redirect('/auth/email-verification');
+        return redirect(siteConfig.paths.auth.emailVerification);
     }
 
     return (
