@@ -154,7 +154,7 @@ export const SignUpForm = () => {
                         href={siteConfig.paths.legal.terms}
                         className="underline underline-offset-2 hover:text-primary"
                     >
-                        Terms of Service
+                        Terms and Conditions
                     </Link>{' '}
                     and{' '}
                     <Link

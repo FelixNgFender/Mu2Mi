@@ -60,7 +60,7 @@ export const Account = async ({
             <DropdownMenuContent align="end">
                 <DropdownMenuItem>
                     <Link
-                        href={siteConfig.paths.studio.settings}
+                        href={siteConfig.paths.settings}
                         className="flex flex-1"
                     >
                         <Settings className="mr-2 h-5 w-5" />

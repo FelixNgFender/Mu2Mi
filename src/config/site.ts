@@ -17,6 +17,7 @@ export const siteConfig = {
             githubOAuth: '/auth/sign-in/github',
         },
         legal: {
+            cookie: '/legal/cookie',
             terms: '/legal/terms',
             privacy: '/legal/privacy',
         },
@@ -40,8 +41,8 @@ export const siteConfig = {
                 midi: '/studio/track/midi',
                 karaoke: '/studio/track/karaoke',
             },
-            settings: '/studio/settings',
         },
+        settings: '/settings',
         preview: {
             track: '/preview',
             midi: '/preview/midi',
