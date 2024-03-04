@@ -1,7 +1,8 @@
-import { db } from '@/infra';
-import { assetTable, trackTable } from '@/infra/schema';
+import { db, schema } from '@/infra';
 import { desc, eq } from 'drizzle-orm';
 import 'server-only';
+
+const { assetTable, trackTable } = schema;
 
 type NewTrack = Omit<typeof trackTable.$inferInsert, 'createdAt' | 'updatedAt'>;
 

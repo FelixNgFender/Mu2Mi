@@ -1,4 +1,6 @@
-import { mimeType } from '@/infra/schema';
+import { schema } from '@/infra';
+
+const { mimeType } = schema;
 
 export const assetConfig = {
     maxFileSizeBytes: 1024 * 1024 * 50, // 50 MB

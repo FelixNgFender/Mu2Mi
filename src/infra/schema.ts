@@ -43,17 +43,6 @@ export const userTable = pgTable('user', {
     ...updateAndCreatedAt,
 });
 
-export interface DatabaseUser {
-    id: string;
-    email: string;
-    emailVerified: boolean;
-    username: string;
-    usernameLower: string;
-    hashedPassword?: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
 export const sessionTable = pgTable(
     'session',
     {

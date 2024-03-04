@@ -1,7 +1,8 @@
-import { db } from '@/infra';
-import { passwordResetTable } from '@/infra/schema';
+import { db, schema } from '@/infra';
 import { eq } from 'drizzle-orm';
 import 'server-only';
+
+const { passwordResetTable } = schema;
 
 type NewPasswordResetToken = typeof passwordResetTable.$inferInsert;
 

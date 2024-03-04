@@ -1,9 +1,11 @@
-import {
-    trackAssetType,
-    trackStatusColumns as trackStatusColumnsDatabase,
-    trackStatusEnum,
-} from '@/infra/schema';
+import { schema } from '@/infra';
 import { StaticImageData } from 'next/image';
+
+const {
+    trackAssetType,
+    trackStatusColumns: trackStatusColumnsDatabase,
+    trackStatusEnum,
+} = schema;
 
 export interface NavItem {
     title: string;

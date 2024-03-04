@@ -137,7 +137,7 @@ export const EmailVerificationForm = () => {
                     type="submit"
                 >
                     {isSubmitting || !captchaToken ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                         'Verify email'
                     )}
@@ -242,7 +242,7 @@ export const ResendVerificationCodeButton = () => {
                     type="submit"
                 >
                     {form.formState.isSubmitting || !captchaToken ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                         'Didn’t receive an email? Resend'
                     )}
