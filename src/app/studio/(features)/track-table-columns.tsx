@@ -54,6 +54,7 @@ import {
     XCircle,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useTransition } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 import { EditTrackFormType, editTrackFormSchema } from '../schemas';
@@ -73,6 +74,7 @@ const getStatusIndicator = (status: TrackStatus) => {
 
 const DownloadButton = ({ track }: { track: ReturnedTrack }) => {
     const { toast } = useToast();
+    const [isPending, startTransition] = useTransition();
 
     const handleDownload = async () => {
         const { data, validationErrors, serverError } =
@@ -111,24 +113,30 @@ const DownloadButton = ({ track }: { track: ReturnedTrack }) => {
         <Button
             title="Download track"
             variant="outline"
+            disabled={isPending}
             size="icon"
-            onClick={async () => {
-                try {
-                    toast({
-                        title: `Downloading ${track.name}...`,
-                    });
-                    await handleDownload();
-                } catch (error) {
-                    toast({
-                        variant: 'destructive',
-                        title: 'Uh oh! Something went wrong.',
-                        description: (error as Error).message,
-                    });
-                }
-            }}
+            onClick={() =>
+                startTransition(async () => {
+                    try {
+                        await handleDownload();
+                    } catch (error) {
+                        toast({
+                            variant: 'destructive',
+                            title: 'Uh oh! Something went wrong.',
+                            description: (error as Error).message,
+                        });
+                    }
+                })
+            }
         >
-            <Download className="h-4 w-4" />
-            <span className="sr-only">Download track</span>
+            {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+                <Download className="h-4 w-4" />
+            )}
+            <span className="sr-only">
+                {isPending ? 'Downloading...' : 'Download track'}
+            </span>
         </Button>
     );
 };
@@ -279,6 +287,7 @@ const EditButton = ({ track }: { track: ReturnedTrack }) => {
 
 const ShareButton = ({ track }: { track: ReturnedTrack }) => {
     const { toast } = useToast();
+    const [isPending, startTransition] = useTransition();
 
     const getTrackPublicLink = () => {
         if (typeof window === 'undefined') {
@@ -334,24 +343,32 @@ const ShareButton = ({ track }: { track: ReturnedTrack }) => {
                         <Button
                             title="Toggle visibility"
                             variant="outline"
-                            onClick={async () => {
-                                try {
-                                    await handleShare();
-                                    toast({
-                                        title: `${track.name} is now ${
-                                            track.public ? 'private' : 'public'
-                                        }!`,
-                                    });
-                                } catch (error) {
-                                    toast({
-                                        variant: 'destructive',
-                                        title: 'Uh oh! Something went wrong.',
-                                        description: (error as Error).message,
-                                    });
-                                }
-                            }}
+                            disabled={isPending}
+                            onClick={() =>
+                                startTransition(async () => {
+                                    try {
+                                        await handleShare();
+                                        toast({
+                                            title: `${track.name} is now ${
+                                                track.public
+                                                    ? 'private'
+                                                    : 'public'
+                                            }!`,
+                                        });
+                                    } catch (error) {
+                                        toast({
+                                            variant: 'destructive',
+                                            title: 'Uh oh! Something went wrong.',
+                                            description: (error as Error)
+                                                .message,
+                                        });
+                                    }
+                                })
+                            }
                         >
-                            {track.public ? (
+                            {isPending ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : track.public ? (
                                 <Globe className="mr-2 h-4 w-4" />
                             ) : (
                                 <GlobeLock className="mr-2 h-4 w-4" />
@@ -406,6 +423,7 @@ const ShareButton = ({ track }: { track: ReturnedTrack }) => {
 
 const DeleteButton = ({ track }: { track: ReturnedTrack }) => {
     const { toast } = useToast();
+    const [isPending, startTransition] = useTransition();
 
     const handleDelete = async () => {
         const { validationErrors, serverError } = await deleteUserTrack({
@@ -451,20 +469,27 @@ const DeleteButton = ({ track }: { track: ReturnedTrack }) => {
                     <Button
                         title="Delete track"
                         variant="destructive"
-                        onClick={async () => {
-                            try {
-                                await handleDelete();
-                            } catch (error) {
-                                toast({
-                                    variant: 'destructive',
-                                    title: 'Uh oh! Something went wrong.',
-                                    description: (error as Error).message,
-                                });
-                            }
-                        }}
+                        disabled={isPending}
+                        onClick={() =>
+                            startTransition(async () => {
+                                try {
+                                    await handleDelete();
+                                } catch (error) {
+                                    toast({
+                                        variant: 'destructive',
+                                        title: 'Uh oh! Something went wrong.',
+                                        description: (error as Error).message,
+                                    });
+                                }
+                            })
+                        }
                     >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                        {isPending ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                            <Trash2 className="mr-2 h-4 w-4" />
+                        )}
+                        Delete track
                     </Button>
                 </DialogFooter>
             </DialogContent>
