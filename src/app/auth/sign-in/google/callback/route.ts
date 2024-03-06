@@ -1,3 +1,4 @@
+import { siteConfig } from '@/config/site';
 import { auth, googleAuth } from '@/lib/auth';
 import { AppError, withErrorHandling } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
@@ -79,7 +80,7 @@ export const GET = withErrorHandling(
                 sessionCookie.attributes,
             );
             return HttpResponse.redirect(undefined, {
-                Location: '/',
+                Location: siteConfig.paths.studio.home,
             });
         }
 
@@ -105,7 +106,7 @@ export const GET = withErrorHandling(
             sessionCookie.attributes,
         );
         return HttpResponse.redirect(undefined, {
-            Location: '/',
+            Location: siteConfig.paths.studio.home,
         });
     },
     (err: Error) => {
