@@ -5,6 +5,7 @@ import { auth } from '@/lib/auth';
 import { sendEmailVerificationCode } from '@/lib/email';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
+import { rateLimit } from '@/lib/rate-limit';
 import { action } from '@/lib/safe-action';
 import { generateEmailVerificationCode } from '@/lib/token';
 import {
@@ -23,6 +24,7 @@ const verifyCodeSchema = verifyCodeFormSchema;
 
 export const verifyCode = action(verifyCodeSchema, async ({ code }) => {
     const { user } = await getUserSession();
+
     if (!user) {
         throw new AppError(
             'HttpError',
@@ -38,6 +40,17 @@ export const verifyCode = action(verifyCodeSchema, async ({ code }) => {
             httpStatus.clientError.badRequest.humanMessage,
             true,
             httpStatus.clientError.badRequest.code,
+        );
+    }
+
+    try {
+        await rateLimit.verifyCode(user.id);
+    } catch {
+        throw new AppError(
+            'HttpError',
+            httpStatus.clientError.tooManyRequests.humanMessage,
+            true,
+            httpStatus.clientError.tooManyRequests.code,
         );
     }
 
@@ -87,6 +100,7 @@ const resendCodeSchema = z.object({});
 
 export const resendCode = action(resendCodeSchema, async () => {
     const { user } = await getUserSession();
+
     if (!user) {
         throw new AppError(
             'HttpError',
@@ -95,12 +109,24 @@ export const resendCode = action(resendCodeSchema, async () => {
             httpStatus.clientError.unauthorized.code,
         );
     }
+
     if (user.emailVerified) {
         throw new AppError(
             'HttpError',
             httpStatus.clientError.badRequest.humanMessage,
             true,
             httpStatus.clientError.badRequest.code,
+        );
+    }
+
+    try {
+        await rateLimit.resendCode(user.id);
+    } catch {
+        throw new AppError(
+            'HttpError',
+            httpStatus.clientError.tooManyRequests.humanMessage,
+            true,
+            httpStatus.clientError.tooManyRequests.code,
         );
     }
 

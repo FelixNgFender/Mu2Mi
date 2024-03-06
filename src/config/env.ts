@@ -26,6 +26,7 @@ const envSchema = z.object({
         'silly',
     ]),
     ENABLE_EMAIL: isBoolean,
+    ENABLE_RATE_LIMIT: isBoolean,
     AUTH_COOKIE_DURATION_S: isNumber,
     CAPTCHA_SECRET_KEY: isString.optional(),
 

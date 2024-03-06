@@ -3,9 +3,11 @@
 import { sendPasswordResetLink } from '@/lib/email';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
+import { rateLimit } from '@/lib/rate-limit';
 import { action } from '@/lib/safe-action';
 import { generatePasswordResetToken } from '@/lib/token';
 import { findOneByEmail } from '@/models/user';
+import { z } from 'zod';
 
 import { passwordResetFormSchema } from './schemas';
 
@@ -13,16 +15,30 @@ import { passwordResetFormSchema } from './schemas';
  * For **server-side** validation. If you use async refinements, you must use the
  * `parseAsync` method to parse data! Otherwise Zod will throw an error.
  */
-const passwordResetSchema = passwordResetFormSchema.refine(
-    async ({ email }) => {
-        const user = await findOneByEmail(email);
-        return !!user;
-    },
-    {
-        message: 'Invalid email address',
-        path: ['email'],
-    },
-);
+const passwordResetSchema = passwordResetFormSchema
+    .superRefine(async ({}, ctx) => {
+        try {
+            await rateLimit.passwordReset();
+        } catch {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Too many requests',
+                path: ['email'],
+                fatal: true,
+            });
+            return z.NEVER;
+        }
+    })
+    .refine(
+        async ({ email }) => {
+            const user = await findOneByEmail(email);
+            return !!user;
+        },
+        {
+            message: 'Invalid email address',
+            path: ['email'],
+        },
+    );
 
 export const requestPasswordReset = action(
     passwordResetSchema,

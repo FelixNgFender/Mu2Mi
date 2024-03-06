@@ -6,6 +6,7 @@ import { fileStorage } from '@/infra';
 import { replicate } from '@/infra';
 import { AppError } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
+import { rateLimit } from '@/lib/rate-limit';
 import { authAction } from '@/lib/safe-action';
 import { createOne, createOneAndUpdateAsset } from '@/models/track';
 import { musicGenerationInputSchema } from '@/types/replicate';
@@ -22,6 +23,17 @@ const schema = musicGenerationInputSchema
     });
 
 export const generateMusic = authAction(schema, async (data, { user }) => {
+    try {
+        await rateLimit.trackProcessing(user.id);
+    } catch {
+        throw new AppError(
+            'HttpError',
+            httpStatus.clientError.tooManyRequests.humanMessage,
+            true,
+            httpStatus.clientError.tooManyRequests.code,
+        );
+    }
+
     if (data.assetId) {
         const newTrack = await createOneAndUpdateAsset(
             {

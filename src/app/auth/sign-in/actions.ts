@@ -1,8 +1,8 @@
 'use server';
 
 import { siteConfig } from '@/config/site';
-import { studioConfig } from '@/config/studio';
 import { auth } from '@/lib/auth';
+import { rateLimit } from '@/lib/rate-limit';
 import { action } from '@/lib/safe-action';
 import { findOneByEmail } from '@/models/user';
 import { cookies } from 'next/headers';
@@ -18,6 +18,24 @@ import { signInFormSchema } from './schemas';
  */
 const signInSchema = signInFormSchema.superRefine(
     async ({ email, password }, ctx) => {
+        try {
+            await rateLimit.signIn();
+        } catch {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Too many requests',
+                path: ['email'],
+                fatal: true,
+            });
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Too many requests',
+                path: ['password'],
+                fatal: true,
+            });
+            return z.NEVER;
+        }
+
         try {
             const existingUser = await findOneByEmail(email.toLowerCase());
             // in the case of null hashedPassword, it means the user signed
