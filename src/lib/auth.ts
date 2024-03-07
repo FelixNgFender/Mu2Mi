@@ -1,12 +1,11 @@
 import { env } from '@/config/env';
-import { db, schema } from '@/infra';
+import { db } from '@/infra';
+import { sessionTable, userTable } from '@/infra/schema';
 import type { DatabaseUser } from '@/models/user';
 import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
 import { Facebook, GitHub, Google } from 'arctic';
 import { Lucia, TimeSpan } from 'lucia';
 import 'server-only';
-
-const { sessionTable, userTable } = schema;
 
 const adapter = new DrizzlePostgreSQLAdapter(db, sessionTable, userTable);
 

@@ -4,7 +4,7 @@ import { env } from '@/config/env';
 import { siteConfig } from '@/config/site';
 import { fileStorage } from '@/infra';
 import { replicate } from '@/infra';
-import { AppError } from '@/lib/error';
+import { AppError, errorHandler } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { rateLimit } from '@/lib/rate-limit';
 import { authAction } from '@/lib/safe-action';
@@ -59,12 +59,22 @@ export const generateMusic = authAction(schema, async (data, { user }) => {
             env.S3_PRESIGNED_URL_EXPIRATION_S,
         );
 
-        await replicate.generateMusic({
-            ...data,
-            taskId: newTrack.trackId,
-            userId: user.id,
-            input_audio: url,
-        });
+        try {
+            await replicate.generateMusic({
+                ...data,
+                taskId: newTrack.trackId,
+                userId: user.id,
+                input_audio: url,
+            });
+        } catch (error) {
+            await errorHandler.handleError(error as Error);
+            throw new AppError(
+                'HttpError',
+                httpStatus.serverError.internalServerError.humanMessage,
+                true,
+                httpStatus.serverError.internalServerError.code,
+            );
+        }
     } else {
         const newTrack = await createOne({
             userId: user.id,
@@ -81,11 +91,21 @@ export const generateMusic = authAction(schema, async (data, { user }) => {
             );
         }
 
-        await replicate.generateMusic({
-            ...data,
-            taskId: newTrack.id,
-            userId: user.id,
-        });
+        try {
+            await replicate.generateMusic({
+                ...data,
+                taskId: newTrack.id,
+                userId: user.id,
+            });
+        } catch (error) {
+            await errorHandler.handleError(error as Error);
+            throw new AppError(
+                'HttpError',
+                httpStatus.serverError.internalServerError.humanMessage,
+                true,
+                httpStatus.serverError.internalServerError.code,
+            );
+        }
     }
     revalidatePath(siteConfig.paths.studio.musicGeneration); // refresh track table on generation page
     return {

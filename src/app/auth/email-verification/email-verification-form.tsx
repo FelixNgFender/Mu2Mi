@@ -33,13 +33,16 @@ export const EmailVerificationForm = () => {
     const handleComplete = async () => {
         if (process.env.NEXT_PUBLIC_ENABLE_CAPTCHA === 'true') {
             if (!captchaToken) return;
-            const verificationResult = await fetch('/api/captcha', {
-                method: 'POST',
-                body: JSON.stringify({ token: captchaToken }),
-                headers: {
-                    'content-type': 'application/json',
+            const verificationResult = await fetch(
+                siteConfig.paths.api.captcha,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ token: captchaToken }),
+                    headers: {
+                        'content-type': 'application/json',
+                    },
                 },
-            });
+            );
 
             if (verificationResult.status !== httpStatus.success.ok.code) {
                 toast({
@@ -161,13 +164,16 @@ export const ResendVerificationCodeButton = () => {
     const onSubmit = async () => {
         if (process.env.NEXT_PUBLIC_ENABLE_CAPTCHA === 'true') {
             if (!captchaToken) return;
-            const verificationResult = await fetch('/api/captcha', {
-                method: 'POST',
-                body: JSON.stringify({ token: captchaToken }),
-                headers: {
-                    'content-type': 'application/json',
+            const verificationResult = await fetch(
+                siteConfig.paths.api.captcha,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ token: captchaToken }),
+                    headers: {
+                        'content-type': 'application/json',
+                    },
                 },
-            });
+            );
 
             if (verificationResult.status !== httpStatus.success.ok.code) {
                 toast({

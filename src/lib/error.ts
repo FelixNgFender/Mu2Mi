@@ -10,7 +10,8 @@ export class AppError extends Error {
         | 'ValidationError'
         | 'FatalError'
         | 'HttpError'
-        | 'AWSError';
+        | 'AWSError'
+        | 'ReplicateError';
     public readonly isOperational: boolean;
     public readonly httpCode?: HttpErrorCodes;
 
@@ -20,7 +21,8 @@ export class AppError extends Error {
             | 'ValidationError'
             | 'FatalError'
             | 'HttpError'
-            | 'AWSError',
+            | 'AWSError'
+            | 'ReplicateError',
         message: string | undefined,
         isOperational: boolean,
         httpCode?: HttpErrorCodes,

@@ -4,7 +4,7 @@ import { env } from '@/config/env';
 import { siteConfig } from '@/config/site';
 import { fileStorage } from '@/infra';
 import { replicate } from '@/infra';
-import { AppError } from '@/lib/error';
+import { AppError, errorHandler } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { rateLimit } from '@/lib/rate-limit';
 import { authAction } from '@/lib/safe-action';
@@ -58,12 +58,22 @@ export const transcribeLyrics = authAction(schema, async (data, { user }) => {
         env.S3_PRESIGNED_URL_EXPIRATION_S,
     );
 
-    await replicate.lyricsTranscription({
-        ...data,
-        taskId: newTrack.trackId,
-        userId: user.id,
-        audio: url,
-    });
+    try {
+        await replicate.lyricsTranscription({
+            ...data,
+            taskId: newTrack.trackId,
+            userId: user.id,
+            audio: url,
+        });
+    } catch (error) {
+        await errorHandler.handleError(error as Error);
+        throw new AppError(
+            'HttpError',
+            httpStatus.serverError.internalServerError.humanMessage,
+            true,
+            httpStatus.serverError.internalServerError.code,
+        );
+    }
 
     revalidatePath(siteConfig.paths.studio.lyricsTranscription); // refresh track table on studio page
     return {

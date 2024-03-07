@@ -47,13 +47,16 @@ export const SignUpForm = () => {
     const onSubmit: SubmitHandler<SignUpFormType> = async (data) => {
         if (process.env.NEXT_PUBLIC_ENABLE_CAPTCHA === 'true') {
             if (!captchaToken) return;
-            const verificationResult = await fetch('/api/captcha', {
-                method: 'POST',
-                body: JSON.stringify({ token: captchaToken }),
-                headers: {
-                    'content-type': 'application/json',
+            const verificationResult = await fetch(
+                siteConfig.paths.api.captcha,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ token: captchaToken }),
+                    headers: {
+                        'content-type': 'application/json',
+                    },
                 },
-            });
+            );
 
             if (verificationResult.status !== httpStatus.success.ok.code) {
                 toast({

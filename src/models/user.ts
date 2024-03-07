@@ -1,12 +1,11 @@
-import { db, schema } from '@/infra';
+import { db } from '@/infra';
+import { oauthAccountTable, userTable } from '@/infra/schema';
 import { auth } from '@/lib/auth';
 import { eq } from 'drizzle-orm';
 import type { Session, User } from 'lucia';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
 import 'server-only';
-
-const { oauthAccountTable, userTable } = schema;
 
 type DatabaseUser = typeof userTable.$inferSelect;
 type NewUser = Omit<typeof userTable.$inferInsert, 'createdAt' | 'updatedAt'>;

@@ -1,8 +1,7 @@
-import { db, schema } from '@/infra';
+import { db } from '@/infra';
+import { oauthAccountTable } from '@/infra/schema';
 import { and, eq } from 'drizzle-orm';
 import 'server-only';
-
-const { oauthAccountTable } = schema;
 
 type NewOAuthAccount = typeof oauthAccountTable.$inferInsert;
 

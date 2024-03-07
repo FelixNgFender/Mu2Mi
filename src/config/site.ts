@@ -7,6 +7,18 @@ export const siteConfig = {
     title: 'Mu2Mi - The AI Musical Toolkit.',
     url: 'https://mu2mi.com',
     paths: {
+        api: {
+            webhook: {
+                generation: '/api/webhook/generation',
+                remix: '/api/webhook/remix',
+                separation: '/api/webhook/separation',
+                analysis: '/api/webhook/analysis',
+                midi: '/api/webhook/midi',
+                lyrics: '/api/webhook/lyrics',
+            },
+            healthcheck: '/api/healthcheck',
+            captcha: '/api/captcha',
+        },
         home: '/',
         auth: {
             signIn: '/auth/sign-in',

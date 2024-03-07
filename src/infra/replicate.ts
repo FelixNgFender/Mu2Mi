@@ -1,4 +1,6 @@
 import { env } from '@/config/env';
+import { siteConfig } from '@/config/site';
+import { AppError } from '@/lib/error';
 import {
     LyricsTranscriptionSchemaType,
     MidiTranscriptionSchemaType,
@@ -28,27 +30,47 @@ class ReplicateClient {
         userId,
         ...data
     }: MusicGenerationSchemaType) {
-        const webhook = new URL(`${env.ORIGIN}/api/webhook/generation`);
-        webhook.searchParams.set('taskId', taskId);
-        webhook.searchParams.set('userId', userId);
-        return this.replicate.predictions.create({
-            version: env.MUSIC_GENERATION_MODEL_VERSION,
-            input: data,
-            webhook: webhook.toString(),
-            webhook_events_filter: ['completed'],
-        });
+        try {
+            const webhook = new URL(
+                `${env.ORIGIN}${siteConfig.paths.api.webhook.generation}`,
+            );
+            webhook.searchParams.set('taskId', taskId);
+            webhook.searchParams.set('userId', userId);
+            return this.replicate.predictions.create({
+                version: env.MUSIC_GENERATION_MODEL_VERSION,
+                input: data,
+                webhook: webhook.toString(),
+                webhook_events_filter: ['completed'],
+            });
+        } catch (error) {
+            throw new AppError(
+                'ReplicateError',
+                (error as Error).message,
+                true,
+            );
+        }
     }
 
     async styleRemix({ taskId, userId, ...data }: StyleRemixSchemaType) {
-        const webhook = new URL(`${env.ORIGIN}/api/webhook/remix`);
-        webhook.searchParams.set('taskId', taskId);
-        webhook.searchParams.set('userId', userId);
-        return this.replicate.predictions.create({
-            version: env.STYLE_REMIX_MODEL_VERSION,
-            input: data,
-            webhook: webhook.toString(),
-            webhook_events_filter: ['completed'],
-        });
+        try {
+            const webhook = new URL(
+                `${env.ORIGIN}${siteConfig.paths.api.webhook.remix}`,
+            );
+            webhook.searchParams.set('taskId', taskId);
+            webhook.searchParams.set('userId', userId);
+            return this.replicate.predictions.create({
+                version: env.STYLE_REMIX_MODEL_VERSION,
+                input: data,
+                webhook: webhook.toString(),
+                webhook_events_filter: ['completed'],
+            });
+        } catch (error) {
+            throw new AppError(
+                'ReplicateError',
+                (error as Error).message,
+                true,
+            );
+        }
     }
 
     async separateTrack({
@@ -56,27 +78,47 @@ class ReplicateClient {
         userId,
         ...data
     }: TrackSeparationSchemaType) {
-        const webhook = new URL(`${env.ORIGIN}/api/webhook/separation`);
-        webhook.searchParams.set('taskId', taskId);
-        webhook.searchParams.set('userId', userId);
-        return this.replicate.predictions.create({
-            version: env.TRACK_SEPARATION_MODEL_VERSION,
-            input: data,
-            webhook: webhook.toString(),
-            webhook_events_filter: ['completed'],
-        });
+        try {
+            const webhook = new URL(
+                `${env.ORIGIN}${siteConfig.paths.api.webhook.separation}`,
+            );
+            webhook.searchParams.set('taskId', taskId);
+            webhook.searchParams.set('userId', userId);
+            return this.replicate.predictions.create({
+                version: env.TRACK_SEPARATION_MODEL_VERSION,
+                input: data,
+                webhook: webhook.toString(),
+                webhook_events_filter: ['completed'],
+            });
+        } catch (error) {
+            throw new AppError(
+                'ReplicateError',
+                (error as Error).message,
+                true,
+            );
+        }
     }
 
     async analyzeTrack({ taskId, userId, ...data }: TrackAnalysisSchemaType) {
-        const webhook = new URL(`${env.ORIGIN}/api/webhook/analysis`);
-        webhook.searchParams.set('taskId', taskId);
-        webhook.searchParams.set('userId', userId);
-        return this.replicate.predictions.create({
-            version: env.TRACK_ANALYSIS_MODEL_VERSION,
-            input: data,
-            webhook: webhook.toString(),
-            webhook_events_filter: ['completed'],
-        });
+        try {
+            const webhook = new URL(
+                `${env.ORIGIN}${siteConfig.paths.api.webhook.analysis}`,
+            );
+            webhook.searchParams.set('taskId', taskId);
+            webhook.searchParams.set('userId', userId);
+            return this.replicate.predictions.create({
+                version: env.TRACK_ANALYSIS_MODEL_VERSION,
+                input: data,
+                webhook: webhook.toString(),
+                webhook_events_filter: ['completed'],
+            });
+        } catch (error) {
+            throw new AppError(
+                'ReplicateError',
+                (error as Error).message,
+                true,
+            );
+        }
     }
 
     async midiTranscription({
@@ -84,15 +126,25 @@ class ReplicateClient {
         userId,
         ...data
     }: MidiTranscriptionSchemaType) {
-        const webhook = new URL(`${env.ORIGIN}/api/webhook/midi`);
-        webhook.searchParams.set('taskId', taskId);
-        webhook.searchParams.set('userId', userId);
-        return this.replicate.predictions.create({
-            version: env.MIDI_TRANSCRIPTION_MODEL_VERSION,
-            input: data,
-            webhook: webhook.toString(),
-            webhook_events_filter: ['completed'],
-        });
+        try {
+            const webhook = new URL(
+                `${env.ORIGIN}${siteConfig.paths.api.webhook.midi}`,
+            );
+            webhook.searchParams.set('taskId', taskId);
+            webhook.searchParams.set('userId', userId);
+            return this.replicate.predictions.create({
+                version: env.MIDI_TRANSCRIPTION_MODEL_VERSION,
+                input: data,
+                webhook: webhook.toString(),
+                webhook_events_filter: ['completed'],
+            });
+        } catch (error) {
+            throw new AppError(
+                'ReplicateError',
+                (error as Error).message,
+                true,
+            );
+        }
     }
 
     async lyricsTranscription({
@@ -100,15 +152,25 @@ class ReplicateClient {
         userId,
         ...data
     }: LyricsTranscriptionSchemaType) {
-        const webhook = new URL(`${env.ORIGIN}/api/webhook/lyrics`);
-        webhook.searchParams.set('taskId', taskId);
-        webhook.searchParams.set('userId', userId);
-        return this.replicate.predictions.create({
-            version: env.LYRICS_TRANSCRIPTION_MODEL_VERSION,
-            input: data,
-            webhook: webhook.toString(),
-            webhook_events_filter: ['completed'],
-        });
+        try {
+            const webhook = new URL(
+                `${env.ORIGIN}${siteConfig.paths.api.webhook.lyrics}`,
+            );
+            webhook.searchParams.set('taskId', taskId);
+            webhook.searchParams.set('userId', userId);
+            return this.replicate.predictions.create({
+                version: env.LYRICS_TRANSCRIPTION_MODEL_VERSION,
+                input: data,
+                webhook: webhook.toString(),
+                webhook_events_filter: ['completed'],
+            });
+        } catch (error) {
+            throw new AppError(
+                'ReplicateError',
+                (error as Error).message,
+                true,
+            );
+        }
     }
 }
 

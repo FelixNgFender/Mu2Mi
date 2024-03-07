@@ -1,9 +1,7 @@
 import { db } from '@/infra';
-import { schema } from '@/infra';
+import { assetTable } from '@/infra/schema';
 import { eq } from 'drizzle-orm';
 import 'server-only';
-
-const { assetTable } = schema;
 
 type NewAsset = Omit<typeof assetTable.$inferInsert, 'createdAt' | 'updatedAt'>;
 
