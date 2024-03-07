@@ -1,7 +1,9 @@
 import { cache } from '@/infra';
 import { headers } from 'next/headers';
-import { RateLimiterRedis } from 'rate-limiter-flexible';
+import { RateLimiterRedis, RateLimiterRes } from 'rate-limiter-flexible';
 import 'server-only';
+
+import { errorHandler } from './error';
 
 function getIPAdress() {
     const FALLBACK_IP_ADDRESS = '0.0.0.0';
@@ -63,42 +65,108 @@ const rateLimit = {
      * 5 requests from the same IP in 5 minutes.
      */
     signIn: async () => {
-        await signInRateLimiter.consume(getIPAdress());
+        try {
+            await signInRateLimiter.consume(getIPAdress());
+        } catch (rejRes) {
+            if (rejRes instanceof RateLimiterRes) {
+                throw rejRes;
+            }
+            await errorHandler.handleError(rejRes as Error);
+        }
     },
 
     /**
      * 3 requests from the same IP in 24 hours.
      */
     signUp: async () => {
-        await signUpRateLimiter.consume(getIPAdress());
+        try {
+            await signUpRateLimiter.consume(getIPAdress());
+        } catch (rejRes) {
+            if (rejRes instanceof RateLimiterRes) {
+                throw rejRes;
+            }
+            await errorHandler.handleError(rejRes as Error);
+        }
     },
 
     /**
      * 3 requests from the same IP in 1 hour.
      */
     passwordReset: async () => {
-        await passwordResetRateLimiter.consume(getIPAdress());
+        try {
+            await passwordResetRateLimiter.consume(getIPAdress());
+        } catch (rejRes) {
+            if (rejRes instanceof RateLimiterRes) {
+                throw rejRes;
+            }
+            await errorHandler.handleError(rejRes as Error);
+        }
     },
 
     /**
      * 5 requests from the same user in 1 hour.
      */
     verifyCode: async (userId: string) => {
-        await verifyCodeRateLimiter.consume(userId);
+        try {
+            await verifyCodeRateLimiter.consume(userId);
+        } catch (rejRes) {
+            if (rejRes instanceof RateLimiterRes) {
+                throw rejRes;
+            }
+            await errorHandler.handleError(rejRes as Error);
+        }
     },
 
     /**
      * 5 requests from the same user in 1 hour.
      */
     resendCode: async (userId: string) => {
-        await resendCodeRateLimiter.consume(userId);
+        try {
+            await resendCodeRateLimiter.consume(userId);
+        } catch (rejRes) {
+            if (rejRes instanceof RateLimiterRes) {
+                throw rejRes;
+            }
+            await errorHandler.handleError(rejRes as Error);
+        }
     },
 
     /**
      * 10 requests from the same user in 24 hours.
      */
     trackProcessing: async (userId: string) => {
-        await trackProcessingRateLimiter.consume(userId);
+        try {
+            await trackProcessingRateLimiter.consume(userId);
+        } catch (rejRes) {
+            if (rejRes instanceof RateLimiterRes) {
+                throw rejRes;
+            }
+            await errorHandler.handleError(rejRes as Error);
+        }
+    },
+
+    getUserCredits: async (userId: string) => {
+        try {
+            const rateLimiterRes = await trackProcessingRateLimiter.get(userId);
+
+            if (!rateLimiterRes) {
+                return {
+                    remainingCredits: 10,
+                    msBeforeNext: 0,
+                };
+            }
+
+            return {
+                remainingCredits: rateLimiterRes.remainingPoints,
+                msBeforeNext: rateLimiterRes.msBeforeNext,
+            };
+        } catch (rejRes) {
+            await errorHandler.handleError(rejRes as Error);
+            return {
+                remainingCredits: 10,
+                msBeforeNext: 0,
+            };
+        }
     },
 };
 
@@ -106,6 +174,12 @@ if (process.env.ENABLE_RATE_LIMIT === 'false') {
     for (const key in rateLimit) {
         // @ts-expect-error - key guarantees to appear in rateLimit
         rateLimit[key] = async () => {};
+        rateLimit.getUserCredits = async () => {
+            return {
+                remainingCredits: 10,
+                msBeforeNext: 0,
+            };
+        };
     }
 }
 
