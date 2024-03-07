@@ -2,6 +2,7 @@ export const siteConfig = {
     authors: [
         { name: 'Felix Nguyen', content: 'https://github.com/FelixNgFender' },
     ],
+    contact: 'team@mu2mi.com',
     name: 'Mu2Mi',
     title: 'Mu2Mi - The AI Musical Toolkit.',
     url: 'https://mu2mi.com',

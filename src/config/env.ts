@@ -29,6 +29,8 @@ const envSchema = z.object({
     ENABLE_RATE_LIMIT: isBoolean,
     AUTH_COOKIE_DURATION_S: isNumber,
     CAPTCHA_SECRET_KEY: isString.optional(),
+    AWS_ACCESS_KEY_ID: isString.optional(),
+    AWS_SECRET_ACCESS_KEY: isString.optional(),
 
     // Database
     DATABASE_LOGGING: isBoolean,

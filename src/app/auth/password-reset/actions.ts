@@ -1,7 +1,7 @@
 'use server';
 
 import { sendPasswordResetLink } from '@/lib/email';
-import { AppError } from '@/lib/error';
+import { AppError, errorHandler } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { rateLimit } from '@/lib/rate-limit';
 import { action } from '@/lib/safe-action';
@@ -54,7 +54,17 @@ export const requestPasswordReset = action(
         }
 
         const verificationToken = await generatePasswordResetToken(user.id);
-        await sendPasswordResetLink(email, verificationToken);
+        try {
+            await sendPasswordResetLink(email, verificationToken);
+        } catch (error) {
+            await errorHandler.handleError(error as Error);
+            throw new AppError(
+                'HttpError',
+                httpStatus.serverError.internalServerError.humanMessage,
+                true,
+                httpStatus.serverError.internalServerError.code,
+            );
+        }
         return {
             email: user.email,
         };

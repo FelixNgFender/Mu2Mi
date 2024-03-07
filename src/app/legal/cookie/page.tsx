@@ -137,7 +137,7 @@ const CookiesPage = () => {
             </p>
 
             <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                <li>Email: team@mu2mi.com</li>
+                <li>Email: {siteConfig.contact}</li>
             </ul>
         </section>
     );

@@ -3,7 +3,7 @@
 import { siteConfig } from '@/config/site';
 import { auth } from '@/lib/auth';
 import { sendEmailVerificationCode } from '@/lib/email';
-import { AppError } from '@/lib/error';
+import { AppError, errorHandler } from '@/lib/error';
 import { httpStatus } from '@/lib/http';
 import { rateLimit } from '@/lib/rate-limit';
 import { action } from '@/lib/safe-action';
@@ -132,7 +132,17 @@ export const resendCode = action(resendCodeSchema, async () => {
 
     await deleteAllByUserId(user.id);
     const code = await generateEmailVerificationCode(user.id, user.email);
-    await sendEmailVerificationCode(user.email, code);
+    try {
+        await sendEmailVerificationCode(user.email, code);
+    } catch (error) {
+        await errorHandler.handleError(error as Error);
+        throw new AppError(
+            'HttpError',
+            httpStatus.serverError.internalServerError.humanMessage,
+            true,
+            httpStatus.serverError.internalServerError.code,
+        );
+    }
     return {
         email: user.email,
     };

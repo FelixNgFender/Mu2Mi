@@ -9,12 +9,18 @@ export class AppError extends Error {
         | 'StartupError'
         | 'ValidationError'
         | 'FatalError'
-        | 'HttpError';
+        | 'HttpError'
+        | 'AWSError';
     public readonly isOperational: boolean;
     public readonly httpCode?: HttpErrorCodes;
 
     constructor(
-        name: 'StartupError' | 'ValidationError' | 'FatalError' | 'HttpError',
+        name:
+            | 'StartupError'
+            | 'ValidationError'
+            | 'FatalError'
+            | 'HttpError'
+            | 'AWSError',
         message: string | undefined,
         isOperational: boolean,
         httpCode?: HttpErrorCodes,

@@ -3,6 +3,8 @@
 import { siteConfig } from '@/config/site';
 import { auth } from '@/lib/auth';
 import { sendEmailVerificationCode } from '@/lib/email';
+import { AppError, errorHandler } from '@/lib/error';
+import { httpStatus } from '@/lib/http';
 import { rateLimit } from '@/lib/rate-limit';
 import { action } from '@/lib/safe-action';
 import { generateEmailVerificationCode } from '@/lib/token';
@@ -70,8 +72,17 @@ export const signUp = action(signUpSchema, async ({ email, password }) => {
     });
 
     const verificationCode = await generateEmailVerificationCode(userId, email);
-    await sendEmailVerificationCode(email, verificationCode);
-
+    try {
+        await sendEmailVerificationCode(email, verificationCode);
+    } catch (error) {
+        await errorHandler.handleError(error as Error);
+        throw new AppError(
+            'HttpError',
+            httpStatus.serverError.internalServerError.humanMessage,
+            true,
+            httpStatus.serverError.internalServerError.code,
+        );
+    }
     const session = await auth.createSession(userId, {});
     const sessionCookie = auth.createSessionCookie(session.id);
     cookies().set(

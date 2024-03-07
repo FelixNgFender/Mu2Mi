@@ -1,3 +1,5 @@
+import { siteConfig } from '@/config/site';
+
 const PrivacyPage = () => {
     return (
         <section className="container relative flex h-full flex-1 flex-col space-y-4 py-8">
@@ -600,7 +602,7 @@ const PrivacyPage = () => {
                 contact us:
             </p>
             <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-                <li>By email: team@mu2mi.com</li>
+                <li>By email: {siteConfig.contact}</li>
             </ul>
         </section>
     );
