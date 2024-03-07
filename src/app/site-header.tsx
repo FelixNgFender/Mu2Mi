@@ -1,39 +1,11 @@
-import { Badge } from '@/components/ui/badge';
-import {
-    HoverCard,
-    HoverCardContent,
-    HoverCardTrigger,
-} from '@/components/ui/hover-card';
-
 import { Account } from './account';
 import { CommandMenu } from './command-menu';
+import { CreditBadge } from './credit-badge';
 import { MainNav } from './main-nav';
 import { MobileNav } from './mobile-nav';
-import { getUserCredits } from './queries';
 import { ModeToggle as ThemeToggle } from './theme-toggle';
 
-function formatTime(ms: number): string {
-    const hours = Math.floor(ms / 1000 / 60 / 60);
-    const minutes = Math.floor(ms / 1000 / 60);
-
-    if (hours >= 1) {
-        return `${hours.toString().padStart(2, '0')} hour${
-            hours > 1 ? 's' : ''
-        }`;
-    } else {
-        return `${Math.max(minutes, 1).toString().padStart(2, '0')} minute${
-            minutes > 1 ? 's' : ''
-        }`;
-    }
-}
-
 export const SiteHeader = async () => {
-    const { data: credits, serverError } = await getUserCredits({});
-
-    if (serverError || !credits) {
-        throw new Error(serverError);
-    }
-
     return (
         <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-14 max-w-screen-2xl items-center">
@@ -43,21 +15,7 @@ export const SiteHeader = async () => {
                     <div className="w-full flex-1 md:w-auto md:flex-none">
                         <CommandMenu />
                     </div>
-                    <HoverCard>
-                        <HoverCardTrigger asChild>
-                            <Badge
-                                variant="secondary"
-                                className="whitespace-nowrap"
-                            >
-                                Credit: {credits.remainingCredits}
-                            </Badge>
-                        </HoverCardTrigger>
-                        <HoverCardContent className="w-40 p-2 text-center text-sm font-semibold">
-                            {credits.msBeforeNext > 0
-                                ? `Reset in ${formatTime(credits.msBeforeNext)}`
-                                : 'Starting fresh!'}
-                        </HoverCardContent>
-                    </HoverCard>
+                    <CreditBadge />
                     <nav className="flex items-center space-x-1">
                         {/* <Link
                             title={`${siteConfig.name} GitHub`}

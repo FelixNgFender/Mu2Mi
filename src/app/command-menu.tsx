@@ -11,6 +11,7 @@ import {
     CommandSeparator,
 } from '@/components/ui/command';
 import { studioConfig } from '@/config/studio';
+import { umami } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { DialogProps } from '@radix-ui/react-dialog';
 import { Circle, File, Laptop, Moon, Sun } from 'lucide-react';
@@ -63,6 +64,7 @@ export function CommandMenu({ ...props }: DialogProps) {
                     'relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-muted-foreground shadow-none sm:pr-12 md:w-40 lg:w-64',
                 )}
                 onClick={() => setOpen(true)}
+                data-umami-event={umami.searchSite.name}
                 {...props}
             >
                 <span className="hidden lg:inline-flex">Search site...</span>
@@ -71,7 +73,11 @@ export function CommandMenu({ ...props }: DialogProps) {
                     <span className="text-xs">⌘</span>K
                 </kbd>
             </Button>
-            <CommandDialog open={open} onOpenChange={setOpen}>
+            <CommandDialog
+                open={open}
+                onOpenChange={setOpen}
+                data-umami-event={umami.searchSite.name}
+            >
                 <CommandInput placeholder="Type a command or search..." />
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>

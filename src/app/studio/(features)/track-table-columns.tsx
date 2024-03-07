@@ -32,6 +32,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { siteConfig } from '@/config/site';
+import { umami } from '@/lib/analytics';
 import { cn, formatValidationErrors } from '@/lib/utils';
 import type { ReturnedTrack } from '@/models/track';
 import { TrackStatus, TrackStatusColumn } from '@/types/studio';
@@ -128,6 +129,7 @@ const DownloadButton = ({ track }: { track: ReturnedTrack }) => {
                     }
                 })
             }
+            data-umami-event={umami.downloadTrack.name}
         >
             {isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -410,6 +412,7 @@ const ShareButton = ({ track }: { track: ReturnedTrack }) => {
                                     });
                                 }
                             }}
+                            data-umami-event={umami.shareTrack.name}
                         >
                             <span className="sr-only">Copy</span>
                             <Copy className="h-4 w-4" />
@@ -483,6 +486,7 @@ const DeleteButton = ({ track }: { track: ReturnedTrack }) => {
                                 }
                             })
                         }
+                        data-umami-event={umami.deleteTrack.name}
                     >
                         {isPending ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

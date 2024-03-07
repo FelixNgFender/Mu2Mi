@@ -15,6 +15,8 @@ import { generateId } from 'lucia';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = withErrorHandling(
     async (request: NextRequest) => {
         const url = new URL(request.url);

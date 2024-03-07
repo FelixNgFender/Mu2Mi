@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { umami } from '@/lib/analytics';
 import { useEffect } from 'react';
 
 export default function Error({
@@ -13,7 +14,18 @@ export default function Error({
     useEffect(() => {
         // The `digest` property is a unique identifier for the error
         // that can be used to look up the error in the server-side logs.
-        console.error(error);
+        const intervalId = setInterval(() => {
+            if (window && window.umami) {
+                window.umami.track(umami.unknownError.name, {
+                    message: error.message,
+                    stack: error.stack,
+                    digest: error.digest,
+                });
+                clearInterval(intervalId);
+            }
+        }, 1000);
+
+        return () => clearInterval(intervalId);
     }, [error]);
 
     return (

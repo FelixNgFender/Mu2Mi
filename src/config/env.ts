@@ -27,10 +27,15 @@ const envSchema = z.object({
     ]),
     ENABLE_EMAIL: isBoolean,
     ENABLE_RATE_LIMIT: isBoolean,
+    ENABLE_ANALYTICS: isBoolean,
     AUTH_COOKIE_DURATION_S: isNumber,
     CAPTCHA_SECRET_KEY: isString.optional(),
     AWS_ACCESS_KEY_ID: isString.optional(),
     AWS_SECRET_ACCESS_KEY: isString.optional(),
+
+    // Analytics
+    UMAMI_SCRIPT_URL: isString.optional(),
+    UMAMI_ANALYTICS_ID: isString.optional(),
 
     // Database
     DATABASE_LOGGING: isBoolean,

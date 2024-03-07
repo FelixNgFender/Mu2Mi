@@ -1,10 +1,25 @@
+'use client';
+
 import { buttonVariants } from '@/components/ui/button';
 import { siteConfig } from '@/config/site';
+import { umami } from '@/lib/analytics';
 import { httpStatus } from '@/lib/http';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 export default function NotFound() {
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            if (window && window.umami) {
+                window.umami.track(umami.notFound.name);
+                clearInterval(intervalId);
+            }
+        }, 1000);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
     return (
         <section className="flex flex-1 flex-col items-center justify-center space-y-2 text-balance text-center">
             <h2 className="border-b pb-2 text-2xl font-semibold tracking-tight">

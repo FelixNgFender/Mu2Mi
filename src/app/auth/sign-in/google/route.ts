@@ -5,6 +5,8 @@ import { HttpResponse } from '@/lib/response';
 import { generateCodeVerifier, generateState } from 'arctic';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = withErrorHandling(async () => {
     const state = generateState();
     const codeVerifier = generateCodeVerifier();

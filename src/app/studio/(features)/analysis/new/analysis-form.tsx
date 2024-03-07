@@ -31,6 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { trackAnalysisAssetConfig } from '@/config/asset';
 import { siteConfig } from '@/config/site';
+import { umami } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -192,6 +193,10 @@ export const AnalysisForm = () => {
     };
 
     const onSubmit: SubmitHandler<AnalysisFormType> = async (data) => {
+        if (window && window.umami) {
+            window.umami.track(umami.analysis.init.name);
+        }
+
         toast({
             description: 'Your file is being uploaded.',
         });
@@ -227,6 +232,11 @@ export const AnalysisForm = () => {
             setCurrentStep(-1);
         }
         if (result.serverError) {
+            if (window && window.umami) {
+                window.umami.track(umami.analysis.failure.name, {
+                    error: result.serverError,
+                });
+            }
             toast({
                 variant: 'destructive',
                 title: 'Uh oh! Something went wrong.',
@@ -236,6 +246,9 @@ export const AnalysisForm = () => {
             setCurrentStep(-1);
         }
         if (result.data && result.data.success) {
+            if (window && window.umami) {
+                window.umami.track(umami.analysis.success.name);
+            }
             toast({
                 title: 'File uploaded successfully.',
                 description: '🔥 We are cooking your track.',

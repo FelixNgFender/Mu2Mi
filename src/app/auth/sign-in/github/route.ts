@@ -5,6 +5,8 @@ import { HttpResponse } from '@/lib/response';
 import { generateState } from 'arctic';
 import { cookies } from 'next/headers';
 
+export const dynamic = 'force-dynamic';
+
 export const GET = withErrorHandling(async () => {
     const state = generateState();
     const url = await githubAuth.createAuthorizationURL(state, {

@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
 import { midiTranscriptionAssetConfig } from '@/config/asset';
 import { siteConfig } from '@/config/site';
+import { umami } from '@/lib/analytics';
 import { cn, formatValidationErrors } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
@@ -142,6 +143,9 @@ export const MidiForm = () => {
     };
 
     const onSubmit: SubmitHandler<MidiFormType> = async (data) => {
+        if (window && window.umami) {
+            window.umami.track(umami.midi.init.name);
+        }
         toast({
             description: 'Your files are being uploaded.',
         });
@@ -174,6 +178,11 @@ export const MidiForm = () => {
                     setCurrentStep(-1);
                 }
                 if (result.serverError) {
+                    if (window && window.umami) {
+                        window.umami.track(umami.midi.failure.name, {
+                            error: result.serverError,
+                        });
+                    }
                     toast({
                         variant: 'destructive',
                         title: 'Uh oh! Something went wrong.',
@@ -184,6 +193,9 @@ export const MidiForm = () => {
                 }
             }
             if (results.every((result) => result.data)) {
+                if (window && window.umami) {
+                    window.umami.track(umami.midi.success.name);
+                }
                 toast({
                     title: 'Files uploaded successfully.',
                     description: '🔥 We are cooking your tracks.',

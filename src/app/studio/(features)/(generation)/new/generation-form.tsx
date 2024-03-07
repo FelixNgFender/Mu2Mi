@@ -33,6 +33,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { musicGenerationAssetConfig } from '@/config/asset';
 import { siteConfig } from '@/config/site';
+import { umami } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { Preset } from '@/types/studio';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -202,6 +203,10 @@ export const GenerationForm = () => {
     };
 
     const onSubmit: SubmitHandler<MusicGenerationFormType> = async (data) => {
+        if (window && window.umami) {
+            window.umami.track(umami.generation.init.name);
+        }
+
         toast({
             description: 'Your file is being uploaded.',
         });
@@ -249,6 +254,11 @@ export const GenerationForm = () => {
             setCurrentStep(-1);
         }
         if (result.serverError) {
+            if (window && window.umami) {
+                window.umami.track(umami.generation.failure.name, {
+                    error: result.serverError,
+                });
+            }
             toast({
                 variant: 'destructive',
                 title: 'Uh oh! Something went wrong.',
@@ -258,6 +268,9 @@ export const GenerationForm = () => {
             setCurrentStep(-1);
         }
         if (result.data && result.data.success) {
+            if (window && window.umami) {
+                window.umami.track(umami.generation.success.name);
+            }
             toast({
                 title: 'File uploaded successfully.',
                 description: '🔥 We are cooking your track.',
