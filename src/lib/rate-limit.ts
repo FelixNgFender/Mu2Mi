@@ -16,6 +16,7 @@ function getIPAdress() {
 
 const signInRateLimiter = new RateLimiterRedis({
     storeClient: cache,
+    useRedisPackage: true,
     keyPrefix: 'rate-limiter:sign-in',
     points: 5,
     duration: 5 * 60,
@@ -23,6 +24,7 @@ const signInRateLimiter = new RateLimiterRedis({
 
 const signUpRateLimiter = new RateLimiterRedis({
     storeClient: cache,
+    useRedisPackage: true,
     keyPrefix: 'rate-limiter:sign-up',
     points: 3,
     duration: 1 * 60 * 60 * 24,
@@ -30,6 +32,7 @@ const signUpRateLimiter = new RateLimiterRedis({
 
 const passwordResetRateLimiter = new RateLimiterRedis({
     storeClient: cache,
+    useRedisPackage: true,
     keyPrefix: 'rate-limiter:password-reset',
     points: 3,
     duration: 1 * 60 * 60,
@@ -37,6 +40,7 @@ const passwordResetRateLimiter = new RateLimiterRedis({
 
 const verifyCodeRateLimiter = new RateLimiterRedis({
     storeClient: cache,
+    useRedisPackage: true,
     keyPrefix: 'rate-limiter:verify-code',
     points: 5,
     duration: 1 * 60 * 60,
@@ -44,6 +48,7 @@ const verifyCodeRateLimiter = new RateLimiterRedis({
 
 const resendCodeRateLimiter = new RateLimiterRedis({
     storeClient: cache,
+    useRedisPackage: true,
     keyPrefix: 'rate-limiter:resend-code',
     points: 5,
     duration: 1 * 60 * 60,
@@ -51,6 +56,7 @@ const resendCodeRateLimiter = new RateLimiterRedis({
 
 const trackProcessingRateLimiter = new RateLimiterRedis({
     storeClient: cache,
+    useRedisPackage: true,
     keyPrefix: 'rate-limiter:track-processing',
     points: 10,
     duration: 1 * 60 * 60 * 24,

@@ -11,10 +11,13 @@ declare global {
 let cache: RedisClientType;
 
 if (env.NODE_ENV === 'production') {
-    cache = createClient({ url: env.REDIS_URL });
+    cache = createClient({ url: env.REDIS_URL, disableOfflineQueue: true });
 } else {
     if (!global.cache) {
-        global.cache = createClient({ url: env.REDIS_URL });
+        global.cache = createClient({
+            url: env.REDIS_URL,
+            disableOfflineQueue: true,
+        });
     }
 
     db = global.db;
