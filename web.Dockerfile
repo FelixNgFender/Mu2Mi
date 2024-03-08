@@ -8,6 +8,7 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+# RUN [ "npm", "ci",  "--omit=dev" ]
 RUN npm install && npm i next@14.1.1-canary.59 --force
 
 # Rebuild the source code only when needed

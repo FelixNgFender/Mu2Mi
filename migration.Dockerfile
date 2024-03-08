@@ -7,7 +7,8 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN ["npm", "pkg", "delete", "scripts.prepare"]
-RUN [ "npm", "ci",  "--omit=dev" ]
+# RUN [ "npm", "ci",  "--omit=dev" ]
+RUN [ "npm", "i" ]
 
 FROM base AS migration
 WORKDIR /app
