@@ -11,7 +11,7 @@
         "dev": "next dev",
         "build": "NODE_ENV=production next build",
         "build:analyze": "ANALYZE=true npm run build",
-        "start": "NODE_ENV=production next start",
+        "start": "NEXT_MANUAL_SIG_HANDLE=true NODE_ENV=production next start",
         "lint": "next lint",
         "format": "prettier --write .",
         "db:studio": "drizzle-kit studio",
