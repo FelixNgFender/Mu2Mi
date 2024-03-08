@@ -1,4 +1,9 @@
 import { siteConfig } from '@/config/site';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Privacy Policy',
+};
 
 const PrivacyPage = () => {
     return (

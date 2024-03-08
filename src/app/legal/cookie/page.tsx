@@ -1,4 +1,9 @@
 import { siteConfig } from '@/config/site';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Cookie Policy',
+};
 
 const CookiesPage = () => {
     return (

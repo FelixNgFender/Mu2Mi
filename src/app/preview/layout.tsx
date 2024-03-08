@@ -1,5 +1,13 @@
+import { siteConfig } from '@/config/site';
+import { Metadata } from 'next';
+
 type TrackLayoutProps = {
     children: React.ReactNode;
+};
+
+export const metadata: Metadata = {
+    title: 'Preview',
+    description: `Check out what I just made on ${siteConfig.name}!`,
 };
 
 const TrackLayout = ({ children }: TrackLayoutProps) => {

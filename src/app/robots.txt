@@ -1,4 +1,0 @@
-User-Agent: *
-Allow: /
-Disallow: /studio/
-Sitemap: https://mu2mi.com/sitemap.xml

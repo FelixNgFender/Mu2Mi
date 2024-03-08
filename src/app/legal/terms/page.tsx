@@ -1,3 +1,9 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Terms and Conditions',
+};
+
 const TermsPage = () => {
     return (
         <section className="container relative flex h-full flex-1 flex-col space-y-4 py-8">
