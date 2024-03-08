@@ -3,7 +3,7 @@ import { db } from '@/infra';
 import { sessionTable, userTable } from '@/infra/schema';
 import type { DatabaseUser } from '@/models/user';
 import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
-import { Facebook, GitHub, Google } from 'arctic';
+import { GitHub, Google } from 'arctic';
 import { Lucia, TimeSpan } from 'lucia';
 import 'server-only';
 
@@ -42,11 +42,11 @@ export const googleAuth = new Google(
     env.GOOGLE_REDIRECT_URI,
 );
 
-export const facebookAuth = new Facebook(
-    env.FACEBOOK_CLIENT_ID,
-    env.FACEBOOK_CLIENT_SECRET,
-    env.FACEBOOK_REDIRECT_URI,
-);
+// export const facebookAuth = new Facebook(
+//     env.FACEBOOK_CLIENT_ID,
+//     env.FACEBOOK_CLIENT_SECRET,
+//     env.FACEBOOK_REDIRECT_URI,
+// );
 
 export const githubAuth = new GitHub(
     env.GITHUB_CLIENT_ID,

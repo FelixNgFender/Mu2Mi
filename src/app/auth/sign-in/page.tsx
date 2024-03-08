@@ -48,7 +48,7 @@ const SignInPage = async () => {
                         </span>
                         <span>Continue with Google</span>
                     </Link>
-                    <Link
+                    {/* <Link
                         href={siteConfig.paths.auth.facebookOAuth}
                         className={buttonVariants({ variant: 'secondary' })}
                     >
@@ -56,7 +56,7 @@ const SignInPage = async () => {
                             <Icons.facebook className="mr-2 h-4 w-4 fill-current" />
                         </span>
                         <span>Continue with Facebook</span>
-                    </Link>
+                    </Link> */}
                     <Link
                         href={siteConfig.paths.auth.githubOAuth}
                         className={buttonVariants({ variant: 'secondary' })}

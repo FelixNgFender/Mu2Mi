@@ -26,7 +26,7 @@ export const siteConfig = {
             passwordReset: '/auth/password-reset',
             emailVerification: '/auth/email-verification',
             googleOAuth: '/auth/sign-in/google',
-            facebookOAuth: '/auth/sign-in/facebook',
+            // facebookOAuth: '/auth/sign-in/facebook',
             githubOAuth: '/auth/sign-in/github',
         },
         legal: {

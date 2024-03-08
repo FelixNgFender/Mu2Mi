@@ -1,5 +1,5 @@
 {
-    "id": "9a3fe5ca-db34-4872-8e67-7f5eefb445be",
+    "id": "8bf5ac7e-ee91-4c97-994a-fe3db11d6e35",
     "prevId": "00000000-0000-0000-0000-000000000000",
     "version": "5",
     "dialect": "pg",
@@ -499,8 +499,7 @@
             "name": "provider_id",
             "values": {
                 "github": "github",
-                "google": "google",
-                "facebook": "facebook"
+                "google": "google"
             }
         },
         "track_asset_type": {

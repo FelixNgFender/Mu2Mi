@@ -5,7 +5,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- CREATE TYPE "provider_id" AS ENUM('github', 'google', 'facebook');
+ CREATE TYPE "provider_id" AS ENUM('github', 'google');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

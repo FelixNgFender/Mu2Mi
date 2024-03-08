@@ -65,7 +65,7 @@ export const sessionTable = pgTable(
 export const providerId = pgEnum('provider_id', [
     'github',
     'google',
-    'facebook',
+    // 'facebook',
 ]);
 
 export const oauthAccountTable = pgTable(

@@ -14,7 +14,7 @@ const createOne = async (oAuthAccount: NewOAuthAccount) => {
 };
 
 const findOneByProvider = async (
-    providerId: 'github' | 'google' | 'facebook',
+    providerId: 'github' | 'google', //| 'facebook',
     providerUserId: string,
 ) => {
     return await db.query.oauthAccountTable.findFirst({

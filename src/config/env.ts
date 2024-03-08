@@ -53,9 +53,9 @@ const envSchema = z.object({
     GOOGLE_CLIENT_ID: isString,
     GOOGLE_CLIENT_SECRET: isString,
     GOOGLE_REDIRECT_URI: isString,
-    FACEBOOK_CLIENT_ID: isString,
-    FACEBOOK_CLIENT_SECRET: isString,
-    FACEBOOK_REDIRECT_URI: isString,
+    // FACEBOOK_CLIENT_ID: isString,
+    // FACEBOOK_CLIENT_SECRET: isString,
+    // FACEBOOK_REDIRECT_URI: isString,
     GITHUB_CLIENT_ID: isString,
     GITHUB_CLIENT_SECRET: isString,
 

@@ -61,12 +61,12 @@ export const GET = withErrorHandling(
         );
         if (existingUserWithEmail) {
             const existingOAuthAccount = await findOneOAuthAccountByProvider(
-                'facebook',
+                'google',
                 googleUser.sub,
             );
             if (!existingOAuthAccount) {
                 await createOneOAuthAccount({
-                    providerId: 'facebook',
+                    providerId: 'google',
                     providerUserId: googleUser.sub,
                     userId: existingUserWithEmail.id,
                 });
@@ -96,7 +96,7 @@ export const GET = withErrorHandling(
                 username: googleUser.name,
                 usernameLower: googleUser.name.toLowerCase(),
             },
-            'facebook',
+            'google',
             googleUser.sub,
         );
 

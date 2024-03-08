@@ -65,7 +65,7 @@ const createOne = async (user: NewUser) => {
 
 const createOneWithOAuthAccount = async (
     user: NewUser,
-    providerId: 'github' | 'google' | 'facebook',
+    providerId: 'github' | 'google', // | 'facebook',
     providerUserId: string,
 ) => {
     await db.transaction(async (tx) => {
