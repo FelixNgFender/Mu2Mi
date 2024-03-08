@@ -4,7 +4,9 @@ import {
     HoverCardContent,
     HoverCardTrigger,
 } from '@/components/ui/hover-card';
+import { siteConfig } from '@/config/site';
 import { getUserSession } from '@/models/user';
+import Link from 'next/link';
 
 import { getUserCredits } from './queries';
 
@@ -40,7 +42,9 @@ export const CreditBadge = async () => {
         <HoverCard>
             <HoverCardTrigger asChild>
                 <Badge variant="secondary" className="whitespace-nowrap">
-                    Credit: {credits.remainingCredits}
+                    <Link href={siteConfig.paths.pricing}>
+                        Credit: {credits.remainingCredits}
+                    </Link>
                 </Badge>
             </HoverCardTrigger>
             <HoverCardContent className="w-40 p-2 text-center text-sm font-semibold">

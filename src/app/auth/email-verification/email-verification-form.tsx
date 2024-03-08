@@ -4,7 +4,12 @@ import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { CaptchaWidget } from '@/components/ui/captcha';
 import { Form } from '@/components/ui/form';
-import { OTPInput } from '@/components/ui/otp-input';
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSeparator,
+    InputOTPSlot,
+} from '@/components/ui/input-otp';
 import { ToastAction } from '@/components/ui/toast';
 import { useToast } from '@/components/ui/use-toast';
 import { siteConfig } from '@/config/site';
@@ -99,17 +104,29 @@ export const EmailVerificationForm = () => {
                 onSubmit={handleSubmit}
                 className="flex flex-col items-center space-y-8"
             >
-                <OTPInput
+                <InputOTP
                     value={code}
-                    // @ts-expect-error - TS is dumb
                     onChange={(newValue: string) => setCode(newValue)}
                     maxLength={6}
-                    allowNavigation
                     inputMode="numeric"
                     onComplete={handleComplete}
-                    containerClassName="group flex items-center has-[:disabled]:opacity-30"
                     disabled={isSubmitting}
                     required
+                    render={({ slots }) => (
+                        <>
+                            <InputOTPGroup>
+                                {slots.slice(0, 3).map((slot, index) => (
+                                    <InputOTPSlot key={index} {...slot} />
+                                ))}{' '}
+                            </InputOTPGroup>
+                            <InputOTPSeparator />
+                            <InputOTPGroup>
+                                {slots.slice(3).map((slot, index) => (
+                                    <InputOTPSlot key={index + 3} {...slot} />
+                                ))}
+                            </InputOTPGroup>
+                        </>
+                    )}
                 />
                 <CaptchaWidget
                     id="email-verification"
