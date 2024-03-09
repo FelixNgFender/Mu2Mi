@@ -33,7 +33,6 @@ export const GET = withErrorHandling(
             },
         });
         const githubUser: GitHubUser = await githubUserResponse.json();
-        console.log(githubUser);
         if (!githubUser.email) {
             throw new AppError('ValidationError', 'Email not provided', true);
         }
@@ -75,8 +74,6 @@ export const GET = withErrorHandling(
                 id: userId,
                 email: githubUser.email.toLowerCase(),
                 emailVerified: true,
-                username: githubUser.login,
-                usernameLower: githubUser.login.toLowerCase(),
             },
             'github',
             githubUser.id.toString(),
@@ -105,6 +102,5 @@ export const GET = withErrorHandling(
 
 interface GitHubUser {
     id: number;
-    login: string;
     email: string | null;
 }

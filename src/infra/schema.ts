@@ -36,8 +36,6 @@ export const userTable = pgTable('user', {
     id: text('id').primaryKey(),
     email: text('email').unique().notNull(),
     emailVerified: boolean('email_verified').notNull().default(false),
-    username: text('username').unique().notNull(),
-    usernameLower: text('username_lower').unique().notNull(),
     hashedPassword: text('hashed_password'),
     // other user attributes
     ...updateAndCreatedAt,

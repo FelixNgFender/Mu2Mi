@@ -77,8 +77,6 @@
 //                 id: userId,
 //                 email: facebookUser.email.toLowerCase(),
 //                 emailVerified: true,
-//                 username: facebookUser.name,
-//                 usernameLower: facebookUser.name.toLowerCase(),
 //             },
 //             'facebook',
 //             facebookUser.id,
@@ -107,6 +105,5 @@
 
 // interface FacebookUser {
 //     id: string;
-//     name: string;
 //     email?: string;
 // }

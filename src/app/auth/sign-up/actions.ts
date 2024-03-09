@@ -67,8 +67,6 @@ export const signUp = action(signUpSchema, async ({ email, password }) => {
         email,
         emailVerified: false,
         hashedPassword,
-        username: email,
-        usernameLower: email.toLowerCase(),
     });
 
     const verificationCode = await generateEmailVerificationCode(userId, email);

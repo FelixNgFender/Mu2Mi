@@ -87,14 +87,12 @@ export const GET = withErrorHandling(
         }
 
         const userId = generateId(15);
-        console.log(googleUser);
+
         await createOneUserWithOAuthAccount(
             {
                 id: userId,
                 email: googleUser.email.toLowerCase(),
                 emailVerified: googleUser.email_verified,
-                username: googleUser.name,
-                usernameLower: googleUser.name.toLowerCase(),
             },
             'google',
             googleUser.sub,
@@ -123,7 +121,6 @@ export const GET = withErrorHandling(
 
 interface GoogleUser {
     sub: string;
-    name: string;
     email: string;
     email_verified: boolean;
 }

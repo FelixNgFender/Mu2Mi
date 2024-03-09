@@ -9,7 +9,6 @@ import 'server-only';
 
 type DatabaseUser = typeof userTable.$inferSelect;
 type NewUser = Omit<typeof userTable.$inferInsert, 'createdAt' | 'updatedAt'>;
-type UserDTO = Pick<DatabaseUser, 'id' | 'username'>;
 
 /**
  * Can be used in Server Components and Server Actions to get the current session and user.
@@ -113,7 +112,7 @@ const updateOne = async (id: string, user: Partial<NewUser>) => {
         .where(eq(userTable.id, id));
 };
 
-export type { DatabaseUser, UserDTO };
+export type { DatabaseUser };
 
 export {
     getUserSession,

@@ -21,7 +21,6 @@ export const auth = new Lucia(adapter, {
     },
     getUserAttributes: (attributes) => {
         return {
-            username: attributes.username,
             email: attributes.email,
             emailVerified: attributes.emailVerified,
         };
