@@ -87,7 +87,7 @@ export const GET = withErrorHandling(
         }
 
         const userId = generateId(15);
-
+        console.log(googleUser);
         await createOneUserWithOAuthAccount(
             {
                 id: userId,

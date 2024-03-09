@@ -33,6 +33,7 @@ export const GET = withErrorHandling(
             },
         });
         const githubUser: GitHubUser = await githubUserResponse.json();
+        console.log(githubUser);
         if (!githubUser.email) {
             throw new AppError('ValidationError', 'Email not provided', true);
         }
