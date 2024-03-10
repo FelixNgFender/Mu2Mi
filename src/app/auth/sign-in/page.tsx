@@ -42,6 +42,7 @@ const SignInPage = async () => {
                     <Link
                         href={siteConfig.paths.auth.googleOAuth}
                         className={buttonVariants({ variant: 'secondary' })}
+                        prefetch={false}
                     >
                         <span>
                             <Icons.google className="mr-2 h-4 w-4 fill-current" />
@@ -51,6 +52,7 @@ const SignInPage = async () => {
                     {/* <Link
                         href={siteConfig.paths.auth.facebookOAuth}
                         className={buttonVariants({ variant: 'secondary' })}
+                        prefetch={false}
                     >
                         <span>
                             <Icons.facebook className="mr-2 h-4 w-4 fill-current" />
@@ -60,6 +62,7 @@ const SignInPage = async () => {
                     <Link
                         href={siteConfig.paths.auth.githubOAuth}
                         className={buttonVariants({ variant: 'secondary' })}
+                        prefetch={false}
                     >
                         <span>
                             <Icons.gitHub className="mr-2 h-4 w-4 fill-current" />
