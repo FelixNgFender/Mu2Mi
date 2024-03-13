@@ -45,7 +45,7 @@ export const metadata: Metadata = {
         creator: siteConfig.twitter.creator,
         title: siteConfig.title,
         description: siteConfig.description,
-        images: siteConfig.ogImage,
+        images: `${siteConfig.url}/opengraph-image.png`,
     },
     // TODO: finish this https://support.google.com/webmasters/answer/9008080#meta_tag_verification&zippy=%2Chtml-tag
     // verification: {

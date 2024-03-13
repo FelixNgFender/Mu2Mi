@@ -62,7 +62,6 @@ export const siteConfig = {
             karaoke: '/preview/karaoke',
         },
     } as const,
-    ogImage: 'https://mu2mi.com/opengraph-image.png',
     description:
         'Elevate your music practice with our open-source, AI-powered app. Remove vocals, isolate instruments, transcribe lyrics and instruments, generate and remix songs.',
     links: {
