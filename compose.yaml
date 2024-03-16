@@ -111,12 +111,6 @@ services:
             - '14268'
             - '14250'
 
-    zipkin-all-in-one:
-        image: openzipkin/zipkin:3
-        restart: always
-        ports:
-            - '9411:9411'
-
     otel-collector:
         image: otel/opentelemetry-collector:0.67.0
         restart: always
@@ -133,7 +127,6 @@ services:
             - '55679:55679' # zpages extension
         depends_on:
             - jaeger-all-in-one
-            - zipkin-all-in-one
 
     prometheus:
         container_name: prometheus
