@@ -37,6 +37,9 @@ const envSchema = z.object({
     UMAMI_SCRIPT_URL: isString.optional(),
     UMAMI_ANALYTICS_ID: isString.optional(),
 
+    // Instrumentation
+    ENABLE_INSTRUMENTATION: isBoolean,
+
     // Database
     DATABASE_LOGGING: isBoolean,
     DATABASE_URL: isString,

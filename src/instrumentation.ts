@@ -1,3 +1,5 @@
+import { registerOTel } from '@vercel/otel';
+
 export const register = async () => {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
         if (parseInt(process.versions.node.split('.')[0] ?? '') <= 18) {
@@ -11,7 +13,12 @@ export const register = async () => {
 
         const { errorHandler } = await import('@/lib/error');
         const { logger } = await import('@/lib/logger');
+        const { env } = await import('@/config/env');
         // const { queryClient } = await import('@/infra');
+
+        if (env.ENABLE_INSTRUMENTATION) {
+            registerOTel({ serviceName: 'web' });
+        }
 
         /**
          * Tear down resources and gracefully exit the process.
