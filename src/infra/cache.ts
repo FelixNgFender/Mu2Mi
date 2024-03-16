@@ -1,6 +1,7 @@
 import { env } from '@/config/env';
 import { errorHandler } from '@/lib/error';
 import { logger } from '@/lib/logger';
+import { PHASE_PRODUCTION_BUILD } from 'next/constants';
 import { type RedisClientType, createClient } from 'redis';
 import 'server-only';
 
@@ -20,11 +21,10 @@ if (env.NODE_ENV === 'production') {
         });
     }
 
-    db = global.db;
     cache = global.cache;
 }
 
-if (!cache.isOpen) {
+if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD && !cache.isOpen) {
     cache
         .on('error', async (err) => {
             await errorHandler.handleError(err);
