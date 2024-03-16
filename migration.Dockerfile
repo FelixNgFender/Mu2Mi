@@ -16,7 +16,7 @@ COPY --from=deps /app/node_modules node_modules/
 COPY package.json .
 COPY migrations migrations
 COPY scripts scripts
+ARG ENABLE_ALPINE_PRIVATE_NETWORKING
 ENV NODE_ENV=production
-ENV ENABLE_ALPINE_PRIVATE_NETWORKING true
 USER node
 CMD [ "node", "scripts/migrate.mjs" ]
