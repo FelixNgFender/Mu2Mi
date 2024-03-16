@@ -23,6 +23,9 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
 
+ARG NEXT_OTEL_VERBOSE
+ARG OTEL_LOG_LEVEL
+
 ARG NEXT_MANUAL_SIG_HANDLE
 ARG PROTOCOL
 ARG HOST
