@@ -7,7 +7,6 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN ["npm", "pkg", "delete", "scripts.prepare"]
-ARG ENABLE_ALPINE_PRIVATE_NETWORKING
 # RUN [ "npm", "ci",  "--omit=dev" ]
 RUN [ "npm", "i" ]
 
@@ -18,5 +17,6 @@ COPY package.json .
 COPY migrations migrations
 COPY scripts scripts
 ENV NODE_ENV=production
+ENV ENABLE_ALPINE_PRIVATE_NETWORKING true
 USER node
 CMD [ "node", "scripts/migrate.mjs" ]
