@@ -54,7 +54,7 @@ export const SiteHeader = async () => {
                             </div>
                         </Link> */}
                         <ThemeToggle variant="ghost" className="h-9 w-9 px-0" />
-                        <Account variant="ghost" className="h-9 w-9 px-0" />
+                        <Account className="h-9 w-9 px-0" />
                     </nav>
                 </div>
             </div>

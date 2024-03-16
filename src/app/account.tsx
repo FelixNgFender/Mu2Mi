@@ -14,30 +14,19 @@ import Link from 'next/link';
 import { signOut } from './actions';
 
 interface ModeToggleProps {
-    variant?:
-        | 'default'
-        | 'link'
-        | 'destructive'
-        | 'outline'
-        | 'secondary'
-        | 'ghost'
-        | null
-        | undefined;
     className?: string | undefined;
-    size?: 'default' | 'sm' | 'lg' | 'icon' | null | undefined;
 }
 
-export const Account = async ({
-    variant = 'outline',
-    className,
-    size = 'icon',
-}: ModeToggleProps) => {
+export const Account = async ({ className }: ModeToggleProps) => {
     const { session } = await getUserSession();
     if (!session)
         return (
             <Link
                 href={siteConfig.paths.auth.signIn}
-                className={cn(buttonVariants({ variant: variant }), className)}
+                className={cn(
+                    buttonVariants({ variant: 'ghost', size: 'icon' }),
+                    className,
+                )}
             >
                 <LogIn className="h-5 w-5" />
                 <span className="sr-only">Sign in</span>
@@ -48,9 +37,9 @@ export const Account = async ({
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button
-                    variant={variant}
+                    variant="ghost"
                     className={className}
-                    size={size}
+                    size="icon"
                     title="Account"
                 >
                     <User className="h-5 w-5" />
