@@ -550,7 +550,11 @@ export const trackTableColumnsBuiler = (
                 <div className="whitespace-nowrap">
                     {basePreviewPath ? (
                         <Link
-                            href={`${basePreviewPath}/${row.original.id}?callback=${callback}`}
+                            href={
+                                callback
+                                    ? `${basePreviewPath}/${row.original.id}?callback=${callback}`
+                                    : `${basePreviewPath}/${row.original.id}`
+                            }
                             className={cn(
                                 buttonVariants({ variant: 'link' }),
                                 'text-foreground',
