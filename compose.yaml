@@ -107,8 +107,8 @@ services:
             - jaeger-all-in-one
 
     prometheus:
-        container_name: prometheus
         image: prom/prometheus:v2.50.1
+        container_name: prometheus
         restart: always
         volumes:
             - ./prometheus.yaml:/etc/prometheus/prometheus.yml
