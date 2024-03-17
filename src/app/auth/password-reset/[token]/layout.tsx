@@ -11,7 +11,7 @@ const NewPasswordLayout = async ({ children }: NewPasswordLayoutProps) => {
     if (user) {
         if (!user.emailVerified)
             return redirect(siteConfig.paths.auth.emailVerification);
-        return redirect(siteConfig.paths.home);
+        return redirect(siteConfig.paths.studio.home);
     }
 
     return <>{children}</>;

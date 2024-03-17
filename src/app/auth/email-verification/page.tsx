@@ -28,7 +28,7 @@ const EmailVerificationPage = async () => {
     }
 
     if (user.emailVerified) {
-        return redirect(siteConfig.paths.home);
+        return redirect(siteConfig.paths.studio.home);
     }
 
     return (

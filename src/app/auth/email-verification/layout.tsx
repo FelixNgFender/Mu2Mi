@@ -14,7 +14,7 @@ const EmailVerificationLayout = async ({
         return redirect(siteConfig.paths.auth.signIn);
     }
     if (user.emailVerified) {
-        return redirect(siteConfig.paths.home);
+        return redirect(siteConfig.paths.studio.home);
     }
     return <>{children}</>;
 };

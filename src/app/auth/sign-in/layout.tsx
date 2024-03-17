@@ -12,7 +12,7 @@ const SignInLayout = async ({ children }: SignInLayoutProps) => {
         if (!user.emailVerified) {
             return redirect(siteConfig.paths.auth.emailVerification);
         }
-        return redirect(siteConfig.paths.home);
+        return redirect(siteConfig.paths.studio.home);
     }
 
     return <>{children}</>;
