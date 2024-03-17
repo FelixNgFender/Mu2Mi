@@ -33,7 +33,7 @@ export default function Error({
             <h2 className="border-b pb-2 text-2xl font-semibold tracking-tight">
                 Uh oh! Something went wrong
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="max-w-md text-balance text-sm text-muted-foreground">
                 {error.message || 'An unexpected error occurred.'}
             </p>
             <Button
