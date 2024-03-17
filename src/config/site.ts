@@ -66,6 +66,7 @@ export const siteConfig = {
         'Mu2Mi is an open source, AI-powered toolkit for all your musical needs. Remove vocals, isolate instruments, transcribe lyrics and instruments, generate and remix songs.',
     links: {
         github: 'https://github.com/FelixNgFender/Mu2Mi',
+        discord: 'https://discord.gg/7BkTD7RNRG',
         twitter: 'https://twitter.com/felixcantcode',
     },
     twitter: {

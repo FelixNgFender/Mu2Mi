@@ -128,6 +128,13 @@ export const studioConfig: StudioConfig = {
                     icon: <Icons.gitHub className="fill-current" />,
                 },
                 {
+                    title: 'Discord',
+                    href: siteConfig.links.discord,
+                    items: [],
+                    external: true,
+                    icon: <Icons.discord className="fill-current" />,
+                },
+                {
                     title: 'Twitter',
                     href: siteConfig.links.twitter,
                     items: [],
