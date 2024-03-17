@@ -83,7 +83,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
                             <main className="flex flex-1 flex-col">
                                 {children}
                             </main>
-                            {/* <SiteFooter /> */}
                         </div>
                         {/* </Suspense> */}
                         <TailwindIndicator />

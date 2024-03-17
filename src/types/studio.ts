@@ -7,6 +7,7 @@ import { StaticImageData } from 'next/image';
 
 export interface NavItem {
     title: string;
+    description?: string;
     href?: string;
     external?: boolean;
     icon?: JSX.Element;

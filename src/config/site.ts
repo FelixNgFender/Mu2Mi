@@ -4,7 +4,7 @@ export const siteConfig = {
     ],
     contact: 'team@mu2mi.com',
     name: 'Mu2Mi',
-    title: 'Mu2Mi - The AI Musical Toolkit.',
+    title: 'Mu2Mi | The Open Source AI Musical Toolkit',
     url: 'https://mu2mi.com',
     paths: {
         api: {
@@ -63,7 +63,7 @@ export const siteConfig = {
         },
     } as const,
     description:
-        'Elevate your music practice with our open-source, AI-powered app. Remove vocals, isolate instruments, transcribe lyrics and instruments, generate and remix songs.',
+        'Mu2Mi is an open source, AI-powered toolkit for all your musical needs. Remove vocals, isolate instruments, transcribe lyrics and instruments, generate and remix songs.',
     links: {
         github: 'https://github.com/FelixNgFender/Mu2Mi',
         twitter: 'https://twitter.com/felixcantcode',
