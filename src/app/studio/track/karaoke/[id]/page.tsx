@@ -1,6 +1,8 @@
 import { KaraokePlayer } from '@/app/karaoke-player';
 import { downloadUserTrackAssets } from '@/app/studio/queries';
 import { buttonVariants } from '@/components/ui/button';
+import { siteConfig } from '@/config/site';
+import { httpStatus } from '@/lib/http';
 import { cn, formatValidationErrors } from '@/lib/utils';
 import { LyricsTranscriptionWebhookBody } from '@/types/replicate';
 import { ChevronLeftCircle } from 'lucide-react';
@@ -13,9 +15,15 @@ type KaraokePageProps = {
     searchParams: { callback?: string };
 };
 
+const validCallbacks = [siteConfig.paths.studio.lyricsTranscription];
+
 const KaraokePage = async ({ params, searchParams }: KaraokePageProps) => {
     const trackId = params.id;
     const callback = searchParams.callback;
+
+    if (callback && !(validCallbacks as string[]).includes(callback)) {
+        throw new Error(httpStatus.clientError.badRequest.humanMessage);
+    }
 
     const {
         data: assetLinks,

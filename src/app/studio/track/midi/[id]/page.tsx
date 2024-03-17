@@ -1,5 +1,7 @@
 import { downloadUserTrackAssets } from '@/app/studio/queries';
 import { Skeleton } from '@/components/ui/skeleton';
+import { siteConfig } from '@/config/site';
+import { httpStatus } from '@/lib/http';
 import { formatValidationErrors } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 
@@ -19,6 +21,8 @@ const MidiPlayer = dynamic(() => import('@/app/midi-player'), {
     ),
 });
 
+const validCallbacks = [siteConfig.paths.studio.midiTranscription];
+
 type MidiTrackPageProps = {
     params: {
         id: string;
@@ -29,6 +33,10 @@ type MidiTrackPageProps = {
 const MidiTrackPage = async ({ params, searchParams }: MidiTrackPageProps) => {
     const trackId = params.id;
     const callback = searchParams.callback;
+
+    if (callback && !(validCallbacks as string[]).includes(callback)) {
+        throw new Error(httpStatus.clientError.badRequest.humanMessage);
+    }
 
     const {
         data: assetLinks,

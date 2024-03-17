@@ -1,6 +1,8 @@
 import { downloadUserTrackAssets } from '@/app/studio/queries';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { siteConfig } from '@/config/site';
+import { httpStatus } from '@/lib/http';
 import { formatValidationErrors } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -28,9 +30,20 @@ type TrackPageProps = {
     searchParams: { callback?: string };
 };
 
+const validCallbacks = [
+    siteConfig.paths.studio.musicGeneration,
+    siteConfig.paths.studio.styleRemix,
+    siteConfig.paths.studio.trackSeparation,
+    siteConfig.paths.studio.trackAnalysis,
+];
+
 const TrackPage = async ({ params, searchParams }: TrackPageProps) => {
     const trackId = params.id;
     const callback = searchParams.callback;
+
+    if (callback && !(validCallbacks as string[]).includes(callback)) {
+        throw new Error(httpStatus.clientError.badRequest.humanMessage);
+    }
 
     const {
         data: assetLinks,
