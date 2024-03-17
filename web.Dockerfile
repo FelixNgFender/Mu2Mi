@@ -23,8 +23,6 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
 
-ARG ENABLE_ALPINE_PRIVATE_NETWORKING
-
 ARG NEXT_MANUAL_SIG_HANDLE
 ARG PROTOCOL
 ARG HOST
