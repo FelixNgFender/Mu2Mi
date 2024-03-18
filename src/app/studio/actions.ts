@@ -58,11 +58,13 @@ export const deleteUserTrack = authAction(
                 httpStatus.clientError.unauthorized.code,
             );
         }
-        await fileStorage.removeObjects(
-            env.S3_BUCKET_NAME,
-            assets.map((asset) => asset.name),
-        );
-        await deleteOneTrack(trackId); // cascades to asset table
+        await Promise.all([
+            fileStorage.removeObjects(
+                env.S3_BUCKET_NAME,
+                assets.map((asset) => asset.name),
+            ),
+            deleteOneTrack(trackId), // cascades to asset table
+        ]);
         revalidatePath(siteConfig.paths.studio.home);
     },
 );
