@@ -66,6 +66,16 @@ function LandingFooter() {
                     </Link>
                     .
                 </p>
+                <p className="text-sm leading-loose text-muted-foreground md:text-right">
+                    <Link
+                        href={siteConfig.links.statusPage}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-medium underline underline-offset-4"
+                    >
+                        Status Page
+                    </Link>
+                </p>
             </div>
         </footer>
     );
@@ -83,7 +93,7 @@ const LandingPage = async () => {
                                 fill="white"
                             />
                             <h1 className="text-4xl font-bold sm:text-5xl sm:leading-none lg:text-7xl">
-                                <span className="animate-gradient bg-300% bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 bg-clip-text text-transparent">
+                                <span className="animate-gradient bg-gradient-to-r from-orange-700 via-blue-500 to-green-400 bg-300% bg-clip-text text-transparent">
                                     Unleash your creativity
                                 </span>
                             </h1>

@@ -68,6 +68,7 @@ export const siteConfig = {
         github: 'https://github.com/FelixNgFender/Mu2Mi',
         discord: 'https://discord.gg/7BkTD7RNRG',
         twitter: 'https://twitter.com/felixcantcode',
+        statusPage: 'https://status.mu2mi.com/status/mu2mi',
     },
     twitter: {
         site: '@felixcantcode',
