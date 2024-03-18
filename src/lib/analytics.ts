@@ -11,6 +11,9 @@ export const umami = {
     deleteTrack: {
         name: 'delete-track',
     },
+    deleteAccount: {
+        name: 'delete-account',
+    },
     generation: {
         init: {
             name: 'process-track-generation-init',

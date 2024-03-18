@@ -29,4 +29,13 @@ const findManyByTrackId = async (trackId: string) => {
     });
 };
 
-export { createOne, findManyByTrackId };
+const findManyByUserId = async (userId: string) => {
+    return await db.query.assetTable.findMany({
+        where: eq(assetTable.userId, userId),
+        columns: {
+            name: true,
+        },
+    });
+};
+
+export { createOne, findManyByTrackId, findManyByUserId };

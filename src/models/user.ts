@@ -112,6 +112,10 @@ const updateOne = async (id: string, user: Partial<NewUser>) => {
         .where(eq(userTable.id, id));
 };
 
+const deleteOne = async (id: string) => {
+    await db.delete(userTable).where(eq(userTable.id, id));
+};
+
 export type { DatabaseUser };
 
 export {
@@ -121,4 +125,5 @@ export {
     findOne,
     findOneByEmail,
     updateOne,
+    deleteOne,
 };
