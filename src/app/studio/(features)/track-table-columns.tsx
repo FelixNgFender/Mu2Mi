@@ -445,7 +445,7 @@ const DeleteButton = ({ track }: { track: ReturnedTrack }) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button title="Delete track" variant="destructive" size="icon">
+                <Button variant="destructive" size="icon">
                     <Trash2 className="h-4 w-4" />
                     <span className="sr-only">Delete track</span>
                 </Button>
@@ -470,7 +470,6 @@ const DeleteButton = ({ track }: { track: ReturnedTrack }) => {
                         </Button>
                     </DialogClose>
                     <Button
-                        title="Delete track"
                         variant="destructive"
                         disabled={isPending}
                         onClick={() =>
