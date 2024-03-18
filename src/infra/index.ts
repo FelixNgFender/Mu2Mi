@@ -1,4 +1,4 @@
 export * from './database';
-export * from './cache';
+export * from './redis';
 export * from './file-storage';
 export * from './replicate';

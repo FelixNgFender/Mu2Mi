@@ -1,4 +1,4 @@
-import { cache } from '@/infra';
+import { redis } from '@/infra';
 import { headers } from 'next/headers';
 import { RateLimiterRedis, RateLimiterRes } from 'rate-limiter-flexible';
 import 'server-only';
@@ -15,7 +15,7 @@ function getIPAdress() {
 }
 
 const signInRateLimiter = new RateLimiterRedis({
-    storeClient: cache,
+    storeClient: redis,
     useRedisPackage: true,
     keyPrefix: 'rate-limiter:sign-in',
     points: 5,
@@ -23,7 +23,7 @@ const signInRateLimiter = new RateLimiterRedis({
 });
 
 const signUpRateLimiter = new RateLimiterRedis({
-    storeClient: cache,
+    storeClient: redis,
     useRedisPackage: true,
     keyPrefix: 'rate-limiter:sign-up',
     points: 3,
@@ -31,7 +31,7 @@ const signUpRateLimiter = new RateLimiterRedis({
 });
 
 const passwordResetRateLimiter = new RateLimiterRedis({
-    storeClient: cache,
+    storeClient: redis,
     useRedisPackage: true,
     keyPrefix: 'rate-limiter:password-reset',
     points: 3,
@@ -39,7 +39,7 @@ const passwordResetRateLimiter = new RateLimiterRedis({
 });
 
 const verifyCodeRateLimiter = new RateLimiterRedis({
-    storeClient: cache,
+    storeClient: redis,
     useRedisPackage: true,
     keyPrefix: 'rate-limiter:verify-code',
     points: 5,
@@ -47,7 +47,7 @@ const verifyCodeRateLimiter = new RateLimiterRedis({
 });
 
 const resendCodeRateLimiter = new RateLimiterRedis({
-    storeClient: cache,
+    storeClient: redis,
     useRedisPackage: true,
     keyPrefix: 'rate-limiter:resend-code',
     points: 5,
@@ -55,7 +55,7 @@ const resendCodeRateLimiter = new RateLimiterRedis({
 });
 
 const trackProcessingRateLimiter = new RateLimiterRedis({
-    storeClient: cache,
+    storeClient: redis,
     useRedisPackage: true,
     keyPrefix: 'rate-limiter:track-processing',
     points: 10,

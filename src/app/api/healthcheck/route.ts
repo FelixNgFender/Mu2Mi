@@ -1,4 +1,4 @@
-import { cache, db, fileStorage } from '@/infra';
+import { redis, db, fileStorage } from '@/infra';
 import { withErrorHandling } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
 import { sql } from 'drizzle-orm';
@@ -9,7 +9,7 @@ export const GET = withErrorHandling(async () => {
     const start = performance.now();
     await db.execute(sql`SELECT 1`);
     const databaseLatency = (performance.now() - start).toFixed(2);
-    await cache.ping();
+    await redis.ping();
     const cacheLatency = (
         performance.now() -
         start -

@@ -6,26 +6,26 @@ import { type RedisClientType, createClient } from 'redis';
 import 'server-only';
 
 declare global {
-    var cache: RedisClientType | undefined;
+    var redis: RedisClientType | undefined;
 }
 
-let cache: RedisClientType;
+let redis: RedisClientType;
 
 if (env.NODE_ENV === 'production') {
-    cache = createClient({ url: env.REDIS_URL, disableOfflineQueue: true });
+    redis = createClient({ url: env.REDIS_URL, disableOfflineQueue: true });
 } else {
-    if (!global.cache) {
-        global.cache = createClient({
+    if (!global.redis) {
+        global.redis = createClient({
             url: env.REDIS_URL,
             disableOfflineQueue: true,
         });
     }
 
-    cache = global.cache;
+    redis = global.redis;
 }
 
-if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD && !cache.isOpen) {
-    cache
+if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD && !redis.isOpen) {
+    redis
         .on('error', async (err) => {
             await errorHandler.handleError(err);
         })
@@ -33,4 +33,4 @@ if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD && !cache.isOpen) {
         .connect();
 }
 
-export { cache };
+export { redis };

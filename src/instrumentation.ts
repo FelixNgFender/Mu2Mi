@@ -1,5 +1,3 @@
-import { registerOTel } from '@vercel/otel';
-
 export const register = async () => {
     if (process.env.NEXT_RUNTIME === 'nodejs') {
         if (parseInt(process.versions.node.split('.')[0] ?? '') <= 18) {
@@ -14,10 +12,29 @@ export const register = async () => {
         const { errorHandler } = await import('@/lib/error');
         const { logger } = await import('@/lib/logger');
         const { env } = await import('@/config/env');
-        const { cache } = await import('@/infra');
+        const { redis } = await import('@/infra');
 
         if (env.ENABLE_INSTRUMENTATION) {
-            registerOTel({ serviceName: 'web' });
+            const { OTLPTraceExporter } = await import(
+                '@opentelemetry/exporter-trace-otlp-http'
+            );
+            const { Resource } = await import('@opentelemetry/resources');
+            const { NodeSDK } = await import('@opentelemetry/sdk-node');
+            const { SimpleSpanProcessor } = await import(
+                '@opentelemetry/sdk-trace-node'
+            );
+            const { SEMRESATTRS_SERVICE_NAME } = await import(
+                '@opentelemetry/semantic-conventions'
+            );
+
+            const sdk = new NodeSDK({
+                resource: new Resource({
+                    [SEMRESATTRS_SERVICE_NAME]: 'web',
+                }),
+                spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter()),
+            });
+
+            sdk.start();
         }
 
         /**
@@ -27,7 +44,7 @@ export const register = async () => {
         const cleanup = async (exitCode: number) => {
             // await queryClient.end();
             // Redis and Minio clients are already closed by the time this function is called.
-            await cache.quit();
+            await redis.quit();
             logger.info('Gracefully shutting down...');
             process.exit(exitCode);
         };
