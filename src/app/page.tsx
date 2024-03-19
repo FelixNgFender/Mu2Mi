@@ -75,6 +75,13 @@ function LandingFooter() {
                     >
                         Status Page
                     </Link>
+                    {' | '}
+                    <Link
+                        href={siteConfig.paths.legal.privacy}
+                        className="font-medium underline underline-offset-4"
+                    >
+                        Privacy Policy
+                    </Link>
                 </p>
             </div>
         </footer>
