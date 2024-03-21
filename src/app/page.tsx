@@ -150,7 +150,7 @@ const LandingPage = async () => {
                     </div>
                 </div>
             </section>
-            <section className="py-16 lg:py-24 xl:py-40">
+            {/* <section className="py-16 lg:py-24 xl:py-40">
                 <div className="container px-4 md:px-6">
                     <div className="grid items-center gap-6">
                         <div className="flex flex-col justify-center space-y-12 text-center">
@@ -170,7 +170,7 @@ const LandingPage = async () => {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> */}
             <LandingFooter />
         </>
     );
