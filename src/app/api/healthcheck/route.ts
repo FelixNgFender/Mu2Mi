@@ -1,4 +1,4 @@
-import { redis, db, fileStorage } from '@/infra';
+import { db, fileStorage, redis } from '@/infra';
 import { withErrorHandling } from '@/lib/error';
 import { HttpResponse } from '@/lib/response';
 import { sql } from 'drizzle-orm';

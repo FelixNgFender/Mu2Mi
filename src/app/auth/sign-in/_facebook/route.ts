@@ -14,7 +14,7 @@
 //     });
 //     cookies().set('facebook_oauth_state', state, {
 //         path: '/',
-//         secure: env.NODE_ENV === 'production',
+//         secure: process.env.NODE_ENV === 'production',
 //         httpOnly: true,
 //         maxAge: env.AUTH_COOKIE_DURATION_S,
 //         sameSite: 'lax',

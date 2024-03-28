@@ -11,7 +11,7 @@ declare global {
 
 let redis: RedisClientType;
 
-if (env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production') {
     redis = createClient({ url: env.REDIS_URL, disableOfflineQueue: true });
 } else {
     if (!global.redis) {

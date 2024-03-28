@@ -19,7 +19,7 @@ declare global {
 
 let db: PostgresJsDatabase<typeof schema>;
 
-if (env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production') {
     db = drizzle(postgres(env.DATABASE_URL), {
         logger: env.DATABASE_LOGGING && new DatabaseLogger(),
         schema,

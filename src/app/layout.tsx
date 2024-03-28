@@ -21,7 +21,7 @@ const fontSans = FontSans({
 
 export const metadata: Metadata = {
     metadataBase:
-        env.NODE_ENV === 'development'
+        process.env.NODE_ENV === 'development'
             ? new URL(env.ORIGIN)
             : new URL(siteConfig.url),
     title: {

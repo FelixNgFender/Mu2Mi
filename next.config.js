@@ -8,10 +8,7 @@ const nextConfig = {
     experimental: {
         instrumentationHook: true,
     },
-    webpack: (
-        config,
-        { isServer },
-    ) => {
+    webpack: (config, { isServer }) => {
         config.externals.push('@node-rs/argon2', '@node-rs/bcrypt');
         if (isServer) {
             config.ignoreWarnings = [{ module: /opentelemetry/ }];

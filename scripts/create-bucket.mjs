@@ -6,8 +6,7 @@ if (
     !process.env.S3_USE_SSL ||
     !process.env.S3_ACCESS_KEY ||
     !process.env.S3_SECRET_KEY ||
-    !process.env.S3_BUCKET_NAME ||
-    !process.env.S3_BUCKET_REGION
+    !process.env.S3_BUCKET_NAME
 ) {
     throw new Error('S3 environment variables are not set');
 }
@@ -27,10 +26,7 @@ const main = async () => {
     } else {
         console.info(`Bucket ${process.env.S3_BUCKET_NAME} does not exist.`);
         console.info(`Creating bucket ${process.env.S3_BUCKET_NAME}...`);
-        await fileStorage.makeBucket(
-            process.env.S3_BUCKET_NAME,
-            process.env.S3_BUCKET_REGION,
-        );
+        await fileStorage.makeBucket(process.env.S3_BUCKET_NAME);
         console.info(`Bucket ${process.env.S3_BUCKET_NAME} created.`);
     }
     process.exit(0);

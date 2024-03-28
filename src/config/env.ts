@@ -6,15 +6,24 @@ const isBoolean = isString.transform((value) => value === 'true');
 const isNumber = isString.transform(Number);
 
 const envSchema = z.object({
-    // Node.js
-    NODE_ENV: z.enum(['development', 'production', 'test']),
-
-    // Express
-    PROTOCOL: z.enum(['http', 'https']),
-    APP_PORT: isNumber,
-    HOST: isString,
-
     // General
+    NEXT_MANUAL_SIG_HANDLE: isBoolean,
+    PROTOCOL: z.enum(['http', 'https']),
+    HOST: isString,
+    APP_PORT: isNumber,
+
+    // Authentication
+    AUTH_COOKIE_DURATION_S: isNumber,
+    GOOGLE_CLIENT_ID: isString,
+    GOOGLE_CLIENT_SECRET: isString,
+    GOOGLE_REDIRECT_URI: isString,
+    // FACEBOOK_CLIENT_ID: isString,
+    // FACEBOOK_CLIENT_SECRET: isString,
+    // FACEBOOK_REDIRECT_URI: isString,
+    GITHUB_CLIENT_ID: isString,
+    GITHUB_CLIENT_SECRET: isString,
+
+    // Logging
     APP_LOGGING: isBoolean,
     LOG_LEVEL: z.enum([
         'error',
@@ -25,25 +34,39 @@ const envSchema = z.object({
         'debug',
         'silly',
     ]),
-    ENABLE_EMAIL: isBoolean,
+
+    // Rate limiting
     ENABLE_RATE_LIMIT: isBoolean,
-    ENABLE_ANALYTICS: isBoolean,
-    AUTH_COOKIE_DURATION_S: isNumber,
+
+    // Captcha
+    NEXT_PUBLIC_ENABLE_CAPTCHA: isBoolean.optional(),
+    NEXT_PUBLIC_CAPTCHA_SITE_KEY: isString.optional(),
     CAPTCHA_SECRET_KEY: isString.optional(),
+
+    // Email
+    ENABLE_EMAIL: isBoolean,
     AWS_ACCESS_KEY_ID: isString.optional(),
     AWS_SECRET_ACCESS_KEY: isString.optional(),
 
     // Analytics
+    ENABLE_ANALYTICS: isBoolean,
     UMAMI_SCRIPT_URL: isString.optional(),
     UMAMI_ANALYTICS_ID: isString.optional(),
 
     // Instrumentation
     ENABLE_INSTRUMENTATION: isBoolean,
+    OTEL_EXPORTER_OTLP_ENDPOINT: isString.optional(),
+    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: isString.optional(),
+    OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: isString.optional(),
+    NEXT_OTEL_VERBOSE: isNumber.optional(),
+    OTEL_LOG_LEVEL: isString.optional(),
 
     // Database
     DATABASE_LOGGING: isBoolean,
     DATABASE_URL: isString,
     REDIS_URL: isString,
+
+    // S3
     S3_ENDPOINT: isString,
     S3_PORT: isNumber,
     S3_USE_SSL: isBoolean,
@@ -51,16 +74,6 @@ const envSchema = z.object({
     S3_SECRET_KEY: isString,
     S3_BUCKET_NAME: isString,
     S3_PRESIGNED_URL_EXPIRATION_S: isNumber,
-
-    // Auth
-    GOOGLE_CLIENT_ID: isString,
-    GOOGLE_CLIENT_SECRET: isString,
-    GOOGLE_REDIRECT_URI: isString,
-    // FACEBOOK_CLIENT_ID: isString,
-    // FACEBOOK_CLIENT_SECRET: isString,
-    // FACEBOOK_REDIRECT_URI: isString,
-    GITHUB_CLIENT_ID: isString,
-    GITHUB_CLIENT_SECRET: isString,
 
     // Replicate
     REPLICATE_API_TOKEN: isString,
