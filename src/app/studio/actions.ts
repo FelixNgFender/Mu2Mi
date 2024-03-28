@@ -140,14 +140,14 @@ export const shareUserTrack = authAction(
     },
 );
 
-const updateTrackSchema = z.object({
+const updateUserTrackSchema = z.object({
     trackId: z.string(),
     name: z.string(),
     public: z.boolean().optional(),
 });
 
-export const updateTrack = authAction(
-    updateTrackSchema,
+export const updateUserTrack = authAction(
+    updateUserTrackSchema,
     async ({ trackId, name, public: isPublic }, { user }) => {
         const track = await findOneTrack(trackId);
         if (!track) {

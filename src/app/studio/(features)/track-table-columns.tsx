@@ -4,7 +4,7 @@ import {
     deleteUserTrack,
     downloadUserTrackAssets,
     shareUserTrack,
-    updateTrack,
+    updateUserTrack,
 } from '@/app/studio/actions';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -155,7 +155,7 @@ const EditButton = ({ track }: { track: ReturnedTrack }) => {
 
     const onEditSave: SubmitHandler<EditTrackFormType> = async (data) => {
         try {
-            const { validationErrors, serverError } = await updateTrack({
+            const { validationErrors, serverError } = await updateUserTrack({
                 trackId: track.id,
                 name: data.name,
                 public: data.public,
