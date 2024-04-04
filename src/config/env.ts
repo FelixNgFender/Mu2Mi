@@ -53,14 +53,6 @@ const envSchema = z.object({
     UMAMI_SCRIPT_URL: isString.optional(),
     UMAMI_ANALYTICS_ID: isString.optional(),
 
-    // Instrumentation
-    ENABLE_INSTRUMENTATION: isBoolean,
-    OTEL_EXPORTER_OTLP_ENDPOINT: isString.optional(),
-    OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: isString.optional(),
-    OTEL_EXPORTER_OTLP_TRACES_PROTOCOL: isString.optional(),
-    NEXT_OTEL_VERBOSE: isNumber.optional(),
-    OTEL_LOG_LEVEL: isString.optional(),
-
     // Database
     DATABASE_LOGGING: isBoolean,
     DATABASE_URL: isString,

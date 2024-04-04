@@ -11,31 +11,7 @@ export const register = async () => {
 
         const { errorHandler } = await import('@/lib/error');
         const { logger } = await import('@/lib/logger');
-        const { env } = await import('@/config/env');
         const { redis } = await import('@/infra');
-
-        if (env.ENABLE_INSTRUMENTATION) {
-            const { OTLPTraceExporter } = await import(
-                '@opentelemetry/exporter-trace-otlp-http'
-            );
-            const { Resource } = await import('@opentelemetry/resources');
-            const { NodeSDK } = await import('@opentelemetry/sdk-node');
-            const { SimpleSpanProcessor } = await import(
-                '@opentelemetry/sdk-trace-node'
-            );
-            const { SEMRESATTRS_SERVICE_NAME } = await import(
-                '@opentelemetry/semantic-conventions'
-            );
-
-            const sdk = new NodeSDK({
-                resource: new Resource({
-                    [SEMRESATTRS_SERVICE_NAME]: 'web',
-                }),
-                spanProcessor: new SimpleSpanProcessor(new OTLPTraceExporter()),
-            });
-
-            sdk.start();
-        }
 
         /**
          * Tear down resources and gracefully exit the process.
