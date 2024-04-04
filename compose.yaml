@@ -3,20 +3,6 @@ version: '3.8'
 name: mu2mi
 
 services:
-    web-migration:
-        build:
-            context: .
-            dockerfile: migration.Dockerfile
-            target: migration
-        container_name: web-migration
-        restart: on-failure
-        environment:
-            - DATABASE_URL=${DATABASE_URL}
-        depends_on:
-            postgres:
-                condition: service_healthy
-        network_mode: host
-
     postgres:
         image: postgres:16.1-alpine3.19
         container_name: postgres
@@ -33,6 +19,20 @@ services:
             interval: 1s
             timeout: 5s
             retries: 10
+
+    web-migration:
+        build:
+            context: .
+            dockerfile: migration.Dockerfile
+            target: migration
+        container_name: web-migration
+        restart: no
+        environment:
+            - DATABASE_URL=${DATABASE_URL}
+        depends_on:
+            postgres:
+                condition: service_healthy
+        network_mode: host
 
     redis:
         image: redis:7.2.4-alpine
@@ -69,10 +69,10 @@ services:
             retries: 10
 
     bucket-init:
-        image: minio/mc
+        image: minio/mc:RELEASE.2024-03-30T15-29-52Z.fips
         container_name: bucket-init
         restart: no
-        entrypoint: /bin/sh -c "/usr/bin/mc config host add minio http://minio:9000 ${S3_ACCESS_KEY} ${S3_SECRET_KEY} && /usr/bin/mc mb minio/${S3_BUCKET_NAME} && /usr/bin/mc anonymous set public minio/${S3_BUCKET_NAME} && exit 0"
+        entrypoint: /bin/sh -c "/usr/bin/mc config host add minio http://minio:9000 ${S3_ACCESS_KEY} ${S3_SECRET_KEY}; /usr/bin/mc mb minio/${S3_BUCKET_NAME}; /usr/bin/mc anonymous set public minio/${S3_BUCKET_NAME}; exit 0;"
         environment:
             - S3_ACCESS_KEY=${S3_ACCESS_KEY}
             - S3_SECRET_KEY=${S3_SECRET_KEY}
@@ -80,47 +80,8 @@ services:
         depends_on:
             minio:
                 condition: service_healthy
-    # jaeger-all-in-one:
-    #     image: jaegertracing/all-in-one:1
-    #     restart: always
-    #     ports:
-    #         - '16686:16686'
-    #         - '14268'
-    #         - '14250'
-
-    # otel-collector:
-    #     image: otel/opentelemetry-collector:0.67.0
-    #     restart: always
-    #     command: ['--config=/etc/otel-collector-config.yaml']
-    #     volumes:
-    #         - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
-    #     ports:
-    #         - '1888:1888' # pprof extension
-    #         - '8888:8888' # Prometheus metrics exposed by the collector
-    #         - '8889:8889' # Prometheus exporter metrics
-    #         - '13133:13133' # health_check extension
-    #         - '4317:4317' # OTLP gRPC receiver
-    #         - '4318:4318' # OTLP HTTP receiver
-    #         - '55679:55679' # zpages extension
-    #     depends_on:
-    #         - jaeger-all-in-one
-
-    # prometheus:
-    #     image: prom/prometheus:v2.50.1
-    #     container_name: prometheus
-    #     restart: always
-    #     volumes:
-    #         - ./prometheus.yaml:/etc/prometheus/prometheus.yml
-    #         - prometheus-data:/prometheus
-    #     ports:
-    #         - '9090:9090'
 
 volumes:
     postgres-data:
-        driver: local
     redis-data:
-        driver: local
     minio_data:
-        driver: local
-    # prometheus-data:
-    #     driver: local
