@@ -47,12 +47,6 @@ export const metadata: Metadata = {
         description: siteConfig.description,
         images: `${siteConfig.url}/opengraph-image.png`,
     },
-    // TODO: finish this https://support.google.com/webmasters/answer/9008080#meta_tag_verification&zippy=%2Chtml-tag
-    // verification: {
-    //     google: '',
-    //     yandex: '',
-    //     me: '',
-    // },
     category: siteConfig.category,
 };
 
