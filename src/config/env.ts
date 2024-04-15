@@ -45,6 +45,7 @@ const envSchema = z.object({
 
     // Email
     ENABLE_EMAIL: isBoolean,
+    AWS_REGION: isString.optional(),
     AWS_ACCESS_KEY_ID: isString.optional(),
     AWS_SECRET_ACCESS_KEY: isString.optional(),
 

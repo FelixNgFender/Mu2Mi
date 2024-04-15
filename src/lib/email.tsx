@@ -11,8 +11,14 @@ import { AppError } from './error';
 
 let ses: SES;
 
-if (env.ENABLE_EMAIL && env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY) {
+if (
+    env.ENABLE_EMAIL &&
+    env.AWS_REGION &&
+    env.AWS_ACCESS_KEY_ID &&
+    env.AWS_SECRET_ACCESS_KEY
+) {
     ses = new SES({
+        region: env.AWS_REGION,
         credentials: {
             accessKeyId: env.AWS_ACCESS_KEY_ID,
             secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
@@ -20,7 +26,7 @@ if (env.ENABLE_EMAIL && env.AWS_ACCESS_KEY_ID && env.AWS_SECRET_ACCESS_KEY) {
     });
 } else if (
     env.ENABLE_EMAIL &&
-    (!env.AWS_ACCESS_KEY_ID || !env.AWS_SECRET_ACCESS_KEY)
+    (!env.AWS_REGION || !env.AWS_ACCESS_KEY_ID || !env.AWS_SECRET_ACCESS_KEY)
 ) {
     throw new AppError(
         'StartupError',
