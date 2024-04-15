@@ -11,7 +11,7 @@ export const register = async () => {
 
         const { errorHandler } = await import('@/lib/error');
         const { logger } = await import('@/lib/logger');
-        // const { redis } = await import('@/infra');
+        const { redis } = await import('@/infra');
 
         /**
          * Tear down resources and gracefully exit the process.
@@ -20,7 +20,7 @@ export const register = async () => {
         const cleanup = async (exitCode: number) => {
             // await queryClient.end();
             // Redis and Minio clients are already closed by the time this function is called.
-            // await redis.quit();
+            await redis.quit();
             logger.info('Gracefully shutting down...');
             process.exit(exitCode);
         };
