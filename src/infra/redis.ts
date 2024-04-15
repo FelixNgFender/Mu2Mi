@@ -24,13 +24,13 @@ if (process.env.NODE_ENV === 'production') {
     redis = global.redis;
 }
 
-// if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD && !redis.isOpen) {
-//     redis
-//         .on('error', async (err) => {
-//             await errorHandler.handleError(err);
-//         })
-//         .on('ready', () => logger.info('Redis Client Ready'))
-//         .connect();
-// }
+if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD && !redis.isOpen) {
+    redis
+        .on('error', async (err) => {
+            await errorHandler.handleError(err);
+        })
+        .on('ready', () => logger.info('Redis Client Ready'))
+        .connect();
+}
 
 export { redis };
