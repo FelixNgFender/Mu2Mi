@@ -34,7 +34,7 @@ if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD && !redis.isOpen) {
             await errorHandler.handleError(err);
         })
         .on('ready', () => logger.info('Redis Client Ready'));
-    await (async () => {
+    (async () => {
         await redis.connect();
     })();
 }
