@@ -36,10 +36,16 @@ const main = async () => {
     }
 
     // Remove all objects from the bucket
-    const objectsStream = fileStorage.listObjectsV2(process.env.S3_BUCKET_NAME);
+    const objectsStream = fileStorage.listObjects(
+        process.env.S3_BUCKET_NAME,
+        '',
+        true,
+    );
     console.log(objectsStream);
     const incompleteUploadsStream = fileStorage.listIncompleteUploads(
         process.env.S3_BUCKET_NAME,
+        '',
+        true,
     );
     const objectNames = [];
     const incompleteUploadNames = [];
