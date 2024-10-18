@@ -10,13 +10,12 @@ RUN ["npm", "pkg", "delete", "scripts.prepare"]
 # RUN [ "npm", "ci",  "--omit=dev" ]
 RUN [ "npm", "i" ]
 
-FROM base AS migration
+FROM base AS cleanup
 WORKDIR /app
 COPY --from=deps /app/node_modules node_modules/
 COPY package.json .
-COPY migrations migrations
 COPY scripts scripts
 ARG ENABLE_ALPINE_PRIVATE_NETWORKING
 ENV NODE_ENV=production
 USER node
-CMD [ "node", "scripts/migrate.mjs" ]
+CMD [ "node", "scripts/cron-monthly-cleanup.mjs" ]

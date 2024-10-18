@@ -22,6 +22,7 @@
         "db:introspect": "drizzle-kit introspect:pg",
         "db:generate": "drizzle-kit generate:pg",
         "db:migrate": "node -r dotenv/config scripts/migrate.mjs",
+        "cleanup": "node -r dotenv/config scripts/cron-monthly-cleanup.mjs",
         "email:dev": "email dev --port 3001 --dir src/components/emails"
     },
     "dependencies": {
