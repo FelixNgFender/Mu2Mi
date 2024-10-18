@@ -72,7 +72,7 @@ services:
         image: minio/mc:RELEASE.2024-03-30T15-29-52Z.fips
         container_name: bucket-init
         restart: no
-        entrypoint: /bin/sh -c "/usr/bin/mc config host add minio http://minio:9000 ${S3_ACCESS_KEY} ${S3_SECRET_KEY}; /usr/bin/mc mb minio/${S3_BUCKET_NAME}; /usr/bin/mc anonymous set public minio/${S3_BUCKET_NAME}; exit 0;"
+        entrypoint: /bin/sh -c "/usr/bin/mc config host add minio http://minio:9000 ${S3_ACCESS_KEY} ${S3_SECRET_KEY}; /usr/bin/mc mb minio/${S3_BUCKET_NAME}; /usr/bin/mc anonymous set public minio/${S3_BUCKET_NAME}; /usr/bin/mc ilm rule add --expire-days 30 minio/${S3_BUCKET_NAME}; exit 0;"
         environment:
             - S3_ACCESS_KEY=${S3_ACCESS_KEY}
             - S3_SECRET_KEY=${S3_SECRET_KEY}
