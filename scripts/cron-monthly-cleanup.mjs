@@ -31,7 +31,6 @@ const main = async () => {
     const exists = await fileStorage.bucketExists(process.env.S3_BUCKET_NAME);
     if (exists) {
         console.info(`Bucket ${process.env.S3_BUCKET_NAME} exists.`);
-        fileStorage.removeObjects;
     } else {
         throw new Error(`Bucket ${process.env.S3_BUCKET_NAME} does not exist`);
     }
