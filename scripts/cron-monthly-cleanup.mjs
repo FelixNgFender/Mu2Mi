@@ -37,12 +37,14 @@ const main = async () => {
 
     // Remove all objects from the bucket
     const objectsStream = fileStorage.listObjects(process.env.S3_BUCKET_NAME);
+    console.log(objectsStream);
     const incompleteUploadsStream = fileStorage.listIncompleteUploads(
         process.env.S3_BUCKET_NAME,
     );
     const objectNames = [];
     const incompleteUploadNames = [];
     objectsStream.on('data', (obj) => {
+        console.log(obj);
         if (obj.name) {
             objectNames.push(obj.name);
         }
@@ -63,6 +65,7 @@ const main = async () => {
         );
     });
     incompleteUploadsStream.on('data', (obj) => {
+        console.log(obj);
         incompleteUploadNames.push(obj.key);
     });
     incompleteUploadsStream.on('error', (error) => {
