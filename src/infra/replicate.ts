@@ -51,27 +51,27 @@ class ReplicateClient {
         }
     }
 
-    async styleRemix({ taskId, userId, ...data }: StyleRemixSchemaType) {
-        try {
-            const webhook = new URL(
-                `${env.ORIGIN}${siteConfig.paths.api.webhook.remix}`,
-            );
-            webhook.searchParams.set('taskId', taskId);
-            webhook.searchParams.set('userId', userId);
-            return this.replicate.predictions.create({
-                version: env.STYLE_REMIX_MODEL_VERSION,
-                input: data,
-                webhook: webhook.toString(),
-                webhook_events_filter: ['completed'],
-            });
-        } catch (error) {
-            throw new AppError(
-                'ReplicateError',
-                (error as Error).message,
-                true,
-            );
-        }
-    }
+    // async styleRemix({ taskId, userId, ...data }: StyleRemixSchemaType) {
+    //     try {
+    //         const webhook = new URL(
+    //             `${env.ORIGIN}${siteConfig.paths.api.webhook.remix}`,
+    //         );
+    //         webhook.searchParams.set('taskId', taskId);
+    //         webhook.searchParams.set('userId', userId);
+    //         return this.replicate.predictions.create({
+    //             version: env.STYLE_REMIX_MODEL_VERSION,
+    //             input: data,
+    //             webhook: webhook.toString(),
+    //             webhook_events_filter: ['completed'],
+    //         });
+    //     } catch (error) {
+    //         throw new AppError(
+    //             'ReplicateError',
+    //             (error as Error).message,
+    //             true,
+    //         );
+    //     }
+    // }
 
     async separateTrack({
         taskId,

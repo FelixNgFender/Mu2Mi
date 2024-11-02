@@ -54,14 +54,14 @@ export const studioConfig: StudioConfig = {
                     items: [],
                     icon: <BrainCircuit />,
                 },
-                {
-                    title: 'Style Remix',
-                    description:
-                        'Remix and reimagine a track in various music styles with AI.',
-                    href: siteConfig.paths.studio.styleRemix,
-                    items: [],
-                    icon: <Disc3 />,
-                },
+                // {
+                //     title: 'Style Remix',
+                //     description:
+                //         'Remix and reimagine a track in various music styles with AI.',
+                //     href: siteConfig.paths.studio.styleRemix,
+                //     items: [],
+                //     icon: <Disc3 />,
+                // },
             ],
         },
         {

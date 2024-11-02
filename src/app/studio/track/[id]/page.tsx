@@ -32,7 +32,7 @@ type TrackPageProps = {
 
 const validCallbacks = [
     siteConfig.paths.studio.musicGeneration,
-    siteConfig.paths.studio.styleRemix,
+    // siteConfig.paths.studio.styleRemix,
     siteConfig.paths.studio.trackSeparation,
     siteConfig.paths.studio.trackAnalysis,
 ];

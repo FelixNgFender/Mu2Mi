@@ -14,7 +14,7 @@ import { trackTableColumnsBuiler } from './track-table-columns';
 const previewPathMap: Record<string, string> = {
     [siteConfig.paths.studio.musicGeneration]:
         siteConfig.paths.studio.preview.track,
-    [siteConfig.paths.studio.styleRemix]: siteConfig.paths.studio.preview.track,
+    // [siteConfig.paths.studio.styleRemix]: siteConfig.paths.studio.preview.track,
     [siteConfig.paths.studio.trackSeparation]:
         siteConfig.paths.studio.preview.track,
     [siteConfig.paths.studio.trackAnalysis]:

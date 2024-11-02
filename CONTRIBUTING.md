@@ -52,9 +52,9 @@ Follow the following steps to ensure your contribution goes smoothly.
 
 #### Prerequisites
 
-- Node.js v21.6.1
-- Docker
-- Docker Compose
+-   Node.js v21.6.1
+-   Docker
+-   Docker Compose
 
 #### Setting Up Your Development Environment
 
@@ -67,7 +67,7 @@ Mu2Mi is built with Next.js, PostgreSQL, Minio, and Redis. The development envir
 cp .env.example .env
 ```
 
-3. Run `make up` to start the development environment. *Quick tip: The `Makefile` and `compose.yaml` files are used to manage the development environment and contain other useful commands*.
+3. Run `make up` to start the development environment. _Quick tip: The `Makefile` and `compose.yaml` files are used to manage the development environment and contain other useful commands_.
 4. Run `npm i` to install the project dependencies.
 5. Run `npm run dev` to start the development server.
 6. Visit `http://localhost:3000` in your browser to view the application.
@@ -80,16 +80,16 @@ To test out track processing functionality that uses Replicate service, you will
 
 -   3000 (Next.js)
 -   9000 (Minio)
-  
-Once the tunnels are set up, update these variables in your `.env`: 
 
-- `PROTOCOL` to `https`
-- `HOST` to the Next.js tunnel URL
-- `APP_PORT` to `443` for `https` connection
-- `S3_ENDPOINT` to the Minio tunnel URL
-- `S3_PORT` to `443` for `https` connection
-- `S3_USE_SSL` to `true` for `https` connection
- 
+Once the tunnels are set up, update these variables in your `.env`:
+
+-   `PROTOCOL` to `https`
+-   `HOST` to the Next.js tunnel URL
+-   `APP_PORT` to `443` for `https` connection
+-   `S3_ENDPOINT` to the Minio tunnel URL
+-   `S3_PORT` to `443` for `https` connection
+-   `S3_USE_SSL` to `true` for `https` connection
+
 You may also need to restart the Next.js server to apply the changes.
 
 ### Codebase Overview

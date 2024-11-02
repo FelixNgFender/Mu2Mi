@@ -10,7 +10,7 @@ export const siteConfig = {
         api: {
             webhook: {
                 generation: '/api/webhook/generation',
-                remix: '/api/webhook/remix',
+                // remix: '/api/webhook/remix',
                 separation: '/api/webhook/separation',
                 analysis: '/api/webhook/analysis',
                 midi: '/api/webhook/midi',
@@ -39,8 +39,8 @@ export const siteConfig = {
             home: '/studio',
             musicGeneration: '/studio',
             newMusicGeneration: '/studio/new',
-            styleRemix: '/studio/remix',
-            newStyleRemix: '/studio/remix/new',
+            // styleRemix: '/studio/remix',
+            // newStyleRemix: '/studio/remix/new',
             trackSeparation: '/studio/separation',
             newTrackSeparation: '/studio/separation/new',
             trackAnalysis: '/studio/analysis',
